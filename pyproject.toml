@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "biblioteca-digital-logistica-publica"
 version = "0.1.0"
@@ -23,6 +27,12 @@ ai = [
     "openai>=1.50",
     "tenacity>=9.0",
 ]
+
+# Aplicação Django (executada via Docker / manage.py), não uma biblioteca a empacotar.
+# Declara explicitamente que não há pacotes a descobrir, evitando o erro de
+# "multiple top-level packages discovered in a flat-layout" e habilitando `pip install -e .`.
+[tool.setuptools]
+py-modules = []
 
 [tool.ruff]
 line-length = 120
