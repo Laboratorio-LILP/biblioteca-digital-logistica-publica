@@ -222,3 +222,7 @@ backup_*.sql
 # Dados de migração temporários
 migration/output/
 migration/*.log
+
+# Claude Code — estado local da máquina (não versionar)
+.claude/settings.local.json
+.claude/worktrees/
