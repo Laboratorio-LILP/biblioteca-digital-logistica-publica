@@ -1,0 +1,43 @@
+{% comment %}
+DocCard — card de documento fiel ao protótipo do Eduardo (Next.js).
+Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de Informação).
+{% endcomment %}
+{% load catalog_tags %}
+{% colecao_visual doc as cv %}
+<a class="sp-card doc-card" href="{% url 'catalog:document_detail' doc.code %}">
+  <div class="doc-card__top">
+    <span class="doc-card__type {{ cv.color }}">
+      <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
+      {% if cv.tipo_nome %}{{ cv.tipo_nome }}{% else %}{{ cv.nome }}{% endif %}
+    </span>
+    {% if doc.ano %}<span class="doc-card__year">{{ doc.ano }}</span>{% endif %}
+  </div>
+
+  <div>
+    <h3 class="doc-card__title">{{ doc.title }}</h3>
+    {% if doc.abstract %}<p class="doc-card__resumo">{{ doc.abstract }}</p>{% endif %}
+  </div>
+
+  <div class="doc-card__foot">
+    {% with primary=doc|primary_author %}
+    {% if primary %}
+    <div class="doc-card__author">
+      <svg class="fi" aria-hidden="true"><use href="#fi-user"/></svg>
+      <span>{{ primary }}{% with n=doc|extra_authors %}{% if n %}<span class="muted"> + {{ n }} autor(es)</span>{% endif %}{% endwith %}</span>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% if doc.keywords or doc.permissao == 'Restrito' %}
+    <div class="doc-card__tags">
+      {% for kw in doc.keywords|split_keywords|slice:":3" %}<span class="doc-card__tag">{{ kw }}</span>{% endfor %}
+      {% if doc.permissao == 'Restrito' %}<span class="doc-card__restrito"><svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>Restrito</span>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="doc-card__bottom">
+      {% with a=doc|assunto_nome %}<span class="doc-card__assunto">{% if a %}{{ a }}{% else %}{{ cv.nome }}{% endif %}</span>{% endwith %}
+      <span class="doc-card__ver">Ver documento <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></span>
+    </div>
+  </div>
+</a>

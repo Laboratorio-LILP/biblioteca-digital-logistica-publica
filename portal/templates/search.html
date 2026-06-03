@@ -1,175 +1,156 @@
 {% extends "base.html" %}
-{% load catalog_tags %}
-{% load static %}
+{% load static catalog_tags %}
 
 {% block title %}{% if query %}{{ query }} — busca{% else %}Acervo{% endif %} — Biblioteca Digital de Logística Pública{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/acervo-filters.css' %}">
-{% endblock %}
-
-{% block content %}
-<article class="sp-pagina-legal sp-busca acervo-page">
-  <header class="sp-pagina-legal__cabecalho">
-    <h1>Acervo</h1>
-    <p class="sp-pagina-legal__intro">
-      Pesquise por título, autor, palavras-chave ou refine usando os filtros à esquerda.
-      Os filtros são facetados — só aparecem opções com resultados disponíveis.
-    </p>
-  </header>
-
-  <form action="{% url 'catalog:search' %}" method="get" id="acervo-form" class="acervo-form">
-    <button type="button" class="acervo-mobile-toggle" aria-controls="acervo-sidebar" aria-expanded="false">
-      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
-      <span>Filtros</span>
-      <span class="filter-badge" id="filter-active-count" {% if not filters %}hidden{% endif %}>{{ filters|length }}</span>
-    </button>
-
-    <aside id="acervo-sidebar" class="acervo-sidebar" aria-label="Filtros do acervo">
-      <div class="acervo-sidebar__header">
-        <label for="busca-acervo" class="sr-only">Termos da busca</label>
-        <input type="search" id="busca-acervo" name="q" value="{{ query }}"
-               placeholder="Buscar por título, autor, palavras-chave..." class="search-input">
-        <button type="submit" class="btn btn-primary">Buscar</button>
+{% block content_raw %}
+<form id="acervo-form" action="{% url 'catalog:search' %}" method="get">
+  <section class="catalog-hero">
+    <div class="sp-container catalog-hero__inner">
+      <div class="catalog-hero__crumb">Biblioteca Digital de Logística Pública / Consulta</div>
+      <div class="catalog-hero__grid">
+        <div>
+          <span class="eyebrow">Acervo</span>
+          <h1>Pesquisa institucional</h1>
+          <p>Consulte jurisprudência, trabalhos acadêmicos, doutrina, conteúdo técnico e materiais
+             de capacitação sobre logística pública, licitações e gestão de suprimentos.</p>
+        </div>
+        <div class="searchbar">
+          <span class="searchbar__field">
+            <label class="sr-only" for="sp-busca">Buscar no acervo</label>
+            <svg class="fi searchbar__icon" aria-hidden="true"><use href="#fi-search"/></svg>
+            <input id="sp-busca" name="q" type="search" value="{{ query }}" placeholder="Buscar no acervo">
+          </span>
+          <button class="sp-button-primary searchbar__submit" type="submit"><svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg> Buscar</button>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <div class="acervo-sidebar__actions">
-        <span class="filters-summary">
-          {% if filters %}
-            {{ filters|length }} {{ filters|length|pluralize_pt:"filtro" }} {{ filters|length|pluralize_pt:"ativo" }}
-          {% else %}
-            Nenhum filtro ativo
-          {% endif %}
+  <nav class="breadcrumb-bar" aria-label="Você está em">
+    <div class="sp-container breadcrumb">
+      <a href="{% url 'catalog:home' %}">Início</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <span>Acervo</span>
+    </div>
+  </nav>
+
+  <div class="sp-container acervo-layout">
+    <aside id="acervo-sidebar" class="sp-panel filter-panel" aria-label="Filtros do acervo">
+      <div class="filter-panel__head">
+        <span class="filter-panel__head-title">
+          <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
+          <h2>Filtros</h2>
         </span>
-        {% if filters or query %}
-        <a href="{% url 'catalog:search' %}" class="btn-clear">Limpar todos</a>
+        {% if filters %}
+        <a class="clear-btn" href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}"><svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg> Limpar {{ filters|length }}</a>
         {% endif %}
       </div>
 
-      {# === HIERARQUIA TAXONÔMICA EM CASCATA === #}
-      <details class="facet-group" open>
-        <summary>Assunto</summary>
-        {% include "_partials/_facet_list.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
-      </details>
+      {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto #}
+      <section class="side-section">
+        <h3>Coleção</h3>
+        {% include "_partials/_facet_options.html" with facet=facets.colecoes_v6 param="colecao_v6" current=filters.colecao_v6 %}
+      </section>
 
-      <details class="facet-group" open>
-        <summary>Categoria</summary>
-        {% include "_partials/_facet_list.html" with facet=facets.categorias param="category_id" current=filters.category_id %}
-      </details>
+      <section class="side-section">
+        <h3>Categorias</h3>
+        {% include "_partials/_facet_options.html" with facet=facets.categorias param="category_id" current=filters.category_id %}
+        {% if filters.category_id and facets.subcategorias %}
+        <p class="nested-label">Subcategorias</p>
+        {% include "_partials/_facet_options.html" with facet=facets.subcategorias param="subcategoria_id" current=filters.subcategoria_id %}
+        {% endif %}
+        {% if filters.subcategoria_id and facets.microcategorias %}
+        <p class="nested-label">Microcategorias</p>
+        {% include "_partials/_facet_options.html" with facet=facets.microcategorias param="microcategoria_id" current=filters.microcategoria_id %}
+        {% endif %}
+      </section>
 
-      <details class="facet-group" {% if filters.category_id or filters.subcategoria_id %}open{% endif %}>
-        <summary>Subcategoria</summary>
-        {% include "_partials/_facet_list.html" with facet=facets.subcategorias param="subcategoria_id" current=filters.subcategoria_id empty_msg="Selecione uma Categoria para ver as subcategorias." %}
-      </details>
+      <section class="side-section">
+        <h3>Natureza</h3>
+        {% include "_partials/_facet_options.html" with facet=facets.naturezas param="natureza" current=filters.natureza empty_msg="Sem materiais classificados por natureza ainda." %}
+      </section>
 
-      <details class="facet-group" {% if filters.subcategoria_id or filters.microcategoria_id %}open{% endif %}>
-        <summary>Microcategoria</summary>
-        {% include "_partials/_facet_list.html" with facet=facets.microcategorias param="microcategoria_id" current=filters.microcategoria_id empty_msg="Selecione uma Subcategoria para ver as microcategorias." %}
-      </details>
+      <section class="side-section">
+        <h3>Assunto</h3>
+        {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
+      </section>
 
-      {# === FILTRO DE ANO (RANGE SLIDER) === #}
-      <details class="facet-group">
-        <summary>Ano de publicação</summary>
-        <div class="year-range" data-min="{{ facets.ano_bounds.min }}" data-max="{{ facets.ano_bounds.max }}">
-          <div class="year-inputs">
-            <label>
-              <span>De</span>
-              <input type="number" name="ano_min" id="ano_min"
-                     min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
-                     value="{{ filters.ano_min|default:facets.ano_bounds.min }}"
-                     inputmode="numeric">
-            </label>
-            <label>
-              <span>Até</span>
-              <input type="number" name="ano_max" id="ano_max"
-                     min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
-                     value="{{ filters.ano_max|default:facets.ano_bounds.max }}"
-                     inputmode="numeric">
-            </label>
+      <section class="side-section">
+        <h3>Tipo de informação</h3>
+        {% for grp in facets.tipos_por_colecao %}
+        <details class="filter-group">
+          <summary>{{ grp.colecao }}</summary>
+          <div class="filter-group__body">
+            {% include "_partials/_facet_options.html" with facet=grp.tipos param="typeinform_id" current=filters.typeinform_id %}
           </div>
-          <div class="year-slider" aria-label="Faixa de anos">
-            <div class="year-track" aria-hidden="true">
-              <div class="year-track-fill"></div>
-            </div>
-            <input type="range" class="year-handle year-handle-min"
-                   min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
-                   value="{{ filters.ano_min|default:facets.ano_bounds.min }}"
-                   aria-label="Ano mínimo">
-            <input type="range" class="year-handle year-handle-max"
-                   min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
-                   value="{{ filters.ano_max|default:facets.ano_bounds.max }}"
-                   aria-label="Ano máximo">
-          </div>
-        </div>
-      </details>
+        </details>
+        {% empty %}
+        <p class="facet-empty">Nenhum tipo com resultados.</p>
+        {% endfor %}
+      </section>
 
-      {# === FILTROS SECUNDÁRIOS === #}
-      <details class="facet-group">
-        <summary>Coleção</summary>
-        {% include "_partials/_facet_list.html" with facet=facets.colecoes param="topic_id" current=filters.topic_id %}
-      </details>
-
-      <details class="facet-group">
-        <summary>Tipo de informação</summary>
-        {% include "_partials/_facet_list.html" with facet=facets.tipos_informacao param="typeinform_id" current=filters.typeinform_id %}
-      </details>
-
-      <button type="submit" class="btn btn-primary btn-apply">Aplicar filtros</button>
+      <button type="submit" class="sp-button-primary btn-apply">Aplicar filtros</button>
     </aside>
 
-    <main class="acervo-results" aria-label="Resultados da busca">
+    <div class="acervo-results">
+      <div class="sp-panel results-bar">
+        <div class="results-bar__left">
+          <span class="results-bar__icon"><svg class="fi" aria-hidden="true"><use href="#fi-filter"/></svg></span>
+          <div>
+            <div class="results-bar__hint">Resultados encontrados</div>
+            <div class="results-bar__count" aria-live="polite">{{ total_results }} {{ total_results|pluralize_pt:"documento" }}</div>
+          </div>
+        </div>
+        <label class="results-bar__sort">Ordenar por
+          <select name="sort">
+            <option value="">Relevância</option>
+            <option value="recente"{% if sort == 'recente' %} selected{% endif %}>Mais recente</option>
+            <option value="autor"{% if sort == 'autor' %} selected{% endif %}>Autor</option>
+            <option value="titulo"{% if sort == 'titulo' %} selected{% endif %}>Título (A–Z)</option>
+            <option value="ano"{% if sort == 'ano' %} selected{% endif %}>Ano</option>
+          </select>
+        </label>
+      </div>
+
       {% if query %}
-      <p class="results-count">
-        <strong>{{ total_results }}</strong> {{ total_results|pluralize_pt:"resultado" }}
-        para <em>“{{ query }}”</em>
-      </p>
-      {% else %}
-      <p class="results-count"><strong>{{ total_results }}</strong> {{ total_results|pluralize_pt:"material" }} no acervo</p>
+      <p class="query-indicator">Pesquisa por <strong>“{{ query }}”</strong></p>
       {% endif %}
 
-      {% for doc in page_obj %}
-      <article class="result-item">
-        <h3><a href="{% url 'catalog:document_detail' doc.code %}">{{ doc.title }}</a></h3>
-        <p class="result-meta">
-          {% if doc.autor_principal %}{{ doc.autor_principal }}{% endif %}
-          {% if doc.source and not doc.source|is_year_only %} — {{ doc.source }}{% endif %}
-          {% if doc.ano %} — {{ doc.ano }}{% endif %}
-          {% with assunto=doc.assunto %}
-          {% if assunto %}<span class="badge badge-assunto">{{ assunto.nome }}</span>{% endif %}
-          {% endwith %}
-          {% if doc.category %}<span class="badge badge-categoria">{{ doc.category.name }}</span>{% endif %}
-        </p>
-        {% if doc.abstract %}
-        <p class="result-abstract">{{ doc.abstract|truncate_words_html:30 }}</p>
-        {% endif %}
-        {% if doc.keywords %}
-        <div class="result-keywords">
-          {% for kw in doc.keywords|split_keywords %}
-          <span class="tag">{{ kw }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-      </article>
-      {% empty %}
-      <p class="no-results">Nenhum resultado encontrado para os filtros aplicados.
-        {% if filters %}<a href="{% url 'catalog:search' %}">Limpar filtros</a>{% endif %}
-      </p>
-      {% endfor %}
+      {% if page_obj.object_list %}
+      <div class="doc-grid">
+        {% for doc in page_obj %}{% include "_partials/_doc_card.html" %}{% endfor %}
+      </div>
+      {% else %}
+      <div class="sp-panel empty-state">
+        <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
+        <strong>Nenhum documento encontrado</strong>
+        <p>Tente outros filtros ou termos de pesquisa para ampliar a busca.{% if filters or query %} <a href="{% url 'catalog:search' %}">Limpar tudo</a>{% endif %}</p>
+      </div>
+      {% endif %}
 
       {% if page_obj.has_other_pages %}
       <nav class="pagination" aria-label="Paginação dos resultados">
         {% if page_obj.has_previous %}
-        <a href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}" class="btn btn-sm">&laquo; Anterior</a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}" aria-label="Página anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>
+        {% else %}
+        <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-left"/></svg></span>
         {% endif %}
-        <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% for num in page_obj.paginator.page_range %}
+          {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}"{% if num == page_obj.number %} aria-current="page"{% endif %}>{{ num }}</a>
+          {% endif %}
+        {% endfor %}
         {% if page_obj.has_next %}
-        <a href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}" class="btn btn-sm">Próxima &raquo;</a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}" aria-label="Próxima página"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>
+        {% else %}
+        <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-right"/></svg></span>
         {% endif %}
       </nav>
       {% endif %}
-    </main>
-  </form>
-</article>
+    </div>
+  </div>
+</form>
 {% endblock %}
 
 {% block extra_js %}

@@ -16,6 +16,7 @@ from .models import (
     TypeInformation,
 )
 from .search import _apply_filters
+from .taxonomy_v6 import COLECOES_V6, colecao_v6_for_tipo
 
 
 def _facet_counts(filters, exclude_key, group_by):
@@ -57,12 +58,63 @@ def _string_facet(filters, exclude_key, field):
         .annotate(count=Count("id"))
         .order_by("-count")
     )
-    return [{"value": r[field], "nome": r[field], "count": r["count"]} for r in rows]
+    # `id` espelha `value` para uniformizar com as facetas de modelo
+    # (o template usa sempre opt.id como valor do checkbox).
+    return [{"id": r[field], "value": r[field], "nome": r[field], "count": r["count"]} for r in rows]
+
+
+def _colecao_v6_facet(filters):
+    """Contagem por Coleção v6 (derivada do Tipo de Informação), faceta-aware."""
+    f = {k: v for k, v in (filters or {}).items() if k != "colecao_v6"}
+    qs = Document.objects.filter(status="a")
+    qs = _apply_filters(qs, f)
+    rows = (
+        qs.exclude(typeinform_id__isnull=True)
+        .values("typeinform_id")
+        .annotate(count=Count("id"))
+    )
+    type_names = {ti.id: ti.name for ti in TypeInformation.objects.all()}
+    counts = {c["nome"]: 0 for c in COLECOES_V6}
+    for r in rows:
+        nome = colecao_v6_for_tipo(type_names.get(r["typeinform_id"]))["nome"]
+        counts[nome] += r["count"]
+    return [
+        {
+            "id": c["slug"], "nome": c["nome"], "count": counts[c["nome"]],
+            "icon": c["icon"], "color": c["color"],
+        }
+        for c in COLECOES_V6
+    ]
+
+
+def colecao_v6_overview():
+    """As 4 coleções v6 com contagem total — usada na home e na página de coleções."""
+    return _colecao_v6_facet(None)
+
+
+def _tipos_por_colecao_facet(filters):
+    """Tipo de Informação agrupado por Coleção v6 (só tipos com resultados)."""
+    flat = _attach_names(
+        list(_facet_counts(filters, "typeinform_id", "typeinform_id")),
+        "typeinform_id", TypeInformation, label_field="name",
+    )
+    by_col = {c["nome"]: [] for c in COLECOES_V6}
+    for t in flat:
+        nome = colecao_v6_for_tipo(t["nome"])["nome"]
+        by_col[nome].append(t)
+    return [
+        {"colecao": c["nome"], "tipos": by_col[c["nome"]]}
+        for c in COLECOES_V6 if by_col[c["nome"]]
+    ]
 
 
 def compute_facets(filters):
     """Devolve um dict com as facetas disponíveis dado o conjunto de filtros aplicado."""
     facets = {}
+
+    # Coleção v6 (derivada do Tipo de Informação)
+    facets["colecoes_v6"] = _colecao_v6_facet(filters)
+    facets["tipos_por_colecao"] = _tipos_por_colecao_facet(filters)
 
     # Hierarquia taxonômica
     facets["assuntos"] = _attach_names(
@@ -93,8 +145,8 @@ def compute_facets(filters):
         label_field="name",
     )
 
-    # Atributos string
-    facets["tipologias"] = _string_facet(filters, "tipologia", "tipologia")
+    # Natureza (objeto da contratação, v6) e demais atributos string
+    facets["naturezas"] = _string_facet(filters, "natureza", "natureza")
     facets["complexidades"] = _string_facet(filters, "complexidade", "complexidade")
     facets["permissoes"] = _string_facet(filters, "permissao", "permissao")
 

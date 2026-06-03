@@ -160,6 +160,18 @@ class Microcategoria(models.Model):
         return None
 
 
+# Natureza do objeto da contratação — taxonomia v6 (5 valores canônicos, §7).
+# Obrigatória na captura/curadoria; nullable no schema para não quebrar os
+# registros legados até o de-para v5→v6 (P2).
+NATUREZA_CHOICES = [
+    ("Contratação de Materiais", "Contratação de Materiais"),
+    ("Contratação de Obras e Serviços de Engenharia", "Contratação de Obras e Serviços de Engenharia"),
+    ("Contratação de Serviços", "Contratação de Serviços"),
+    ("Contratação de TIC", "Contratação de TIC"),
+    ("Não se aplica", "Não se aplica"),
+]
+
+
 class Document(models.Model):
     """Documento digital — mapeia tabela 'nr_document' do Nou-Rau."""
 
@@ -216,7 +228,9 @@ class Document(models.Model):
     dados_pesquisa = models.CharField(max_length=800, blank=True)
 
     # Campos customizados SGGD/LILP
-    tipologia = models.CharField(max_length=255, blank=True)
+    # Tipologia foi removida do modelo na taxonomia v6. A coluna física
+    # `tipologia` é preservada no banco para o de-para v5→v6 (ver
+    # docker/postgres/init/07-natureza.sql); apenas não é mais mapeada aqui.
     etapa_processo_licitatorio = models.CharField(max_length=255, blank=True)
     complexidade = models.CharField(max_length=50, blank=True)
     uso_futuro = models.TextField(blank=True)
@@ -232,6 +246,8 @@ class Document(models.Model):
     ano = models.IntegerField(null=True, blank=True)
     PERMISSAO_CHOICES = [("Aberto", "Aberto"), ("Restrito", "Restrito")]
     permissao = models.CharField(max_length=20, blank=True, choices=PERMISSAO_CHOICES)
+    # Natureza do objeto da contratação (v6, obrigatória na captura)
+    natureza = models.CharField(max_length=80, blank=True, choices=NATUREZA_CHOICES)
 
     class Meta:
         managed = False

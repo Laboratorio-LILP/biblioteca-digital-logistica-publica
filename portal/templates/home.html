@@ -3,122 +3,105 @@
 
 {% block title %}Início — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 
-{% block content %}
-<section class="hero hero--photo" aria-labelledby="hero-titulo"
-         style="background-image: linear-gradient(rgba(189, 14, 21, 0.22), rgba(189, 14, 21, 0.22)), url('{% static 'img/bsp-foto.jpg' %}');">
-    <div class="hero__interior">
-        <h1 id="hero-titulo">Pesquise na Biblioteca Digital de Logística Pública</h1>
-        <p>Repositório temático sobre licitações, contratos administrativos e logística pública do Estado de São Paulo</p>
-        <form action="{% url 'catalog:search' %}" method="get" class="search-form-hero" role="search" aria-label="Busca rápida no acervo">
-            <label for="hero-q" class="sr-only">Termos da busca</label>
-            <input type="text" id="hero-q" name="q" placeholder="Buscar por título, autor, palavras-chave..." class="search-input-hero" autofocus>
-            <button type="submit" class="btn btn-primary btn-hero">Buscar</button>
-        </form>
+{% block content_raw %}
+<section class="hero">
+  <div class="hero__pattern sp-pattern" aria-hidden="true"></div>
+  <div class="sp-container hero__inner">
+    <div class="hero__badge"><svg class="fi" aria-hidden="true"><use href="#fi-award"/></svg> Plataforma oficial de conhecimento e inovação pública</div>
+    <h1>Biblioteca Digital de Logística Pública</h1>
+    <p class="hero__copy">
+      Acervo institucional de jurisprudência, trabalhos acadêmicos, doutrina, conteúdo técnico
+      e materiais de capacitação para apoiar contratações públicas, governança e gestão de
+      suprimentos no Estado de São Paulo.
+    </p>
+
+    <form class="searchbar searchbar--lg hero__search" action="{% url 'catalog:search' %}" method="get" role="search">
+      <span class="searchbar__field">
+        <label class="sr-only" for="sp-busca">Buscar no acervo</label>
+        <svg class="fi searchbar__icon" aria-hidden="true"><use href="#fi-search"/></svg>
+        <input id="sp-busca" name="q" type="search" placeholder="Buscar no acervo">
+      </span>
+      <button class="sp-button-primary searchbar__submit" type="submit"><svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg> Buscar</button>
+    </form>
+
+    <div class="hero__tags" aria-label="Atalhos de busca">
+      {% if artigos_id %}
+      <a class="tag active" href="{% url 'catalog:search' %}?typeinform_id={{ artigos_id }}">Artigos</a>
+      {% else %}
+      <a class="tag active" href="{% url 'catalog:search' %}?q=artigo">Artigos</a>
+      {% endif %}
+      <a class="tag" href="{% url 'catalog:search' %}?q=Contrata%C3%A7%C3%A3o+Direta">Contratação Direta</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Preg%C3%A3o">Pregão</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Registro+de+Pre%C3%A7os">Registro de Preços</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=ODS">ODS</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=TCE">TCE</a>
     </div>
-</section>
 
-<section class="sp-stats" aria-label="Estatísticas do acervo">
-    <ul class="sp-stats__lista">
-        <li class="sp-stats__item">
-            <strong class="sp-stats__numero">{{ total_docs }}</strong>
-            <span class="sp-stats__rotulo">materiais no acervo</span>
-        </li>
-        <li class="sp-stats__item">
-            <strong class="sp-stats__numero">{{ tipos_distintos }}</strong>
-            <span class="sp-stats__rotulo">modalidades de material</span>
-            {% if tipos_top %}
-            <span class="sp-stats__detalhe">
-                {% for t in tipos_top %}{{ t.nome }} ({{ t.count }}){% if not forloop.last %} · {% endif %}{% endfor %}
-            </span>
-            {% endif %}
-        </li>
-        <li class="sp-stats__item">
-            <strong class="sp-stats__numero">{{ cobertura.assuntos }}</strong>
-            <span class="sp-stats__rotulo">assuntos temáticos</span>
-            <span class="sp-stats__detalhe">
-                {{ cobertura.macroetapas }} macroetapas · {{ cobertura.subcategorias }} subcategorias
-            </span>
-        </li>
-        <li class="sp-stats__item">
-            <strong class="sp-stats__numero">{{ pct_aberto }}%</strong>
-            <span class="sp-stats__rotulo">acesso aberto</span>
-            <span class="sp-stats__detalhe">disponíveis sem cadastro</span>
-        </li>
-    </ul>
-</section>
-
-<section class="sp-acesso-rapido" aria-labelledby="acesso-rapido-titulo">
-    <h2 id="acesso-rapido-titulo">Acesso rápido</h2>
-    <div class="grid grid-4 sp-acesso-rapido__grid">
-        <a href="{% url 'catalog:search' %}" class="card sp-card-acesso">
-            <span class="sp-card-acesso__icone" aria-hidden="true">
-                <svg class="sp-icon" focusable="false"><use href="#icon-busca"/></svg>
-            </span>
-            <h3>Buscar no acervo</h3>
-            <p>Pesquise por título, autor ou palavras-chave em todo o catálogo.</p>
-        </a>
-        <a href="{% url 'catalog:collection_list' %}" class="card sp-card-acesso">
-            <span class="sp-card-acesso__icone" aria-hidden="true">
-                <svg class="sp-icon" focusable="false"><use href="#icon-menu"/></svg>
-            </span>
-            <h3>Coleções</h3>
-            <p>Navegue pelos eixos temáticos do acervo: eventos, livros, materiais e teses.</p>
-        </a>
-        <a href="{% url 'catalog:search' %}?ano_min=2026&amp;ano_max=2026" class="card sp-card-acesso">
-            <span class="sp-card-acesso__icone" aria-hidden="true">
-                <svg class="sp-icon" focusable="false"><use href="#icon-calendario"/></svg>
-            </span>
-            <h3>Pesquisas recentes</h3>
-            <p>Materiais publicados em 2026 — produção mais atual do acervo.</p>
-        </a>
-        <a href="{% url 'catalog:search' %}?q=14.133" class="card sp-card-acesso">
-            <span class="sp-card-acesso__icone" aria-hidden="true">
-                <svg class="sp-icon" focusable="false"><use href="#icon-balanca"/></svg>
-            </span>
-            <h3>Lei 14.133/2021</h3>
-            <p>Materiais sobre a Nova Lei de Licitações e Contratos Administrativos.</p>
-        </a>
+    <div class="hero__geometry">
+      <div class="sp-geometry" aria-hidden="true">
+        <span class="blk blk-red"></span><span class="blk blk-blue"></span>
+        <span class="blk blk-black"></span><span class="blk blk-cyan"></span>
+      </div>
     </div>
+  </div>
 </section>
 
-<section class="collections-grid" aria-labelledby="colecoes-titulo">
-    <h2 id="colecoes-titulo">Coleções</h2>
-    <div class="grid grid-4">
-        {% for item in collections %}
-        <a href="{% url 'catalog:collection_detail' item.topic.id %}" class="card">
-            <h3>{{ item.topic.name }}</h3>
-            {% if item.topic.description %}<p>{{ item.topic.description }}</p>{% endif %}
-            <p class="collection-count">{{ item.doc_count }} {{ item.doc_count|pluralize_pt:"documento" }}</p>
-        </a>
-        {% endfor %}
+<section class="stats" aria-label="Indicadores do acervo">
+  <div class="sp-container stats-grid">
+    <div class="stat"><div class="stat__value">{{ total_docs }}</div><div class="stat__label">Documentos catalogados</div></div>
+    <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções curatoriais</div></div>
+    <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Áreas temáticas</div></div>
+    <div class="stat"><div class="stat__value">{{ pct_aberto }}%</div><div class="stat__label">Em acesso aberto</div></div>
+  </div>
+</section>
+
+<section class="sp-section">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Explorar o acervo</span>
+        <h2>Coleções organizadas para a tomada de decisão pública</h2>
+      </div>
+      <a class="sp-button-secondary" href="{% url 'catalog:collection_list' %}">Consultar acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
+    <div class="collections-grid">
+      {% for c in colecoes_v6 %}
+      <a class="sp-card collection-card" href="{% url 'catalog:search' %}?colecao_v6={{ c.id }}">
+        <span class="collection-card__icon {{ c.color }}"><svg class="fi" aria-hidden="true"><use href="#{{ c.icon }}"/></svg></span>
+        <span>
+          <span class="collection-card__label">{{ c.nome }}</span>
+          <span class="collection-card__count">{{ c.count }} {{ c.count|pluralize_pt:"documento" }}</span>
+        </span>
+        <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+      </a>
+      {% endfor %}
+      <a class="sp-card collection-card" href="{% url 'catalog:search' %}?q=Aspectos+Jur%C3%ADdicos">
+        <span class="collection-card__icon c-bluedark"><svg class="fi" aria-hidden="true"><use href="#fi-shield"/></svg></span>
+        <span><span class="collection-card__label">Aspectos Jurídicos</span><span class="collection-card__count">Buscar no acervo</span></span>
+        <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+      </a>
+      <a class="sp-card collection-card" href="{% url 'catalog:search' %}?q=Sustentabilidade">
+        <span class="collection-card__icon c-green"><svg class="fi" aria-hidden="true"><use href="#fi-trending-up"/></svg></span>
+        <span><span class="collection-card__label">Sustentabilidade e ODS</span><span class="collection-card__count">Buscar no acervo</span></span>
+        <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+      </a>
+    </div>
+  </div>
 </section>
 
-<section class="recent-docs" aria-labelledby="recentes-titulo">
-    <h2 id="recentes-titulo">Adições recentes</h2>
-    {% for doc in recent_docs %}
-    <article class="result-item">
-        <h3><a href="{% url 'catalog:document_detail' doc.code %}">{{ doc.title }}</a></h3>
-        <p class="result-meta">
-            {% if doc.autor_principal %}{{ doc.autor_principal }}{% endif %}
-            {% if doc.source and not doc.source|is_year_only %} — {{ doc.source }}{% endif %}
-            {% if doc.ano %} — {{ doc.ano }}{% endif %}
-            {% with assunto=doc.assunto %}
-            {% if assunto %}<span class="badge badge-assunto">{{ assunto.nome }}</span>{% endif %}
-            {% endwith %}
-            {% if doc.category %}<span class="badge badge-categoria">{{ doc.category.name }}</span>{% endif %}
-        </p>
-        {% if doc.abstract %}
-        <p class="result-abstract">{{ doc.abstract|truncate_words_html:30 }}</p>
-        {% endif %}
-        {% if doc.keywords %}
-        <div class="result-keywords">
-            {% for kw in doc.keywords|split_keywords %}
-            <span class="tag">{{ kw }}</span>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </article>
-    {% endfor %}
+<section class="sp-section sp-section--alt">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Temas em alta</span>
+        <h2>Sustentabilidade e ODS</h2>
+      </div>
+      <a class="sp-button-secondary" href="{% url 'catalog:search' %}?q=Sustentabilidade">Ver tema no acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+    </div>
+    <p class="page__intro">Materiais indicados para apoiar compras públicas sustentáveis, desenvolvimento responsável e inovação aplicada à cadeia de suprimentos.</p>
+    <div class="doc-grid doc-grid--3">
+      {% for doc in trending_docs %}{% include "_partials/_doc_card.html" %}{% endfor %}
+    </div>
+  </div>
 </section>
 {% endblock %}

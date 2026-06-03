@@ -7,31 +7,108 @@
     <meta name="description" content="{% block meta_description %}Repositório digital de produções científicas, técnicas, jurisprudenciais e normativas sobre logística pública, com foco na Lei 14.133/2021. Iniciativa do LILP/SGGD em parceria com o SBU/Unicamp.{% endblock %}">
     <title>{% block title %}Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}</title>
 
-    {# Tipografia oficial — Roboto (web), Verdana (fallback conforme Manual GESP v1.6) #}
+    {# Tipografia do protótipo — Montserrat (títulos/subtítulos); Verdana fallback de corpo #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap">
 
-    {# Folhas de estilo — design system GESP carrega antes para style.css ter precedência #}
-    <link rel="stylesheet" href="{% static 'css/sp-design-system.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/portal.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     {% include "_partials/_icons_sprite.html" %}
+    {% include "_partials/_feather.html" %}
     {% include "_partials/_skip_links.html" %}
-    {% include "_partials/_barra_govsp.html" %}
 
-    {% include "_partials/_header_institucional.html" %}
-    {% include "_partials/_menu_principal.html" %}
-
-    <main id="sp-conteudo" class="main" role="main" tabindex="-1">
-        <div class="container">
-            {% block content %}{% endblock %}
+    {# === Barra do Governo de São Paulo === #}
+    <div class="govbar">
+      <div class="sp-container govbar-inner">
+        <span class="govbar-brand">Governo do Estado de São Paulo</span>
+        <nav class="govbar-links" aria-label="Acesso institucional">
+          <a href="https://www.saopaulo.sp.gov.br/" target="_blank" rel="noopener">Ouvidoria</a>
+          <a href="{% url 'catalog:transparencia' %}">Transparência</a>
+          <a href="{% url 'catalog:transparencia' %}">SIC</a>
+          <a href="{% url 'catalog:transparencia' %}">Acesso à Informação</a>
+        </nav>
+        <div class="govbar-a11y" role="group" aria-label="Controles de acessibilidade">
+          <button type="button" data-a11y-action="font-down" aria-label="Reduzir tamanho do texto" title="Reduzir fonte">A-</button>
+          <button type="button" data-a11y-action="font-up" aria-label="Aumentar tamanho do texto" title="Aumentar fonte">A+</button>
+          <button type="button" data-a11y-action="contrast" aria-pressed="false" aria-label="Alternar alto contraste" title="Alto contraste">◐</button>
         </div>
+      </div>
+    </div>
+
+    {# === Cabeçalho institucional === #}
+    <header class="site-header">
+      <div class="sp-container header-inner">
+        <a class="identity" href="{% url 'catalog:home' %}" aria-label="Página inicial — Biblioteca Digital de Logística Pública">
+          <img class="identity__logo" src="{% static 'img/brand/sp-gov-br-horizontal-rgb.png' %}" alt="SP.GOV.BR — Governo do Estado de São Paulo">
+          <span class="identity__divider" aria-hidden="true"></span>
+          <span class="library-mark">
+            <span class="library-mark__book" aria-hidden="true"><svg class="fi"><use href="#fi-book-open"/></svg></span>
+            <span><span class="library-mark__name">Biblioteca Digital</span><span class="library-mark__sub">Logística Pública</span></span>
+          </span>
+        </a>
+        <nav id="sp-menu" class="primary-nav" aria-label="Navegação principal">
+          <a href="{% url 'catalog:home' %}"{% if current_url_name == 'home' %} class="active" aria-current="page"{% endif %}>Início</a>
+          <a href="{% url 'catalog:search' %}"{% if current_url_name == 'search' %} class="active" aria-current="page"{% endif %}>Acervo</a>
+          <a href="{% url 'catalog:collection_list' %}"{% if current_url_name == 'collection_list' or current_url_name == 'collection_detail' %} class="active" aria-current="page"{% endif %}>Coleções</a>
+          <a href="{% url 'catalog:about' %}"{% if current_url_name == 'about' %} class="active" aria-current="page"{% endif %}>Sobre</a>
+        </nav>
+      </div>
+      <div class="state-stripe" aria-hidden="true"></div>
+    </header>
+
+    <main id="sp-conteudo" tabindex="-1">
+      {% block content_raw %}
+      <div class="sp-container page">
+        {% block content %}{% endblock %}
+      </div>
+      {% endblock %}
     </main>
 
-    {% include "_partials/_rodape_institucional.html" %}
+    {# === Rodapé institucional === #}
+    <footer id="sp-rodape" class="site-footer">
+      <div class="footer-stripe" aria-hidden="true"></div>
+      <div class="sp-container footer-grid">
+        <div class="footer-identity">
+          <div class="footer-identity__top">
+            <img class="footer-identity__logo" src="{% static 'img/brand/sp-gov-br-vertical-white.png' %}" alt="SP.GOV.BR — Governo do Estado de São Paulo">
+            <span class="library-mark">
+              <span><span class="library-mark__name">Biblioteca Digital</span><span class="library-mark__sub">Logística Pública</span></span>
+            </span>
+          </div>
+          <p class="footer-identity__desc">
+            Biblioteca Digital de Logística Pública do Governo do Estado de São Paulo —
+            Laboratório de Inovação em Logística Pública (LILP), Secretaria de Gestão e
+            Governo Digital (SGGD). Parceria SBU/Unicamp.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h2>Biblioteca</h2>
+          <ul>
+            <li><a href="{% url 'catalog:search' %}">Acervo</a></li>
+            <li><a href="{% url 'catalog:collection_list' %}">Coleções</a></li>
+            <li><a href="{% url 'catalog:about' %}">Sobre</a></li>
+            <li><a href="{% url 'catalog:mapa_site' %}">Mapa do site</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h2>Institucional</h2>
+          <ul>
+            <li><a href="{% url 'catalog:transparencia' %}">Transparência</a></li>
+            <li><a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a></li>
+            <li><a href="{% url 'catalog:politica_privacidade' %}">Privacidade</a></li>
+            <li><a href="{% url 'catalog:fale_conosco' %}">Contato</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="sp-container footer-bottom">
+        <span>© {{ site_year }} Governo do Estado de São Paulo — SGGD/LILP</span>
+        <span>Biblioteca Digital de Logística Pública</span>
+      </div>
+    </footer>
+
     {% include "_partials/_banner_cookies.html" %}
 
     <script src="{% static 'js/main.js' %}" defer></script>

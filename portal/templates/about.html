@@ -75,20 +75,22 @@
       quatro grandes coleções:
     </p>
     <ul>
-      <li><strong>Eventos</strong> — Documentos provenientes de
-        conferências, seminários, workshops e outros eventos.</li>
-      <li><strong>Livros Digitais</strong> — Livros, e-books e
-        publicações digitalizadas.</li>
-      <li><strong>Materiais Pedagógicos</strong> — Apostilas, manuais,
-        relatórios, tutoriais e vídeos.</li>
-      <li><strong>Trabalhos Acadêmicos</strong> — Dissertações, teses
-        e trabalhos de conclusão de curso.</li>
+      <li><strong>Jurisprudência</strong> — Enunciados, súmulas, boletins
+        e documentos normativos.</li>
+      <li><strong>Trabalhos Acadêmicos</strong> — Teses, dissertações,
+        monografias, TCCs e memoriais.</li>
+      <li><strong>Doutrina e Conteúdo Técnico</strong> — Livros digitais,
+        artigos, notas técnicas, relatórios, textos de discussão e resumos.</li>
+      <li><strong>Instrução e Capacitação</strong> — Manuais, guias,
+        tutoriais, apostilas, aulas, cursos, vídeos e slides.</li>
     </ul>
     <p>
-      Os documentos são classificados também por tipologia
-      (administrativo, informacional, jurisprudencial, normativo,
-      operacional), etapa do processo licitatório e nível de
-      complexidade — permitindo busca facetada precisa.
+      A classificação segue a taxonomia v6: <strong>Coleção</strong>,
+      <strong>Tipo de Informação</strong>, <strong>Assunto</strong>,
+      <strong>Natureza</strong> (objeto da contratação) e
+      <strong>Categoria</strong> — com subcategoria e microcategoria em
+      cascata, permitindo busca facetada precisa. O nível de
+      <strong>complexidade</strong> é opcional.
     </p>
   </section>
 
@@ -98,7 +100,7 @@
       A camada de gestão do acervo (ingestão, catalogação, aprovação)
       utiliza o sistema <strong>Nou-Rau</strong>, software livre
       desenvolvido pelo SBU/Unicamp. Já o portal público — esta página —
-      é uma aplicação <strong>Django (Python 5.1+)</strong> servida
+      é uma aplicação <strong>Django 5.1 (Python 3.11+)</strong> servida
       por Gunicorn em container Docker, consumindo a base
       PostgreSQL 15 do Nou-Rau em modo somente-leitura.
     </p>

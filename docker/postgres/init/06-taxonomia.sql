@@ -47,6 +47,27 @@ ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS microcategoria_id INT REFERENCE
 ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS ano INT;
 ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS permissao VARCHAR(20);
 
+-- 2.5 Seed dos 14 Assuntos temáticos v8 (eixo paralelo, coluna C da planilha) -
+-- Fonte: aba "Coleção, Assunto e Natureza" de BDLP_Template_Insercao_v8.xlsx.
+-- As subcategorias/microcategorias dependem de nr_category (populada em
+-- 07-categories.sql, que roda DEPOIS deste arquivo) e por isso são semeadas lá.
+INSERT INTO nr_assunto (nome, slug, ordem) VALUES
+    ('Aspectos Jurídicos e Regulatórios', 'aspectos-juridicos-e-regulatorios', 1),
+    ('Catálogo eletrônico de Padronização', 'catalogo-eletronico-de-padronizacao', 2),
+    ('Compras Centralizadas/compartilhadas', 'compras-centralizadas-compartilhadas', 3),
+    ('Controle, Auditoria e Combate à Corrupção', 'controle-auditoria-e-combate-a-corrupcao', 4),
+    ('Gestão de Competências', 'gestao-de-competencias', 5),
+    ('Governança', 'governanca', 6),
+    ('Inovação e Tecnologia', 'inovacao-e-tecnologia', 7),
+    ('Integridade', 'integridade', 8),
+    ('Logística e Gestão de Suprimentos', 'logistica-e-gestao-de-suprimentos', 9),
+    ('Micro e Pequenas Empresas', 'micro-e-pequenas-empresas', 10),
+    ('Sanções Administrativas', 'sancoes-administrativas', 11),
+    ('Sustentabilidade e ODS', 'sustentabilidade-e-ods', 12),
+    ('Transparência', 'transparencia', 13),
+    ('Uso de Sistemas', 'uso-de-sistemas', 14)
+ON CONFLICT (nome) DO NOTHING;
+
 -- 3. Índices para os filtros do Acervo ---------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_nr_document_assunto ON nr_document (assunto_id);
@@ -81,6 +102,5 @@ CREATE INDEX IF NOT EXISTS idx_nr_document_fts ON nr_document
         coalesce(uso_futuro, '') || ' ' ||
         coalesce(metodo, '') || ' ' ||
         coalesce(resultado, '') || ' ' ||
-        coalesce(tipologia, '') || ' ' ||
         coalesce(complexidade, '')
     ));

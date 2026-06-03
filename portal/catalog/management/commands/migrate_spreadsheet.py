@@ -26,6 +26,7 @@ COLUMN_MAP = {
     "Categoria": "categoria",
     "Subcategoria": "subcategoria",
     "Microcategoria": "microcategoria",
+    "Natureza": "natureza",
     "Coleção": "colecao",
     "Tipo de informação": "tipo_informacao",
     "Autor Principal": "author",
@@ -49,6 +50,7 @@ COLUMN_MAP = {
     "Tipologia": "tipologia",
     "Complexidade": "complexidade",
     "Aplicabilidade": "uso_futuro",
+    "Uso Futuro": "uso_futuro",
     "Método": "metodo",
     "Resultados": "resultado",
     "Referências": "referencias",
@@ -198,7 +200,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"\n[{sheet}] Colunas mapeadas: {mapped}/{total_cols}")
                 if missing := set(COLUMN_MAP.values()) - set(col_indices.keys()):
                     # Filtrar opcionais que não existem em todas as abas
-                    optional = {"edicao", "event_description", "nlspi"}
+                    optional = {"edicao", "event_description", "nlspi", "tipologia"}
                     real_missing = missing - optional
                     if real_missing:
                         self.stdout.write(self.style.WARNING(f"  Colunas não encontradas: {real_missing}"))
@@ -225,19 +227,32 @@ class Command(BaseCommand):
                 sheet_errors = []
 
                 for row_num, row in data_rows:
-                    try:
-                        record = self._parse_row(row, col_indices)
-                        if not record.get("title"):
-                            sheet_skipped += 1
-                            continue
+                    record = self._parse_row(row, col_indices)
+                    if not record.get("title"):
+                        sheet_skipped += 1
+                        continue
 
+                    # Savepoint por linha: um registro com erro não aborta a
+                    # transação inteira (sem isto, um erro deixa a transação em
+                    # estado abortado e TODAS as linhas seguintes falhariam com
+                    # InFailedSqlTransaction).
+                    with conn.cursor() as cur:
+                        cur.execute("SAVEPOINT row_sp")
+                    try:
                         topic_id = self._resolve_topic(record, topic_map)
-                        category_id = self._resolve_category(record.get("categoria", ""), category_map)
-                        type_info_id = self._resolve_type_information(
-                            record.get("tipo_informacao", ""), type_info_map
+
+                        # === Roteamento v8 — campos diretos da planilha (sem de-para) ===
+                        type_info_id = self._ensure_type(
+                            conn, record.get("tipo_informacao", ""), type_info_map,
+                            allow_create=not dry_run,
                         )
-                        assunto_id = self._resolve_assunto(
-                            record.get("assunto", ""), assunto_map
+                        categoria_v8 = record.get("categoria", "").strip()
+                        category_id = (
+                            self._resolve_category(categoria_v8, category_map) if categoria_v8 else None
+                        )
+                        assunto_v8 = record.get("assunto", "").strip()
+                        assunto_id = (
+                            self._resolve_assunto(assunto_v8, assunto_map) if assunto_v8 else None
                         )
                         subcategoria_id = self._resolve_subcategoria(
                             record.get("subcategoria", ""), category_id, subcategoria_map
@@ -249,20 +264,22 @@ class Command(BaseCommand):
                         if dry_run:
                             title_preview = record["title"][:80]
                             self.stdout.write(f"  [DRY] #{global_seq} {sheet}/{row_num}: {title_preview}")
-                            sheet_inserted += 1
-                            global_seq += 1
-                            continue
-
-                        code = generate_code(global_seq)
-                        self._insert_document(
-                            conn, record, code,
-                            topic_id, category_id, type_info_id,
-                            assunto_id, subcategoria_id, microcategoria_id,
-                        )
+                        else:
+                            code = generate_code(global_seq)
+                            self._insert_document(
+                                conn, record, code,
+                                topic_id, category_id, type_info_id,
+                                assunto_id, subcategoria_id, microcategoria_id,
+                            )
                         sheet_inserted += 1
                         global_seq += 1
+                        with conn.cursor() as cur:
+                            cur.execute("RELEASE SAVEPOINT row_sp")
 
                     except Exception as e:
+                        with conn.cursor() as cur:
+                            cur.execute("ROLLBACK TO SAVEPOINT row_sp")
+                            cur.execute("RELEASE SAVEPOINT row_sp")
                         sheet_errors.append((sheet, row_num, str(e)))
                         if len(sheet_errors) <= 5:
                             self.stdout.write(self.style.ERROR(f"  ERRO {sheet}/L{row_num}: {e}"))
@@ -325,14 +342,27 @@ class Command(BaseCommand):
         return red_rows
 
     def _map_headers(self, header):
-        """Mapeia cabeçalhos da planilha para campos internos com tolerância a acentos."""
+        """Mapeia cabeçalhos da planilha para campos internos com tolerância a acentos.
+
+        Match EXATO tem prioridade sobre o substring — senão, na planilha v8,
+        "Assunto" casaria com "Assunto em português (Palavras-chave)" e
+        "Categoria" com "Subcategoria"/"Microcategoria".
+        """
         col_indices = {}
         header_normalized = [strip_accents(h.lower()) if h else "" for h in header]
 
         for col_name, field_name in COLUMN_MAP.items():
             col_norm = strip_accents(col_name.lower())
+            matched = False
             for i, h_norm in enumerate(header_normalized):
-                if h_norm and col_norm in h_norm:
+                if h_norm == col_norm:           # match exato — prioridade
+                    col_indices[field_name] = i
+                    matched = True
+                    break
+            if matched:
+                continue
+            for i, h_norm in enumerate(header_normalized):
+                if h_norm and col_norm in h_norm:    # fallback substring
                     col_indices[field_name] = i
                     break
         return col_indices
@@ -467,6 +497,28 @@ class Command(BaseCommand):
 
         return None
 
+    def _ensure_type(self, conn, name, type_info_map, allow_create=True):
+        """Resolve o id do Tipo de Informação v8; cria em type_information se faltar.
+
+        Em --dry-run passa-se allow_create=False: faz apenas lookup, sem escrever
+        no banco. Com os tipos v8 já semeados (08-type-information.sql), a criação
+        é só rede de segurança para vocabulário fora do padrão.
+        """
+        if not name or not name.strip():
+            return None
+        key = strip_accents(name.strip().lower())
+        if key in type_info_map:
+            return type_info_map[key]
+        if not allow_create:
+            return None
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO type_information (name) VALUES (%s) RETURNING id", [name.strip()]
+            )
+            new_id = cur.fetchone()[0]
+        type_info_map[key] = new_id
+        return new_id
+
     def _resolve_category(self, categoria_name, category_map):
         """Resolve o category_id baseado no nome da categoria.
         Retorna None quando não encontra — evita assignar a documentos uma
@@ -524,38 +576,6 @@ class Command(BaseCommand):
             if key in nome_norm or nome_norm in key:
                 return mid
         return None
-
-    def _resolve_type_information(self, tipo_info_name, type_info_map):
-        """Resolve type_information id com fallback para NULL."""
-        if not tipo_info_name:
-            return None
-        key = strip_accents(tipo_info_name.strip().lower())
-        if key in type_info_map:
-            return type_info_map[key]
-        # Busca parcial para variações como "Artigo de periódico" -> "Artigos"
-        # Mapeamento manual de variações conhecidas
-        aliases = {
-            "artigo de periodico": "artigos",
-            "dissertacao": "dissertacoes",
-            "tese": "teses",
-            "tcc": "tccs",
-            "monografia de especializacao": "dissertacoes",
-            "livro": "livros",
-            "capitulo de livro": "capitulo de livro",
-            "artigo de evento": "artigos de eventos",
-            "apresentacao de evento": "apresentacoes",
-            "relatorio": "relatorios",
-            "material pedagogico": "apostilas",
-            "pagina web": None,  # não existe no Nou-Rau
-            "documento normativo": None,
-            "nota tecnica": "nota tecnica",
-            "publicacao digital": None,
-            "policy brief": "policy brief",
-        }
-        alias = aliases.get(key)
-        if alias and alias in type_info_map:
-            return type_info_map[alias]
-        return None  # Sem match — será gravado como nome cru no campo info
 
     def _insert_document(
         self, conn, record, code,
@@ -615,7 +635,7 @@ class Command(BaseCommand):
                     typeinformation, typeinform_id,
                     descricao_fisica, edicao, event_description, capa,
                     assunto_id, subcategoria_id, microcategoria_id,
-                    ano, permissao
+                    ano, permissao, natureza
                 ) VALUES (
                     %s, %s, %s, %s,
                     %s, %s, %s, %s,
@@ -627,7 +647,7 @@ class Command(BaseCommand):
                     %s, %s,
                     %s, %s, %s, %s,
                     %s, %s, %s,
-                    %s, %s
+                    %s, %s, %s
                 )
                 """,
                 [
@@ -666,5 +686,6 @@ class Command(BaseCommand):
                     microcategoria_id,
                     ano_int,
                     permissao,
+                    record.get("natureza", "")[:80],
                 ],
             )

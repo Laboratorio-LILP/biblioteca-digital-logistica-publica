@@ -1,7 +1,11 @@
 import re
+from functools import lru_cache
 from urllib.parse import urlencode, urlparse
 
 from django import template
+
+from ..models import Assunto, TypeInformation
+from ..taxonomy_v6 import colecao_v6_for_tipo
 
 register = template.Library()
 
@@ -128,3 +132,51 @@ def querystring_replace(querydict, key, value):
     if hasattr(params, "urlencode"):
         return params.urlencode()
     return urlencode(params)
+
+
+@lru_cache(maxsize=1)
+def _type_names():
+    """{id: nome} de TypeInformation, carregado uma vez por processo (anti-N+1)."""
+    return {ti.id: ti.name for ti in TypeInformation.objects.all()}
+
+
+@lru_cache(maxsize=1)
+def _assunto_names():
+    """{id: nome} de Assunto, carregado uma vez por processo (anti-N+1)."""
+    return {a.id: a.nome for a in Assunto.objects.all()}
+
+
+@register.simple_tag
+def colecao_visual(doc):
+    """Coleção v6 (ícone + cor + nome) e nome do Tipo, derivados do Tipo de
+    Informação. Resolve o nome do tipo por um mapa cacheado {id: nome} em vez da
+    property doc.type_info, eliminando o N+1 nos cards (antes ~3 queries/card)."""
+    tipo_nome = _type_names().get(getattr(doc, "typeinform_id", None), "")
+    return {**colecao_v6_for_tipo(tipo_nome), "tipo_nome": tipo_nome}
+
+
+@register.filter
+def assunto_nome(doc):
+    """Nome do Assunto do documento via mapa cacheado (evita a query da property)."""
+    return _assunto_names().get(getattr(doc, "assunto_id", None), "")
+
+
+@register.filter
+def primary_author(doc):
+    """Primeiro autor de `author` (coluna 'Autor Principal' do v8); fallback para
+    a Autoridade Intelectual (`autor_principal`). Mantém coerência com
+    extra_authors, que conta os segmentos de `author`."""
+    author = (getattr(doc, "author", "") or "").strip()
+    if author:
+        return author.split(";")[0].strip()
+    return (getattr(doc, "autor_principal", "") or "").strip()
+
+
+@register.filter
+def extra_authors(doc):
+    """Nº de coautores além do principal (campo `author` separado por ';')."""
+    author = (getattr(doc, "author", "") or "").strip()
+    if not author:
+        return 0
+    parts = [p for p in author.split(";") if p.strip()]
+    return max(0, len(parts) - 1)

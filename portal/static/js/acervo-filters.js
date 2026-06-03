@@ -61,6 +61,12 @@
     });
   });
 
+  // Ordenação (Autor/Título/Ano): auto-submit ao trocar
+  const sortSelect = form.querySelector('select[name="sort"]');
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => form.submit());
+  }
+
   // === Range slider duplo de ano ===
   const yearRange = form.querySelector(".year-range");
   if (yearRange) {

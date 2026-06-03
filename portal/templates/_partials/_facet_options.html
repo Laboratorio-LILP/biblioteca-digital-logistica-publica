@@ -1,0 +1,17 @@
+{% comment %}
+Opções de faceta no estilo ToggleOpt do protótipo (checkbox quadrado custom).
+Params: facet (lista {id,nome,count}), param (campo GET), current (valor ativo), empty_msg.
+Single-select por grupo + auto-submit ficam em acervo-filters.js (classe .facet-input).
+{% endcomment %}
+{% if facet %}
+  {% for opt in facet %}
+  <label class="toggle-opt{% if current|stringformat:'s' == opt.id|stringformat:'s' %} active{% endif %}">
+    <input class="facet-input sr-only" type="checkbox" name="{{ param }}" value="{{ opt.id }}"{% if current|stringformat:'s' == opt.id|stringformat:'s' %} checked{% endif %}>
+    <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
+    <span>{{ opt.nome }}</span>
+    <span class="toggle-opt__count">{{ opt.count }}</span>
+  </label>
+  {% endfor %}
+{% elif empty_msg %}
+  <p class="facet-empty">{{ empty_msg }}</p>
+{% endif %}

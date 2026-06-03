@@ -1,16 +1,19 @@
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db.models import F
 
-from .models import Document
+from .models import Document, TypeInformation
+from .taxonomy_v6 import tipos_de_colecao
 
 
 # Filtros suportados pela busca; o helper apply_filters reutiliza esta lista
 FILTERABLE_FIELDS = (
     "topic_id",
+    "colecao_v6",
     "category_id",
     "subcategoria_id",
     "microcategoria_id",
     "assunto_id",
-    "tipologia",
+    "natureza",
     "etapa",
     "complexidade",
     "typeinform_id",
@@ -23,6 +26,14 @@ FILTERABLE_FIELDS = (
 )
 
 
+def _typeinform_ids_for_colecao(slug):
+    """Ids de Tipo de Informação que compõem uma coleção v6 (derivada do tipo)."""
+    tipos = tipos_de_colecao(slug)
+    if not tipos:
+        return []
+    return list(TypeInformation.objects.filter(name__in=tipos).values_list("id", flat=True))
+
+
 def _apply_filters(qs, filters):
     """Aplica filtros estruturados ao queryset de Document."""
     if not filters:
@@ -30,6 +41,9 @@ def _apply_filters(qs, filters):
 
     if filters.get("topic_id"):
         qs = qs.filter(topic_id=filters["topic_id"])
+    if filters.get("colecao_v6"):
+        ids = _typeinform_ids_for_colecao(filters["colecao_v6"])
+        qs = qs.filter(typeinform_id__in=ids or [-1])
     if filters.get("category_id"):
         qs = qs.filter(category_id=filters["category_id"])
     if filters.get("subcategoria_id"):
@@ -38,8 +52,8 @@ def _apply_filters(qs, filters):
         qs = qs.filter(microcategoria_id=filters["microcategoria_id"])
     if filters.get("assunto_id"):
         qs = qs.filter(assunto_id=filters["assunto_id"])
-    if filters.get("tipologia"):
-        qs = qs.filter(tipologia=filters["tipologia"])
+    if filters.get("natureza"):
+        qs = qs.filter(natureza=filters["natureza"])
     if filters.get("etapa"):
         qs = qs.filter(etapa_processo_licitatorio=filters["etapa"])
     if filters.get("complexidade"):
@@ -66,10 +80,30 @@ def _apply_filters(qs, filters):
     return qs
 
 
-def search_documents(query, filters=None):
+# Ordenação exposta ao usuário (restrição Lina: Autor/Título/Ano).
+SORT_CHOICES = ("autor", "titulo", "ano", "recente")
+
+
+def _apply_sort(qs, sort, default):
+    """Ordena por Autor/Título/Ano (escolha do usuário) ou pelo `default` da view.
+
+    `default` é "-rank" na busca textual e "-created" na listagem por filtros.
+    """
+    if sort == "autor":
+        return qs.order_by("autor_principal", "title")
+    if sort == "titulo":
+        return qs.order_by("title")
+    if sort == "ano":
+        return qs.order_by(F("ano").desc(nulls_last=True), "title")
+    if sort == "recente":
+        return qs.order_by("-created")
+    return qs.order_by(default)
+
+
+def search_documents(query, filters=None, sort=None):
     """Busca full-text em português + filtros estruturados nos documentos arquivados.
 
-    O vetor inclui campos LILP (tipologia, complexidade, uso_futuro, metodo, resultado)
+    O vetor inclui campos LILP (complexidade, uso_futuro, metodo, resultado)
     além dos clássicos title/keywords/author/abstract.
     """
     vector = (
@@ -81,21 +115,20 @@ def search_documents(query, filters=None):
         + SearchVector("uso_futuro", weight="C", config="portuguese")
         + SearchVector("metodo", weight="D", config="portuguese")
         + SearchVector("resultado", weight="D", config="portuguese")
-        + SearchVector("tipologia", weight="D", config="portuguese")
         + SearchVector("complexidade", weight="D", config="portuguese")
     )
     search_query = SearchQuery(query, config="portuguese")
 
     qs = Document.objects.filter(status="a")
     qs = qs.annotate(rank=SearchRank(vector, search_query))
-    qs = qs.filter(rank__gte=0.01).order_by("-rank")
+    qs = qs.filter(rank__gte=0.01)
 
     qs = _apply_filters(qs, filters)
-    return qs
+    return _apply_sort(qs, sort, default="-rank")
 
 
-def filter_documents(filters):
-    """Apenas filtros estruturados (sem termo de busca). Ordena por mais recente."""
+def filter_documents(filters, sort=None):
+    """Apenas filtros estruturados (sem termo de busca). Default: mais recente."""
     qs = Document.objects.filter(status="a")
     qs = _apply_filters(qs, filters)
-    return qs.order_by("-created")
+    return _apply_sort(qs, sort, default="-created")

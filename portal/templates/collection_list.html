@@ -4,36 +4,23 @@
 {% block title %}Coleções — Biblioteca Digital de Logística Pública{% endblock %}
 
 {% block content %}
-<article class="sp-pagina-legal">
-  <header class="sp-pagina-legal__cabecalho">
-    <h1>Coleções</h1>
-    <p class="sp-pagina-legal__intro">
-      O acervo da BDLP está organizado em coleções temáticas que agrupam
-      documentos por sua natureza editorial. Cada coleção pode conter
-      subcoleções e abriga produções científicas, técnicas, jurisprudenciais
-      e normativas sobre logística pública.
-    </p>
-  </header>
+<span class="eyebrow">Acervo</span>
+<h1>Coleções</h1>
+<p class="page__intro">
+  O acervo está organizado em quatro coleções definidas pelo tipo de informação
+  (taxonomia v6). Escolha uma coleção para explorar os materiais.
+</p>
 
-  <div class="grid grid-2">
-    {% for item in collection_data %}
-    <a class="card collection-card" href="{% url 'catalog:collection_detail' item.topic.id %}">
-      <h2 class="collection-card__titulo">{{ item.topic.name }}</h2>
-      {% if item.topic.description %}
-      <p>{{ item.topic.description }}</p>
-      {% endif %}
-      <p class="collection-count">{{ item.doc_count }} {{ item.doc_count|pluralize_pt:"documento" }}</p>
-      {% if item.subcollections %}
-      <ul class="subcollection-list" aria-label="Subcoleções de {{ item.topic.name }}">
-        {% for sub in item.subcollections %}
-          {% if sub.doc_count > 0 %}
-          <li>{{ sub.topic.name }} <span class="subcollection-count">{{ sub.doc_count }}</span></li>
-          {% endif %}
-        {% endfor %}
-      </ul>
-      {% endif %}
-    </a>
-    {% endfor %}
-  </div>
-</article>
+<div class="collections-grid">
+  {% for c in colecoes_v6 %}
+  <a class="sp-card collection-card" href="{% url 'catalog:search' %}?colecao_v6={{ c.id }}">
+    <span class="collection-card__icon {{ c.color }}" aria-hidden="true"><svg class="fi"><use href="#{{ c.icon }}"/></svg></span>
+    <span>
+      <span class="collection-card__label">{{ c.nome }}</span>
+      <span class="collection-card__count">{{ c.count }} {{ c.count|pluralize_pt:"documento" }}</span>
+    </span>
+    <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+  </a>
+  {% endfor %}
+</div>
 {% endblock %}

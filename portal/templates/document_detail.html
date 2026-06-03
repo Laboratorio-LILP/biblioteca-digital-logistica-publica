@@ -3,193 +3,104 @@
 
 {% block title %}{{ document.title }} — Biblioteca Digital de Logística Pública{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal document-detail">
-  <header class="sp-pagina-legal__cabecalho">
-    <nav class="breadcrumb" aria-label="Você está em">
-      <a href="{% url 'catalog:home' %}">Início</a>
-      <span class="breadcrumb-sep">/</span>
-      <a href="{% url 'catalog:search' %}">Acervo</a>
-      {% if document.topic %}
-      <span class="breadcrumb-sep">/</span>
-      <a href="{% url 'catalog:collection_detail' document.topic_id %}">{{ document.topic.name }}</a>
-      {% endif %}
-    </nav>
+{% block content_raw %}
+{% colecao_visual document as cv %}
+<nav class="breadcrumb-bar" aria-label="Você está em">
+  <div class="sp-container breadcrumb">
+    <a href="{% url 'catalog:home' %}">Início</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <a href="{% url 'catalog:search' %}">Acervo</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <span>{{ document.title|truncatechars:60 }}</span>
+  </div>
+</nav>
 
-    <h1>{{ document.title }}</h1>
-    {% if document.title_en %}
-    <p class="title-en">{{ document.title_en }}</p>
-    {% endif %}
-
-    {% comment %}
-      Sumário curto sintetizando os principais campos. Só renderiza se
-      houver pelo menos tipologia OU autor — evita frases bicudas.
-    {% endcomment %}
-    {% if document.tipologia or document.autor_principal or document.ano %}
-    <p class="document-summary">
-      Material{% if document.tipologia %} <strong>{{ document.tipologia|lower }}</strong>{% endif %}
-      {% if document.ano %}publicado em <strong>{{ document.ano }}</strong>{% endif %}
-      {% if document.autor_principal %}por {{ document.autor_principal }}{% endif %}{% if document.topic %},
-      vinculado à coleção <a href="{% url 'catalog:collection_detail' document.topic_id %}">{{ document.topic.name }}</a>{% endif %}.
-    </p>
-    {% endif %}
-
-    <div class="document-actions">
-      {% if document.is_remote and document.acesso_eletronico %}
-      <a href="{{ document.acesso_eletronico }}" target="_blank" rel="noopener" class="btn btn-primary">Acessar documento</a>
-      {% with dom=document.acesso_eletronico|url_domain %}
-      {% if dom %}<span class="document-actions__hint">Abre em nova aba — {{ dom }}</span>{% endif %}
-      {% endwith %}
-      {% elif document.filename %}
-      <a href="{% url 'catalog:download' document.code %}" class="btn btn-primary">Download</a>
+<section class="doc-detail-hero">
+  <div class="sp-container">
+    <div class="doc-badges">
+      <span class="doc-badge {{ cv.color }}">
+        <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
+        {% if document.type_info %}{{ document.type_info.name }}{% else %}{{ cv.nome }}{% endif %}
+      </span>
+      {% if document.complexidade %}<span class="doc-badge">Complexidade: {{ document.complexidade }}</span>{% endif %}
+      {% if document.permissao %}
+      <span class="doc-badge {{ document.permissao|lower }}">
+        {% if document.permissao == 'Aberto' %}<svg class="fi" aria-hidden="true"><use href="#fi-unlock"/></svg>{% else %}<svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>{% endif %}
+        {{ document.permissao }}
+      </span>
       {% endif %}
     </div>
-  </header>
 
-  <div class="document-metadata">
-    {# === IDENTIFICAÇÃO === #}
-    <h3 class="metadata-section-title">Identificação</h3>
-    <table class="metadata-table">
-      <caption class="sr-only">Identificação do documento</caption>
-      {% if document.autor_principal %}
-      <tr><th scope="row">Autor principal</th><td>{{ document.autor_principal }}</td></tr>
-      {% endif %}
-      {% if document.author and document.author != document.autor_principal %}
-      <tr><th scope="row">Autores</th><td>{{ document.author }}</td></tr>
-      {% endif %}
-      {% if document.source and not document.source|is_year_only %}
-      <tr><th scope="row">Imprenta</th><td>{{ document.source }}</td></tr>
-      {% endif %}
-      {% if document.ano %}
-      <tr><th scope="row">Ano de publicação</th><td>{{ document.ano }}</td></tr>
-      {% endif %}
-      {% if document.edicao %}
-      <tr><th scope="row">Edição</th><td>{{ document.edicao }}</td></tr>
-      {% endif %}
-      {% if document.doi %}
-      <tr><th scope="row">DOI</th><td><a href="https://doi.org/{{ document.doi }}" target="_blank" rel="noopener">{{ document.doi }}</a></td></tr>
-      {% endif %}
-      {% if document.nlspi %}
-      <tr><th scope="row">ISSN/ISBN</th><td>{{ document.nlspi }}</td></tr>
-      {% endif %}
-    </table>
+    <h1>{{ document.title }}</h1>
 
-    {# === CLASSIFICAÇÃO === #}
-    <h3 class="metadata-section-title">Classificação</h3>
-    <table class="metadata-table">
-      <caption class="sr-only">Classificação temática do documento</caption>
-      {% if document.topic %}
-      <tr><th scope="row">Coleção</th><td><a href="{% url 'catalog:collection_detail' document.topic_id %}">{{ document.topic.name }}</a></td></tr>
-      {% endif %}
-      {% with assunto=document.assunto %}
-      {% if assunto %}
-      <tr><th scope="row">Assunto</th><td>{{ assunto.nome }}</td></tr>
-      {% endif %}
-      {% endwith %}
-      {% if document.category %}
-      <tr><th scope="row">Categoria</th><td>{{ document.category.name }}</td></tr>
-      {% endif %}
-      {% with subcategoria=document.subcategoria %}
-      {% if subcategoria %}
-      <tr><th scope="row">Subcategoria</th><td>{{ subcategoria.nome }}</td></tr>
-      {% endif %}
-      {% endwith %}
-      {% with microcategoria=document.microcategoria %}
-      {% if microcategoria %}
-      <tr><th scope="row">Microcategoria</th><td>{{ microcategoria.nome }}</td></tr>
-      {% endif %}
-      {% endwith %}
-      {% if document.tipologia %}
-      <tr><th scope="row">Tipologia</th><td>{{ document.tipologia }}</td></tr>
-      {% endif %}
-      {% if document.type_info %}
-      <tr><th scope="row">Tipo de informação</th><td>{{ document.type_info.name }}</td></tr>
-      {% endif %}
-    </table>
+    <div class="doc-authors">
+      {% if document.autor_principal %}<span><svg class="fi" aria-hidden="true"><use href="#fi-user"/></svg>{{ document.autor_principal }}</span>{% endif %}
+      {% if document.author and document.author != document.autor_principal %}<span><svg class="fi" aria-hidden="true"><use href="#fi-users"/></svg>{{ document.author }}</span>{% endif %}
+      {% if document.ano %}<span><svg class="fi" aria-hidden="true"><use href="#fi-calendar"/></svg>{{ document.ano }}</span>{% endif %}
+    </div>
+  </div>
+</section>
 
-    {# === ACESSO === #}
-    <h3 class="metadata-section-title">Acesso</h3>
-    <table class="metadata-table">
-      <caption class="sr-only">Permissão e formato de acesso</caption>
-      {% if document.permissao %}
-      <tr><th scope="row">Permissão</th><td><span class="badge badge-{{ document.permissao|lower }}">{{ document.permissao }}</span></td></tr>
+<div class="sp-container doc-detail-layout">
+  <div>
+    <article class="sp-panel doc-panel">
+      <h2 class="doc-section-title">Resumo</h2>
+      {% if document.abstract %}<p>{{ document.abstract }}</p>{% else %}<p>Resumo não disponível para este material.</p>{% endif %}
+
+      {% if document.uso_futuro %}<div class="doc-callout"><h3 class="doc-section-title">Aplicabilidade</h3><p>{{ document.uso_futuro }}</p></div>{% endif %}
+      {% if document.metodo %}<div class="doc-callout"><h3 class="doc-section-title">Método</h3><p>{{ document.metodo }}</p></div>{% endif %}
+      {% if document.resultado %}<div class="doc-callout"><h3 class="doc-section-title">Resultados</h3><p>{{ document.resultado }}</p></div>{% endif %}
+      {% if document.referencias %}<div class="doc-callout"><h3 class="doc-section-title">Referências</h3><p>{{ document.referencias }}</p></div>{% endif %}
+      {% if document.abstract_en %}<div class="doc-callout"><h3 class="doc-section-title">Abstract</h3><p>{{ document.abstract_en }}</p></div>{% endif %}
+      {% if document.event_description %}<div class="doc-callout"><h3 class="doc-section-title">Apresentações do evento</h3><p>{{ document.event_description }}</p></div>{% endif %}
+      {% if document.description %}<div class="doc-callout"><h3 class="doc-section-title">Informações adicionais</h3><p>{{ document.description }}</p></div>{% endif %}
+
+      {% if document.keywords %}
+      <div class="doc-detail-tags">
+        {% for kw in document.keywords|split_keywords %}<span class="tg">{{ kw }}</span>{% endfor %}
+      </div>
       {% endif %}
-      {% if document.format %}
-      <tr><th scope="row">Formato</th><td>{{ document.format.name }}</td></tr>
-      {% endif %}
-    </table>
+    </article>
+
+    <section class="sp-panel doc-panel">
+      <h2 class="doc-section-title">Classificação BDLP</h2>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="label">Coleção</div><div class="value">{{ cv.nome }}</div></div>
+        {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de Informação</div><div class="value">{{ document.type_info.name }}</div></div>{% endif %}
+        {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value">{{ assunto.nome }}</div></div>{% endif %}{% endwith %}
+        {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value">{{ document.natureza }}</div></div>{% endif %}
+        {% if document.category %}<div class="meta-item"><div class="label">Categoria</div><div class="value">{{ document.category.name }}</div></div>{% endif %}
+        {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value">{{ sub.nome }}</div></div>{% endif %}{% endwith %}
+        {% with mic=document.microcategoria %}{% if mic %}<div class="meta-item"><div class="label">Microcategoria</div><div class="value">{{ mic.nome }}</div></div>{% endif %}{% endwith %}
+      </div>
+    </section>
   </div>
 
-  <section>
-    <h2>Resumo</h2>
-    {% if document.abstract %}
-    <p>{{ document.abstract }}</p>
-    {% else %}
-    <p class="document-empty">Resumo não disponível para este material.</p>
-    {% endif %}
-  </section>
+  <aside class="doc-aside">
+    <div class="sp-panel doc-panel">
+      <div class="doc-actions">
+        {% if document.is_remote and document.acesso_eletronico %}
+        <a class="sp-button-primary" href="{{ document.acesso_eletronico }}" target="_blank" rel="noopener"><svg class="fi" aria-hidden="true"><use href="#fi-external-link"/></svg> Acessar documento</a>
+        {% with dom=document.acesso_eletronico|url_domain %}{% if dom %}<span class="facet-empty">Abre em nova aba — {{ dom }}</span>{% endif %}{% endwith %}
+        {% elif document.filename %}
+        <a class="sp-button-primary" href="{% url 'catalog:download' document.code %}"><svg class="fi" aria-hidden="true"><use href="#fi-download"/></svg> Download</a>
+        {% else %}
+        <span class="facet-empty">Acesso ao arquivo indisponível.</span>
+        {% endif %}
+      </div>
+    </div>
 
-  {% if document.abstract_en %}
-  <section>
-    <h2>Abstract</h2>
-    <p>{{ document.abstract_en }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.keywords %}
-  <section>
-    <h2>Palavras-chave</h2>
-    <p>{{ document.keywords }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.keywords_en %}
-  <section>
-    <h2>Keywords</h2>
-    <p>{{ document.keywords_en }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.event_description %}
-  <section>
-    <h2>Apresentações do evento</h2>
-    <p>{{ document.event_description }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.metodo %}
-  <section>
-    <h2>Método</h2>
-    <p>{{ document.metodo }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.resultado %}
-  <section>
-    <h2>Resultados</h2>
-    <p>{{ document.resultado }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.uso_futuro %}
-  <section>
-    <h2>Aplicabilidade</h2>
-    <p>{{ document.uso_futuro }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.referencias %}
-  <section>
-    <h2>Referências</h2>
-    <p>{{ document.referencias }}</p>
-  </section>
-  {% endif %}
-
-  {% if document.description %}
-  <section>
-    <h2>Informações adicionais</h2>
-    <p>{{ document.description }}</p>
-  </section>
-  {% endif %}
-</article>
+    <div class="sp-panel doc-panel">
+      <h2 class="doc-section-title">Referência</h2>
+      <div class="doc-ref">
+        {% if document.source and not document.source|is_year_only %}<div class="meta-item"><div class="label">Imprenta</div><div class="value">{{ document.source }}</div></div>{% endif %}
+        {% if document.edicao %}<div class="meta-item"><div class="label">Edição</div><div class="value">{{ document.edicao }}</div></div>{% endif %}
+        {% if document.doi %}<div class="meta-item"><div class="label">DOI</div><div class="value"><a href="https://doi.org/{{ document.doi }}" target="_blank" rel="noopener">{{ document.doi }}</a></div></div>{% endif %}
+        {% if document.nlspi %}<div class="meta-item"><div class="label">ISSN/ISBN</div><div class="value">{{ document.nlspi }}</div></div>{% endif %}
+        {% if document.format %}<div class="meta-item"><div class="label">Formato</div><div class="value">{{ document.format.name }}</div></div>{% endif %}
+        {% if document.permissao %}<div class="meta-item"><div class="label">Acesso</div><div class="value">{{ document.permissao }}</div></div>{% endif %}
+      </div>
+    </div>
+  </aside>
+</div>
 {% endblock %}

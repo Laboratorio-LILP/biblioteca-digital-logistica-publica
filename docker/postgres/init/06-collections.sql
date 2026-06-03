@@ -1,76 +1,74 @@
 --
--- Hierarquia de coleções (topics) para a Biblioteca Digital de Logística Pública
--- Baseado no template SBU adaptado ao projeto
+-- Hierarquia de coleções (topics) da Biblioteca Digital de Logística Pública
+-- Taxonomia v8 (canônica, §7): 4 Coleções definidas pelo Tipo de Informação.
+-- Fonte: aba "Coleção, Assunto e Natureza" de BDLP_Template_Insercao_v8.xlsx.
+-- Cada Tipo de Informação é semeado como subcoleção da sua Coleção, para que o
+-- migrate_spreadsheet._resolve_topic() case a coluna "Coleção" → raiz e refine
+-- pela coluna "Tipo de Informação" → subcoleção.
 --
 
--- Coleções principais (parent_id = 0 = raiz)
+-- Coleções principais v8 (parent_id = 0 = raiz)
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Eventos', 'Documentos provenientes de eventos acadêmicos e profissionais', 0, 's');
+    ('Jurisprudência', 'Enunciados, súmulas, boletins e documentos normativos', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Livros Digitais', 'Livros e e-books em formato digital', 0, 's');
+    ('Trabalhos Acadêmicos', 'Teses, dissertações, monografias, TCCs e memoriais docentes', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Materiais Pedagógicos', 'Materiais didáticos e de apoio ao ensino', 0, 's');
+    ('Doutrina e Conteúdo Técnico', 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão e resumos', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Trabalhos Acadêmicos', 'Dissertações, teses e trabalhos de conclusão de curso', 0, 's');
+    ('Instrução e Capacitação', 'Manuais, guias, tutoriais, apostilas, aulas, cursos, vídeos e slides', 0, 's');
 
--- Subcoleções de Eventos (parent_id = id de "Eventos")
+-- Subcoleções = Tipos de Informação v8 (nomes EXATOS do vocabulário controlado)
 INSERT INTO topic (name, description, parent_id, archieve)
 SELECT sub.name, sub.description, t.id, 's'
 FROM topic t,
 (VALUES
-    ('Colóquios', 'Colóquios e debates'),
-    ('Conferências', 'Conferências e palestras'),
-    ('Congressos', 'Congressos acadêmicos e profissionais'),
-    ('Encontros', 'Encontros e reuniões técnicas'),
-    ('Fóruns', 'Fóruns de discussão'),
-    ('Jornadas', 'Jornadas acadêmicas'),
-    ('Mesas redondas', 'Mesas redondas e painéis de discussão'),
-    ('Painéis', 'Painéis temáticos'),
-    ('Seminários', 'Seminários acadêmicos e profissionais'),
-    ('Simpósios', 'Simpósios científicos'),
-    ('Workshops', 'Workshops e oficinas')
+    ('Enunciados', 'Enunciados'),
+    ('Súmulas', 'Súmulas'),
+    ('Boletins', 'Boletins'),
+    ('Documentos Normativos', 'Documentos normativos')
 ) AS sub(name, description)
-WHERE t.name = 'Eventos' AND t.parent_id = 0;
+WHERE t.name = 'Jurisprudência' AND t.parent_id = 0;
 
--- Subcoleções de Livros Digitais
 INSERT INTO topic (name, description, parent_id, archieve)
 SELECT sub.name, sub.description, t.id, 's'
 FROM topic t,
 (VALUES
-    ('Livro', 'Livros publicados'),
-    ('E-book', 'E-books e publicações eletrônicas'),
-    ('Livros digitalizados', 'Livros digitalizados a partir de originais impressos')
+    ('Teses', 'Teses de doutorado'),
+    ('Dissertações', 'Dissertações de mestrado'),
+    ('Monografias', 'Monografias'),
+    ('TCCs', 'Trabalhos de conclusão de curso'),
+    ('Memoriais Docentes', 'Memoriais de docentes e pesquisadores')
 ) AS sub(name, description)
-WHERE t.name = 'Livros Digitais' AND t.parent_id = 0;
+WHERE t.name = 'Trabalhos Acadêmicos' AND t.parent_id = 0;
 
--- Subcoleções de Materiais Pedagógicos
 INSERT INTO topic (name, description, parent_id, archieve)
 SELECT sub.name, sub.description, t.id, 's'
 FROM topic t,
 (VALUES
+    ('Livros digitais', 'Livros e e-books em formato digital'),
+    ('Artigos', 'Artigos técnicos e científicos'),
+    ('Notas Técnicas', 'Notas técnicas'),
+    ('Relatórios', 'Relatórios técnicos e de gestão'),
+    ('Textos de Discussão', 'Textos para discussão e debate'),
+    ('Resumos', 'Resumos'),
+    ('Resumos expandidos', 'Resumos expandidos')
+) AS sub(name, description)
+WHERE t.name = 'Doutrina e Conteúdo Técnico' AND t.parent_id = 0;
+
+INSERT INTO topic (name, description, parent_id, archieve)
+SELECT sub.name, sub.description, t.id, 's'
+FROM topic t,
+(VALUES
+    ('Manuais', 'Manuais técnicos e operacionais'),
+    ('Guias', 'Guias práticos'),
+    ('Tutoriais', 'Tutoriais e guias passo a passo'),
     ('Apostilas', 'Apostilas e materiais didáticos'),
     ('Aulas', 'Aulas e apresentações'),
     ('Cursos', 'Cursos e programas de capacitação'),
-    ('Manuais', 'Manuais técnicos e operacionais'),
-    ('Relatórios', 'Relatórios técnicos e de gestão'),
-    ('Slides', 'Apresentações em slides'),
-    ('Textos de discussão', 'Textos para discussão e debate'),
-    ('Tutoriais', 'Tutoriais e guias passo a passo'),
-    ('Vídeos', 'Vídeos educativos e instrucionais')
+    ('Vídeos', 'Vídeos educativos e instrucionais'),
+    ('Slides', 'Apresentações em slides')
 ) AS sub(name, description)
-WHERE t.name = 'Materiais Pedagógicos' AND t.parent_id = 0;
-
--- Subcoleções de Trabalhos Acadêmicos
-INSERT INTO topic (name, description, parent_id, archieve)
-SELECT sub.name, sub.description, t.id, 's'
-FROM topic t,
-(VALUES
-    ('Dissertações', 'Dissertações de mestrado'),
-    ('Memoriais docentes', 'Memoriais de docentes e pesquisadores'),
-    ('TCCs', 'Trabalhos de conclusão de curso'),
-    ('Teses', 'Teses de doutorado')
-) AS sub(name, description)
-WHERE t.name = 'Trabalhos Acadêmicos' AND t.parent_id = 0;
+WHERE t.name = 'Instrução e Capacitação' AND t.parent_id = 0;
 
 -- Atualizar topic_path para as coleções principais
 INSERT INTO topic_path (topic_id, parent_ids, parent_names)

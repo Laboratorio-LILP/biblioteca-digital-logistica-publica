@@ -3,17 +3,36 @@ from django.core.paginator import Paginator
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
 
-from .facets import compute_facets
+from .facets import compute_facets, colecao_v6_overview
 from .models import Document, NrCategory, Topic, TypeInformation
 from .search import filter_documents, search_documents
 
 
+def _artigos_type_id():
+    """Id do Tipo de Informação 'Artigos' — usado para o destaque na home/busca.
+
+    Na taxonomia v6 todos os tipos de artigo são colapsados num único
+    'Artigos' (coleção Doutrina e Conteúdo Técnico). Pode ser None enquanto
+    os dados ainda não tiverem esse tipo (classificação v5).
+    """
+    return (
+        TypeInformation.objects.filter(name__iexact="Artigos")
+        .values_list("id", flat=True)
+        .first()
+    )
+
+
 def home(request):
     """Homepage: busca, stats, coleções e últimas adições."""
-    from django.db.models import Count
+    from django.db.models import Count, Q
 
-    collections = Topic.objects.filter(parent_id=0).order_by("name")
     recent_docs = Document.objects.filter(status="a").order_by("-created")[:10]
+    # Tema em alta (Sustentabilidade e ODS) — dados reais; cai para recentes se vazio
+    trending_docs = list(
+        Document.objects.filter(status="a")
+        .filter(Q(keywords__icontains="sustentab") | Q(title__icontains="sustentab") | Q(abstract__icontains="sustentab"))
+        .order_by("-created")[:3]
+    ) or list(recent_docs[:3])
 
     # Stat 1: total de materiais
     total_docs = Document.objects.filter(status="a").count()
@@ -52,38 +71,27 @@ def home(request):
     aberto = Document.objects.filter(status="a", permissao="Aberto").count()
     pct_aberto = round(100 * aberto / total_docs) if total_docs else 0
 
-    # Cards de coleção na home — adicionar contagem (incluindo subcoleções)
-    docs_by_topic = dict(
-        Document.objects.filter(status="a")
-        .values_list("topic_id")
-        .annotate(c=Count("id"))
-        .values_list("topic_id", "c")
-    )
-    collections_with_count = []
-    for col in collections:
-        sub_ids = list(Topic.objects.filter(parent_id=col.id).values_list("id", flat=True))
-        topic_ids = [col.id] + sub_ids
-        col_count = sum(docs_by_topic.get(tid, 0) for tid in topic_ids)
-        collections_with_count.append({"topic": col, "doc_count": col_count})
-
     return render(request, "home.html", {
-        "collections": collections_with_count,
+        "colecoes_v6": colecao_v6_overview(),
         "recent_docs": recent_docs,
+        "trending_docs": trending_docs,
         "total_docs": total_docs,
         "tipos_top": tipos_top,
         "tipos_distintos": tipos_distintos,
         "cobertura": cobertura,
         "pct_aberto": pct_aberto,
+        "artigos_id": _artigos_type_id(),
     })
 
 
 FILTER_PARAMS = (
     "topic_id",
+    "colecao_v6",
     "category_id",
     "subcategoria_id",
     "microcategoria_id",
     "assunto_id",
-    "tipologia",
+    "natureza",
     "etapa",
     "complexidade",
     "typeinform_id",
@@ -103,15 +111,16 @@ def search(request):
     """Busca full-text com filtros facetados em cascata."""
     query = request.GET.get("q", "").strip()
     page_number = request.GET.get("page", 1)
+    sort = request.GET.get("sort", "")
     filters = _read_filters(request)
 
     if query:
-        results = search_documents(query, filters if filters else None)
+        results = search_documents(query, filters if filters else None, sort=sort)
     elif filters:
-        results = filter_documents(filters)
+        results = filter_documents(filters, sort=sort)
     else:
         # Sem busca e sem filtros: lista os mais recentes (não vazio como antes)
-        results = filter_documents({})
+        results = filter_documents({}, sort=sort)
 
     paginator = Paginator(results, settings.SEARCH_RESULTS_PER_PAGE)
     page_obj = paginator.get_page(page_number)
@@ -124,6 +133,8 @@ def search(request):
         "filters": filters,
         "facets": facets,
         "total_results": paginator.count,
+        "sort": sort,
+        "artigos_id": _artigos_type_id(),
     })
 
 
@@ -134,37 +145,8 @@ def document_detail(request, code):
 
 
 def collection_list(request):
-    """Grid das coleções principais."""
-    collections = Topic.objects.filter(parent_id=0).order_by("name")
-
-    # Contagem agregada de docs por topic_id (única query)
-    from django.db.models import Count
-    docs_by_topic = dict(
-        Document.objects.filter(status="a")
-        .values_list("topic_id")
-        .annotate(c=Count("id"))
-        .values_list("topic_id", "c")
-    )
-
-    collection_data = []
-    for col in collections:
-        subcollections_qs = Topic.objects.filter(parent_id=col.id)
-        subs_with_count = []
-        sub_total = 0
-        for sub in subcollections_qs:
-            count = docs_by_topic.get(sub.id, 0)
-            sub_total += count
-            subs_with_count.append({"topic": sub, "doc_count": count})
-        # Ordenar por contagem desc (mais populadas primeiro), depois alfabético
-        subs_with_count.sort(key=lambda s: (-s["doc_count"], s["topic"].name))
-        own_count = docs_by_topic.get(col.id, 0)
-        collection_data.append({
-            "topic": col,
-            "subcollections": subs_with_count,
-            "doc_count": own_count + sub_total,
-        })
-
-    return render(request, "collection_list.html", {"collection_data": collection_data})
+    """As 4 coleções v6 (derivadas do Tipo de Informação) com contagem real."""
+    return render(request, "collection_list.html", {"colecoes_v6": colecao_v6_overview()})
 
 
 def collection_detail(request, topic_id):
