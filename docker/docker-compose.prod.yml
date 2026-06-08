@@ -1,0 +1,49 @@
+# Override de produção — usado em conjunto com docker-compose.yml.
+#
+# Uso:
+#   docker compose --env-file .env \
+#     -f docker/docker-compose.yml \
+#     -f docker/docker-compose.prod.yml \
+#     up -d --build
+#
+# Adiciona um Caddy como reverse proxy com HTTPS automático (Let's Encrypt)
+# e ajusta o portal para modo de produção (DEBUG=false, ALLOWED_HOSTS).
+# Os containers postgres/nourau/portal continuam mapeando suas portas no
+# host — a segurança fica a cargo do firewall externo (Oracle VCN security
+# list libera apenas 80/443 ao internet).
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - caddy_logs:/var/log/caddy
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN obrigatório no .env (ex.: 140.238.202.105.sslip.io)}
+    depends_on:
+      - portal
+      - nourau
+
+  portal:
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "false"
+      ALLOWED_HOSTS: ${DOMAIN},localhost,127.0.0.1
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY obrigatório no .env em produção}
+
+  nourau:
+    restart: unless-stopped
+
+  postgres:
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
+  caddy_logs:

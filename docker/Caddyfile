@@ -1,0 +1,36 @@
+# Caddy v2 — reverse proxy + HTTPS automático via Let's Encrypt
+# Lê {$DOMAIN} de variável de ambiente (definida em .env e propagada pelo
+# docker-compose.prod.yml). Use sslip.io quando ainda não houver domínio
+# próprio: ex.: 140.238.202.105.sslip.io aponta para 140.238.202.105.
+
+{$DOMAIN} {
+    encode zstd gzip
+
+    # Painel administrativo do Nou-Rau (PHP/Apache).
+    # /manager/* → container nourau, porta 80 da rede interna do Compose.
+    handle /manager* {
+        reverse_proxy nourau:80
+    }
+
+    # Tudo o mais → portal Django (Gunicorn).
+    # Inclui /static/* (servido via WhiteNoise dentro do próprio Django).
+    handle {
+        reverse_proxy portal:8000
+    }
+
+    # Headers de segurança básicos
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Strict-Transport-Security só após confirmar que tudo funciona via HTTPS
+        # Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    }
+
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 50mb
+            roll_keep 5
+        }
+    }
+}

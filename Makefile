@@ -1,4 +1,4 @@
-.PHONY: up down logs shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic
+.PHONY: up down logs shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
 
 # Ambiente de desenvolvimento
 up:
@@ -9,6 +9,19 @@ down:
 
 logs:
 	docker compose --env-file .env -f docker/docker-compose.yml logs -f
+
+# Ambiente de produção (Caddy + HTTPS Let's Encrypt). Requer DOMAIN no .env.
+prod-up:
+	docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d --build
+
+prod-down:
+	docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml down
+
+prod-logs:
+	docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml logs -f --tail 100
+
+prod-rebuild:
+	docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d --build portal
 
 shell:
 	docker compose --env-file .env -f docker/docker-compose.yml exec portal python manage.py shell
