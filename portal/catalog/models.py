@@ -1,4 +1,12 @@
+import unicodedata
+
 from django.db import models
+
+
+def _author_key(s):
+    """Normaliza nome de autor para comparação (sem acento, minúsculo, espaços colapsados)."""
+    s = unicodedata.normalize("NFKD", str(s or "")).encode("ascii", "ignore").decode("ascii")
+    return " ".join(s.lower().split())
 
 
 class Topic(models.Model):
@@ -305,6 +313,22 @@ class Document(models.Model):
     @property
     def is_archived(self):
         return self.status == "a"
+
+    @property
+    def display_authors(self):
+        """Autores para exibição, sem duplicar 'Autor Principal' (author) e
+        'Autoridade Intelectual' (autor_principal) quando são equivalentes
+        (texto normalizado igual ou um contido no outro). Distintos → ambos."""
+        a = (self.author or "").strip()
+        ap = (self.autor_principal or "").strip()
+        if not a:
+            return [ap] if ap else []
+        if not ap:
+            return [a]
+        ka, kap = _author_key(a), _author_key(ap)
+        if ka == kap or ka in kap or kap in ka:
+            return [ap if len(ap) >= len(a) else a]
+        return [ap, a]
 
 
 class NrOds(models.Model):

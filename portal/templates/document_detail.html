@@ -34,8 +34,7 @@
     <h1>{{ document.title }}</h1>
 
     <div class="doc-authors">
-      {% if document.autor_principal %}<span><svg class="fi" aria-hidden="true"><use href="#fi-user"/></svg>{{ document.autor_principal }}</span>{% endif %}
-      {% if document.author and document.author != document.autor_principal %}<span><svg class="fi" aria-hidden="true"><use href="#fi-users"/></svg>{{ document.author }}</span>{% endif %}
+      {% for autor in document.display_authors %}<span><svg class="fi" aria-hidden="true"><use href="#fi-user"/></svg>{{ autor }}</span>{% endfor %}
       {% if document.ano %}<span><svg class="fi" aria-hidden="true"><use href="#fi-calendar"/></svg>{{ document.ano }}</span>{% endif %}
     </div>
   </div>

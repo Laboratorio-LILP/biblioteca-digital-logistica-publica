@@ -2,7 +2,7 @@ from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db.models import F
 
 from .models import Document, TypeInformation
-from .taxonomy_v6 import tipos_de_colecao
+from .taxonomy_v6 import colecao_v6_for_tipo
 
 
 # Filtros suportados pela busca; o helper apply_filters reutiliza esta lista
@@ -27,11 +27,18 @@ FILTERABLE_FIELDS = (
 
 
 def _typeinform_ids_for_colecao(slug):
-    """Ids de Tipo de Informação que compõem uma coleção v6 (derivada do tipo)."""
-    tipos = tipos_de_colecao(slug)
-    if not tipos:
-        return []
-    return list(TypeInformation.objects.filter(name__in=tipos).values_list("id", flat=True))
+    """Ids de Tipo de Informação que compõem uma coleção v6.
+
+    Usa a MESMA função de mapeamento da faceta de contagem
+    (`colecao_v6_for_tipo`, resiliente a nomes v5/variantes de grafia) em vez do
+    vocabulário v6 plural exato. Garante que filtro e contagem sejam sempre
+    consistentes — qualquer tipo que a contagem atribui à coleção, o filtro inclui.
+    """
+    return [
+        ti.id
+        for ti in TypeInformation.objects.all()
+        if colecao_v6_for_tipo(ti.name)["slug"] == slug
+    ]
 
 
 def _apply_filters(qs, filters):

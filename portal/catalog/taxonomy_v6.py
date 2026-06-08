@@ -85,6 +85,7 @@ TIPO_V5_TO_V6 = {
     "teses": "Teses",
     "tcc": "TCCs",
     "tccs": "TCCs",
+    "monografia": "Monografias",
     "monografia de especializacao": "Monografias",
     "monografias": "Monografias",
     "memoriais docentes": "Memoriais Docentes",
