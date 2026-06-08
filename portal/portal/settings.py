@@ -14,6 +14,14 @@ SECRET_KEY = env("DJANGO_SECRET_KEY", default="insecure-dev-key-change-in-produc
 DEBUG = env("DJANGO_DEBUG", default=True)
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
+# ── Proxy reverso / subcaminho /Biblioteca (parametrizado; default seguro p/ dev) ──
+# Pré-requisito na VM: index.php como proxy transparente (repassa Host + X-Forwarded-*,
+# NÃO redirect). Sem as vars do .env (dev local), nada disto altera o comportamento.
+USE_X_FORWARDED_HOST = True  # confia no Host público repassado pelo front-controller
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # reconhece HTTPS no proxy
+FORCE_SCRIPT_NAME = env("FORCE_SCRIPT_NAME", default=None)  # ex.: "/Biblioteca"; None em dev
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])  # esquema+host públicos
+
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
@@ -63,9 +71,17 @@ TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+# STATIC_URL respeita o subcaminho (FORCE_SCRIPT_NAME): {% static %} resolve sob
+# /Biblioteca/static/ no público e /static/ no dev local (prefixo vazio).
+_script_prefix = (FORCE_SCRIPT_NAME or "").rstrip("/")
+STATIC_URL = f"{_script_prefix}/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Cookies presos ao subcaminho quando atrás do proxy (não vazam p/ outros apps do host).
+if FORCE_SCRIPT_NAME:
+    SESSION_COOKIE_PATH = FORCE_SCRIPT_NAME
+    CSRF_COOKIE_PATH = FORCE_SCRIPT_NAME
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
