@@ -19,8 +19,8 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 # NÃO redirect). Sem as vars do .env (dev local), nada disto altera o comportamento.
 USE_X_FORWARDED_HOST = True  # confia no Host público repassado pelo front-controller
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # reconhece HTTPS no proxy
-FORCE_SCRIPT_NAME = env("FORCE_SCRIPT_NAME", default=None)  # ex.: "/Biblioteca"; None em dev
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])  # esquema+host públicos
+FORCE_SCRIPT_NAME = env("FORCE_SCRIPT_NAME", default=None) or None  # ex.: "/Biblioteca"; "" (dev) → None
+CSRF_TRUSTED_ORIGINS = [o for o in env.list("CSRF_TRUSTED_ORIGINS", default=[]) if o.strip()]  # esquema+host públicos; ignora vazios
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",

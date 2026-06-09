@@ -49,6 +49,9 @@ services:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-insecure-dev-key-change-in-production}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      # Proxy reverso / subcaminho (VM atrás do index.php). Vazio em dev → settings trata como raiz.
+      FORCE_SCRIPT_NAME: ${FORCE_SCRIPT_NAME:-}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
       POSTGRES_DB: ${POSTGRES_DB:-nourau}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
