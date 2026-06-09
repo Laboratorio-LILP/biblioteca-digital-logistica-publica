@@ -53,9 +53,7 @@
         {% include "_partials/_facet_options.html" with facet=facets.colecoes_v6 param="colecao_v6" current=filters.colecao_v6 %}
       </section>
 
-      {# Categorias em accordion <details> por Categoria (mesmo padrão do Tipo de
-         Informação). Categoria → Subcategoria → Microcategoria, single-select por
-         `name` + cascata-clear já tratados em acervo-filters.js. #}
+      {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Categorias</h3>
         {% for cat in facets.categorias_hierarquia %}
