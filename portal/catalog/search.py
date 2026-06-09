@@ -41,6 +41,18 @@ def _typeinform_ids_for_colecao(slug):
     ]
 
 
+def _eq_or_in(qs, field, value):
+    """Filtra por igualdade (valor único) ou pertencimento (lista/tupla).
+
+    Facetas multi-select chegam como lista → vira `field__in`; single-select
+    chega como string → vira `field=`. Robustez: também aceita escalares.
+    """
+    if isinstance(value, (list, tuple, set)):
+        vals = [v for v in value if v not in (None, "")]
+        return qs.filter(**{f"{field}__in": vals}) if vals else qs
+    return qs.filter(**{field: value})
+
+
 def _apply_filters(qs, filters):
     """Aplica filtros estruturados ao queryset de Document."""
     if not filters:
@@ -57,18 +69,19 @@ def _apply_filters(qs, filters):
         qs = qs.filter(subcategoria_id=filters["subcategoria_id"])
     if filters.get("microcategoria_id"):
         qs = qs.filter(microcategoria_id=filters["microcategoria_id"])
+    # Eixos paralelos multi-select (OR dentro da faceta)
     if filters.get("assunto_id"):
-        qs = qs.filter(assunto_id=filters["assunto_id"])
+        qs = _eq_or_in(qs, "assunto_id", filters["assunto_id"])
     if filters.get("natureza"):
-        qs = qs.filter(natureza=filters["natureza"])
+        qs = _eq_or_in(qs, "natureza", filters["natureza"])
+    if filters.get("typeinform_id"):
+        qs = _eq_or_in(qs, "typeinform_id", filters["typeinform_id"])
+    if filters.get("permissao"):
+        qs = _eq_or_in(qs, "permissao", filters["permissao"])
+    if filters.get("complexidade"):
+        qs = _eq_or_in(qs, "complexidade", filters["complexidade"])
     if filters.get("etapa"):
         qs = qs.filter(etapa_processo_licitatorio=filters["etapa"])
-    if filters.get("complexidade"):
-        qs = qs.filter(complexidade=filters["complexidade"])
-    if filters.get("typeinform_id"):
-        qs = qs.filter(typeinform_id=filters["typeinform_id"])
-    if filters.get("permissao"):
-        qs = qs.filter(permissao=filters["permissao"])
 
     # Ano: novos params (ano_min/ano_max) preferidos sobre legados (year_from/year_to)
     ano_min = filters.get("ano_min") or filters.get("year_from")

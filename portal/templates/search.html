@@ -47,45 +47,48 @@
         {% endif %}
       </div>
 
-      {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto #}
+      {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto. "Coleção" é a cascata de tipos agrupada por coleção (substitui a faceta simples). Manter em UMA linha — comentário multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Coleção</h3>
-        {% include "_partials/_facet_options.html" with facet=facets.colecoes_v6 param="colecao_v6" current=filters.colecao_v6 %}
+        {% for grp in facets.tipos_por_colecao %}
+        <details class="filter-group"{% if grp.active %} open{% endif %}>
+          <summary><span class="filter-group__label">{{ grp.colecao }}</span></summary>
+          <div class="filter-group__body">
+            {% include "_partials/_cat_toggle.html" with param="colecao_v6" id=grp.slug nome="Toda a coleção" count=grp.total disabled=grp.toda_disabled current=filters.colecao_v6 noun="coleção" klass="toggle-opt--all-strong" %}
+            {% for tipo in grp.tipos %}
+            {% include "_partials/_cat_toggle.html" with param="typeinform_id" id=tipo.id nome=tipo.nome count=tipo.count current=filters.typeinform_id noun="tipo" %}
+            {% endfor %}
+          </div>
+        </details>
+        {% endfor %}
       </section>
 
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Categorias</h3>
+        {# Toda categoria é um <details> expansível (mesmo sem subcategorias ainda, ex.: PCA, Ciclo Completo) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
-          <summary>{{ cat.nome }} <span class="filter-group__count">({{ cat.count }})</span></summary>
+          <summary><span class="filter-group__label">{{ cat.nome }}</span></summary>
           <div class="filter-group__body">
-            <label class="toggle-opt{% if filters.category_id == cat.id|stringformat:'s' %} active{% endif %}">
-              <input class="facet-input sr-only" type="checkbox" name="category_id" value="{{ cat.id }}"{% if filters.category_id == cat.id|stringformat:'s' %} checked{% endif %}>
-              <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
-              <span>Toda a categoria</span>
-              <span class="toggle-opt__count">{{ cat.count }}</span>
-            </label>
+            {% include "_partials/_cat_toggle.html" with param="category_id" id=cat.id nome="Toda a categoria" count=cat.count disabled=cat.disabled current=filters.category_id noun="categoria" klass="toggle-opt--all-strong" %}
             {% for sub in cat.subcategorias %}
-            <label class="toggle-opt toggle-opt--sub{% if filters.subcategoria_id == sub.id|stringformat:'s' %} active{% endif %}">
-              <input class="facet-input sr-only" type="checkbox" name="subcategoria_id" value="{{ sub.id }}"{% if filters.subcategoria_id == sub.id|stringformat:'s' %} checked{% endif %}>
-              <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
-              <span>{{ sub.nome }}</span>
-              <span class="toggle-opt__count">{{ sub.count }}</span>
-            </label>
-            {% for mic in sub.microcategorias %}
-            <label class="toggle-opt toggle-opt--mic{% if filters.microcategoria_id == mic.id|stringformat:'s' %} active{% endif %}">
-              <input class="facet-input sr-only" type="checkbox" name="microcategoria_id" value="{{ mic.id }}"{% if filters.microcategoria_id == mic.id|stringformat:'s' %} checked{% endif %}>
-              <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
-              <span>{{ mic.nome }}</span>
-              <span class="toggle-opt__count">{{ mic.count }}</span>
-            </label>
-            {% endfor %}
+            {% if sub.has_micros %}
+            <details class="filter-group filter-group--nested"{% if sub.open %} open{% endif %}>
+              <summary><span class="filter-group__label">{{ sub.nome }}</span></summary>
+              <div class="filter-group__body">
+                {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-em" %}
+                {% for mic in sub.microcategorias %}
+                {% include "_partials/_cat_toggle.html" with param="microcategoria_id" id=mic.id nome=mic.nome count=mic.count disabled=mic.disabled current=filters.microcategoria_id noun="microcategoria" klass="toggle-opt--mic" %}
+                {% endfor %}
+              </div>
+            </details>
+            {% else %}
+            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
+            {% endif %}
             {% endfor %}
           </div>
         </details>
-        {% empty %}
-        <p class="facet-empty">Nenhuma categoria com resultados.</p>
         {% endfor %}
       </section>
 
@@ -97,20 +100,6 @@
       <section class="side-section">
         <h3>Assunto</h3>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
-      </section>
-
-      <section class="side-section">
-        <h3>Tipo de informação</h3>
-        {% for grp in facets.tipos_por_colecao %}
-        <details class="filter-group">
-          <summary>{{ grp.colecao }}</summary>
-          <div class="filter-group__body">
-            {% include "_partials/_facet_options.html" with facet=grp.tipos param="typeinform_id" current=filters.typeinform_id %}
-          </div>
-        </details>
-        {% empty %}
-        <p class="facet-empty">Nenhum tipo com resultados.</p>
-        {% endfor %}
       </section>
 
       <button type="submit" class="sp-button-primary btn-apply">Aplicar filtros</button>
