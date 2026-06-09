@@ -18,12 +18,17 @@ def _norm(s):
     return s.strip().lower()
 
 
-# 4 coleções v6 — identidade visual (ícone Feather + classe de cor)
+# 4 coleções v6 — identidade visual (ícone Feather + classe de cor) e descrição
+# curta em Linguagem Simples (usada na aba Curadoria e nos cards de coleção).
 COLECOES_V6 = [
-    {"nome": "Jurisprudência", "slug": "jurisprudencia", "icon": "fi-shield", "color": "c-bluedark"},
-    {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-layers", "color": "c-blue"},
-    {"nome": "Doutrina e Conteúdo Técnico", "slug": "doutrina", "icon": "fi-book-open", "color": "c-red"},
-    {"nome": "Instrução e Capacitação", "slug": "instrucao", "icon": "fi-file-text", "color": "c-green"},
+    {"nome": "Jurisprudência", "slug": "jurisprudencia", "icon": "fi-shield", "color": "c-bluedark",
+     "descricao": "Decisões, súmulas, enunciados e documentos normativos que orientam como aplicar a lei."},
+    {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-layers", "color": "c-blue",
+     "descricao": "Teses, dissertações, monografias e TCCs produzidos em universidades."},
+    {"nome": "Doutrina e Conteúdo Técnico", "slug": "doutrina", "icon": "fi-book-open", "color": "c-red",
+     "descricao": "Livros, artigos, relatórios e notas técnicas que analisam e explicam o tema."},
+    {"nome": "Instrução e Capacitação", "slug": "instrucao", "icon": "fi-file-text", "color": "c-green",
+     "descricao": "Manuais, guias, cursos e materiais para aprender na prática."},
 ]
 COLECOES_BY_NOME = {c["nome"]: c for c in COLECOES_V6}
 COLECOES_BY_SLUG = {c["slug"]: c for c in COLECOES_V6}

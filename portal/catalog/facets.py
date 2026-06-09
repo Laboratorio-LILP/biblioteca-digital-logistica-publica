@@ -81,7 +81,7 @@ def _colecao_v6_facet(filters):
     return [
         {
             "id": c["slug"], "nome": c["nome"], "count": counts[c["nome"]],
-            "icon": c["icon"], "color": c["color"],
+            "icon": c["icon"], "color": c["color"], "descricao": c.get("descricao", ""),
         }
         for c in COLECOES_V6
     ]
@@ -108,6 +108,54 @@ def _tipos_por_colecao_facet(filters):
     ]
 
 
+def _categorias_hierarquia_facet(filters):
+    """Categoria → Subcategoria → Microcategoria aninhadas, com contagens
+    faceta-aware (cada nível conta excluindo o próprio filtro). Espelha
+    `_tipos_por_colecao_facet`, mas com três níveis.
+
+    Só inclui nós com resultados no contexto atual; ordena as Categorias pela
+    ordem canônica do ciclo de contratação (id 1..6) e Sub/Micro pelo `ordem`
+    do modelo. Cada Categoria recebe `active=True` quando ela ou um de seus
+    filhos é o filtro selecionado — o template usa isso para abrir o <details>.
+    """
+    cat_counts = {r["category_id"]: r["count"] for r in _facet_counts(filters, "category_id", "category_id")}
+    sub_counts = {r["subcategoria_id"]: r["count"] for r in _facet_counts(filters, "subcategoria_id", "subcategoria_id")}
+    mic_counts = {r["microcategoria_id"]: r["count"] for r in _facet_counts(filters, "microcategoria_id", "microcategoria_id")}
+
+    cats = {c.id: c for c in NrCategory.objects.all()}
+    subs_by_cat = {}
+    for s in Subcategoria.objects.all():  # Meta.ordering = (ordem, nome)
+        subs_by_cat.setdefault(s.category_id, []).append(s)
+    mics_by_sub = {}
+    for m in Microcategoria.objects.all():
+        mics_by_sub.setdefault(m.subcategoria_id, []).append(m)
+
+    f = filters or {}
+    sel_cat, sel_sub, sel_mic = f.get("category_id"), f.get("subcategoria_id"), f.get("microcategoria_id")
+
+    out = []
+    for cat_id in sorted(cat_counts):  # ordem canônica do ciclo de contratação
+        cat = cats.get(cat_id)
+        if not cat:
+            continue
+        active = str(cat_id) == (sel_cat or "")
+        subcategorias = []
+        for s in subs_by_cat.get(cat_id, []):
+            if not sub_counts.get(s.id):
+                continue
+            if str(s.id) == (sel_sub or ""):
+                active = True
+            micros = []
+            for m in mics_by_sub.get(s.id, []):
+                if mic_counts.get(m.id):
+                    if str(m.id) == (sel_mic or ""):
+                        active = True
+                    micros.append({"id": m.id, "nome": m.nome, "count": mic_counts[m.id]})
+            subcategorias.append({"id": s.id, "nome": s.nome, "count": sub_counts[s.id], "microcategorias": micros})
+        out.append({"id": cat.id, "nome": cat.name, "count": cat_counts[cat_id], "active": active, "subcategorias": subcategorias})
+    return out
+
+
 def compute_facets(filters):
     """Devolve um dict com as facetas disponíveis dado o conjunto de filtros aplicado."""
     facets = {}
@@ -115,6 +163,8 @@ def compute_facets(filters):
     # Coleção v6 (derivada do Tipo de Informação)
     facets["colecoes_v6"] = _colecao_v6_facet(filters)
     facets["tipos_por_colecao"] = _tipos_por_colecao_facet(filters)
+    # Categorias em cascata (accordion <details>): Categoria → Sub → Micro
+    facets["categorias_hierarquia"] = _categorias_hierarquia_facet(filters)
 
     # Hierarquia taxonômica
     facets["assuntos"] = _attach_names(

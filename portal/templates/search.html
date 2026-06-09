@@ -53,17 +53,42 @@
         {% include "_partials/_facet_options.html" with facet=facets.colecoes_v6 param="colecao_v6" current=filters.colecao_v6 %}
       </section>
 
+      {# Categorias em accordion <details> por Categoria (mesmo padrão do Tipo de
+         Informação). Categoria → Subcategoria → Microcategoria, single-select por
+         `name` + cascata-clear já tratados em acervo-filters.js. #}
       <section class="side-section">
         <h3>Categorias</h3>
-        {% include "_partials/_facet_options.html" with facet=facets.categorias param="category_id" current=filters.category_id %}
-        {% if filters.category_id and facets.subcategorias %}
-        <p class="nested-label">Subcategorias</p>
-        {% include "_partials/_facet_options.html" with facet=facets.subcategorias param="subcategoria_id" current=filters.subcategoria_id %}
-        {% endif %}
-        {% if filters.subcategoria_id and facets.microcategorias %}
-        <p class="nested-label">Microcategorias</p>
-        {% include "_partials/_facet_options.html" with facet=facets.microcategorias param="microcategoria_id" current=filters.microcategoria_id %}
-        {% endif %}
+        {% for cat in facets.categorias_hierarquia %}
+        <details class="filter-group"{% if cat.active %} open{% endif %}>
+          <summary>{{ cat.nome }} <span class="filter-group__count">({{ cat.count }})</span></summary>
+          <div class="filter-group__body">
+            <label class="toggle-opt{% if filters.category_id == cat.id|stringformat:'s' %} active{% endif %}">
+              <input class="facet-input sr-only" type="checkbox" name="category_id" value="{{ cat.id }}"{% if filters.category_id == cat.id|stringformat:'s' %} checked{% endif %}>
+              <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
+              <span>Toda a categoria</span>
+              <span class="toggle-opt__count">{{ cat.count }}</span>
+            </label>
+            {% for sub in cat.subcategorias %}
+            <label class="toggle-opt toggle-opt--sub{% if filters.subcategoria_id == sub.id|stringformat:'s' %} active{% endif %}">
+              <input class="facet-input sr-only" type="checkbox" name="subcategoria_id" value="{{ sub.id }}"{% if filters.subcategoria_id == sub.id|stringformat:'s' %} checked{% endif %}>
+              <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
+              <span>{{ sub.nome }}</span>
+              <span class="toggle-opt__count">{{ sub.count }}</span>
+            </label>
+            {% for mic in sub.microcategorias %}
+            <label class="toggle-opt toggle-opt--mic{% if filters.microcategoria_id == mic.id|stringformat:'s' %} active{% endif %}">
+              <input class="facet-input sr-only" type="checkbox" name="microcategoria_id" value="{{ mic.id }}"{% if filters.microcategoria_id == mic.id|stringformat:'s' %} checked{% endif %}>
+              <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
+              <span>{{ mic.nome }}</span>
+              <span class="toggle-opt__count">{{ mic.count }}</span>
+            </label>
+            {% endfor %}
+            {% endfor %}
+          </div>
+        </details>
+        {% empty %}
+        <p class="facet-empty">Nenhuma categoria com resultados.</p>
+        {% endfor %}
       </section>
 
       <section class="side-section">
@@ -94,6 +119,10 @@
     </aside>
 
     <div class="acervo-results">
+      <button type="button" class="acervo-mobile-toggle" aria-expanded="false" aria-controls="acervo-sidebar">
+        <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
+        Filtros{% if filters %} ({{ filters|length }}){% endif %}
+      </button>
       <div class="sp-panel results-bar">
         <div class="results-bar__left">
           <span class="results-bar__icon"><svg class="fi" aria-hidden="true"><use href="#fi-filter"/></svg></span>
