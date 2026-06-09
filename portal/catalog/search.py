@@ -95,16 +95,25 @@ def _apply_sort(qs, sort, default):
     """Ordena por Autor/Título/Ano (escolha do usuário) ou pelo `default` da view.
 
     `default` é "-rank" na busca textual e "-created" na listagem por filtros.
+
+    Toda ordenação termina em `-pk` (desempate único e estável). Sem essa chave
+    total, a paginação LIMIT/OFFSET do Django duplica e omite registros quando o
+    critério visível empata — e os 499 docs foram carregados em lote com `created`
+    idêntico, então `-created`/`-rank` empatam em massa. Com `-pk` as páginas
+    "ladrilham" sem perder nem repetir documentos.
     """
     if sort == "autor":
-        return qs.order_by("autor_principal", "title")
+        # Ordena pelo MESMO campo exibido no card (`author` = Autor Principal),
+        # não por `autor_principal` (Autoridade Intelectual) — senão a lista
+        # parece fora de ordem, já que o card mostra `author`.
+        return qs.order_by("author", "title", "-pk")
     if sort == "titulo":
-        return qs.order_by("title")
+        return qs.order_by("title", "-pk")
     if sort == "ano":
-        return qs.order_by(F("ano").desc(nulls_last=True), "title")
+        return qs.order_by(F("ano").desc(nulls_last=True), "title", "-pk")
     if sort == "recente":
-        return qs.order_by("-created")
-    return qs.order_by(default)
+        return qs.order_by("-created", "-pk")
+    return qs.order_by(default, "-pk")
 
 
 def search_documents(query, filters=None, sort=None):

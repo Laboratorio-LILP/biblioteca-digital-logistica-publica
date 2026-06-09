@@ -12,6 +12,7 @@ urlpatterns = [
     path("colecoes/", views.collection_list, name="collection_list"),
     path("colecao/<int:topic_id>/", views.collection_detail, name="collection_detail"),
     path("download/<str:code>/", views.download, name="download"),
+    path("curadoria/", views.curadoria, name="curadoria"),
     path("sobre/", views.about, name="about"),
 
     # Páginas institucionais e legais (LAI / LGPD / eMAG / Lei 13.460)

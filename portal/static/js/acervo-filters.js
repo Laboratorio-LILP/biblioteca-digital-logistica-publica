@@ -8,6 +8,10 @@
   const form = document.getElementById("acervo-form");
   if (!form) return;
 
+  // Marca JS ativo: habilita o drawer de filtros no mobile só quando há JS
+  // (sem JS, a sidebar fica empilhada e acessível — progressive enhancement).
+  document.documentElement.classList.add("js");
+
   const sidebar = document.getElementById("acervo-sidebar");
   const mobileToggle = form.querySelector(".acervo-mobile-toggle");
   const activeBadge = form.querySelector("#filter-active-count");

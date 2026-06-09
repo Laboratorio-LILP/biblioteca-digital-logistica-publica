@@ -26,12 +26,12 @@ def home(request):
     """Homepage: busca, stats, coleções e últimas adições."""
     from django.db.models import Count, Q
 
-    recent_docs = Document.objects.filter(status="a").order_by("-created")[:10]
+    recent_docs = Document.objects.filter(status="a").order_by("-created", "-pk")[:10]
     # Tema em alta (Sustentabilidade e ODS) — dados reais; cai para recentes se vazio
     trending_docs = list(
         Document.objects.filter(status="a")
         .filter(Q(keywords__icontains="sustentab") | Q(title__icontains="sustentab") | Q(abstract__icontains="sustentab"))
-        .order_by("-created")[:3]
+        .order_by("-created", "-pk")[:3]
     ) or list(recent_docs[:3])
 
     # Stat 1: total de materiais
@@ -159,7 +159,7 @@ def collection_detail(request, topic_id):
 
     # Documentos da coleção e subcoleções
     topic_ids = [topic.id] + list(subcollections_qs.values_list("id", flat=True))
-    documents = Document.objects.filter(status="a", topic_id__in=topic_ids).order_by("-created")
+    documents = Document.objects.filter(status="a", topic_id__in=topic_ids).order_by("-created", "-pk")
 
     paginator = Paginator(documents, settings.SEARCH_RESULTS_PER_PAGE)
     page_obj = paginator.get_page(page_number)
@@ -216,6 +216,13 @@ def download(request, code):
         raise Http404("Arquivo não encontrado.")
 
     return FileResponse(open(file_path, "rb"), as_attachment=True, filename=doc.filename)
+
+
+def curadoria(request):
+    """Página pública 'Como o acervo é organizado' — em Linguagem Simples,
+    sem processos internos de curadoria. Reusa a visão das 4 coleções v6
+    (mesma fonte da home e da página de coleções)."""
+    return render(request, "curadoria.html", {"colecoes_v6": colecao_v6_overview()})
 
 
 def about(request):
