@@ -1,0 +1,24 @@
+{% comment %}
+Um nó selecionável da hierarquia de Categorias (Cat/Sub/Micro). Reusa o estilo
+ToggleOpt. Quando `disabled` (0 documentos), vira um <span> não-interativo (cinza)
+— a taxonomia continua visível, só não é clicável.
+Params: param (campo GET), id, nome, count, disabled (bool), current (valor ativo),
+        noun (palavra p/ o title do estado desabilitado),
+        klass (classe extra, ex.: toggle-opt--mic), hide_count (não repetir a
+        contagem quando o pai já a mostra — "Toda a categoria/subcategoria").
+{% endcomment %}
+{% load catalog_tags %}
+{% if disabled %}
+<span class="toggle-opt{% if klass %} {{ klass }}{% endif %} is-disabled" aria-disabled="true" title="Sem material nesta {{ noun }} ainda">
+  <span class="toggle-opt__box" aria-hidden="true"></span>
+  <span class="toggle-opt__name">{{ nome }}</span>
+  {% if not hide_count %}<span class="toggle-opt__count">{{ count }}</span>{% endif %}
+</span>
+{% else %}
+<label class="toggle-opt{% if klass %} {{ klass }}{% endif %}{% if current|selected_in:id %} active{% endif %}">
+  <input class="facet-input sr-only" type="checkbox" name="{{ param }}" value="{{ id }}"{% if current|selected_in:id %} checked{% endif %}>
+  <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
+  <span class="toggle-opt__name">{{ nome }}</span>
+  {% if not hide_count %}<span class="toggle-opt__count">{{ count }}</span>{% endif %}
+</label>
+{% endif %}

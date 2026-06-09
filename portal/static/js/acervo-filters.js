@@ -17,11 +17,55 @@
   const activeBadge = form.querySelector("#filter-active-count");
   const applyBtn = form.querySelector(".btn-apply");
 
+  // === Preservar posição de rolagem + grupos abertos através do reload ===
+  // O auto-submit recarrega a página (GET). Sem isto, o navegador volta ao topo
+  // e o usuário "perde o lugar" ao clicar numa faceta lá embaixo (relato Laís).
+  const RESTORE_KEY = "acervo:restore";
+  // Apenas estes grupos são single-select (rádio); os demais são multi-select.
+  const SINGLE_SELECT = new Set(["colecao_v6", "category_id", "subcategoria_id", "microcategoria_id"]);
+
+  function groupKey(details) {
+    // Chave estável do <details>: texto do summary sem a contagem (dígitos/parênteses).
+    const summary = details.querySelector("summary");
+    return (summary ? summary.textContent : "").replace(/[\d()]/g, "").replace(/\s+/g, " ").trim();
+  }
+
+  function saveState() {
+    try {
+      const open = [];
+      form.querySelectorAll("details.filter-group[open]").forEach((d) => open.push(groupKey(d)));
+      sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ y: window.scrollY, open: open }));
+    } catch (e) { /* sessionStorage indisponível: degrada sem quebrar */ }
+  }
+
+  function restoreState() {
+    let state = null;
+    try {
+      state = JSON.parse(sessionStorage.getItem(RESTORE_KEY) || "null");
+      sessionStorage.removeItem(RESTORE_KEY);
+    } catch (e) { return; }
+    if (!state) return;
+    if (Array.isArray(state.open) && state.open.length) {
+      const wanted = new Set(state.open);
+      form.querySelectorAll("details.filter-group").forEach((d) => {
+        if (wanted.has(groupKey(d))) d.open = true;
+      });
+    }
+    // scrollTo instantâneo (sem smooth) — respeita prefers-reduced-motion.
+    if (typeof state.y === "number") window.scrollTo(0, state.y);
+  }
+
+  // Submete o form preservando o estado (rolagem + grupos abertos).
+  function doSubmit() {
+    saveState();
+    form.submit();
+  }
+
   // === Auto-submit em mudança (debounced para slider) ===
   let submitTimer = null;
   function debouncedSubmit(delay) {
     if (submitTimer) clearTimeout(submitTimer);
-    submitTimer = setTimeout(() => form.submit(), delay);
+    submitTimer = setTimeout(doSubmit, delay);
   }
 
   // Checkboxes de faceta: limpa cascata + submit imediato
@@ -29,11 +73,14 @@
     const target = e.target;
     if (!target || !target.matches("input[type=checkbox].facet-input")) return;
 
-    // Comportamento de "rádio dentro do grupo" — só um valor por filtro
+    // Single-select (rádio) só nos grupos de Coleção e da hierarquia de
+    // Categorias; os eixos paralelos (Assunto, Natureza, Tipo) são multi-select.
     const param = target.name;
-    form.querySelectorAll(`input[name="${param}"]`).forEach((el) => {
-      if (el !== target) el.checked = false;
-    });
+    if (SINGLE_SELECT.has(param)) {
+      form.querySelectorAll(`input[name="${param}"]`).forEach((el) => {
+        if (el !== target) el.checked = false;
+      });
+    }
 
     // Cascata: trocar Categoria zera Subcategoria + Microcategoria; trocar Subcategoria zera Microcategoria
     if (param === "category_id") {
@@ -60,7 +107,7 @@
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        form.submit();
+        doSubmit();
       }
     });
   });
@@ -68,7 +115,7 @@
   // Ordenação (Autor/Título/Ano): auto-submit ao trocar
   const sortSelect = form.querySelector('select[name="sort"]');
   if (sortSelect) {
-    sortSelect.addEventListener("change", () => form.submit());
+    sortSelect.addEventListener("change", doSubmit);
   }
 
   // === Range slider duplo de ano ===
@@ -167,4 +214,7 @@
   if (applyBtn) {
     applyBtn.style.display = "none";
   }
+
+  // Restaurar posição de rolagem/grupos abertos após o reload do auto-submit.
+  requestAnimationFrame(restoreState);
 })();

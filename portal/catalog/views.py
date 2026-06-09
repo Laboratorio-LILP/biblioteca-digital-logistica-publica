@@ -100,11 +100,35 @@ FILTER_PARAMS = (
     "ano_max",
 )
 
+# Facetas de eixo paralelo: aceitam MÚLTIPLOS valores (OR dentro da faceta,
+# AND entre facetas). As demais — Coleção e a hierarquia Categoria→Sub→Micro —
+# seguem single-select (a hierarquia depende disso para a cascata).
+MULTI_PARAMS = frozenset({
+    "assunto_id",
+    "natureza",
+    "typeinform_id",
+    "permissao",
+    "complexidade",
+})
+
 
 def _read_filters(request):
-    """Extrai filtros válidos da query string, descartando vazios."""
-    filters = {p: request.GET.get(p) for p in FILTER_PARAMS}
-    return {k: v for k, v in filters.items() if v}
+    """Extrai filtros válidos da query string, descartando vazios.
+
+    Params em MULTI_PARAMS viram lista de valores (`getlist`); os demais,
+    valor único (`get`). Chaves sem valor são descartadas.
+    """
+    filters = {}
+    for p in FILTER_PARAMS:
+        if p in MULTI_PARAMS:
+            vals = [v for v in request.GET.getlist(p) if v]
+            if vals:
+                filters[p] = vals
+        else:
+            value = request.GET.get(p)
+            if value:
+                filters[p] = value
+    return filters
 
 
 def search(request):

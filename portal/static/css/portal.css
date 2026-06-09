@@ -434,13 +434,36 @@ main { flex: 1 0 auto; }
 
 .filter-group { border: 1px solid rgb(var(--rgb-gray-medium) / 0.7); border-radius: 6px; background: var(--sp-white); }
 .filter-group + .filter-group { margin-top: 8px; }
-.filter-group > summary { cursor: pointer; padding: 8px 12px; font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; color: var(--sp-black); list-style-position: inside; }
-.filter-group__body { border-top: var(--border); padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.filter-group > summary { cursor: pointer; padding: 8px 8px 8px 12px; font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; color: var(--sp-black); display: flex; align-items: center; gap: 8px; list-style: none; }
+.filter-group > summary::-webkit-details-marker { display: none; }
+/* Chevron próprio (à esquerda): fechado aponta p/ a direita, aberto p/ baixo. */
+.filter-group > summary::before { content: ""; flex: 0 0 auto; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 150ms ease; opacity: 0.55; }
+.filter-group[open] > summary::before { transform: rotate(45deg); }
+.filter-group__label { flex: 1 1 auto; min-width: 0; }
+.filter-group__body { border-top: var(--border); padding: 8px 0 8px 8px; display: flex; flex-direction: column; gap: 4px; }
 .nested-label { font-family: var(--font-subtitle); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--sp-blue); margin: 16px 0 4px; }
-/* Accordion de Categorias: contagem no resumo + indentação dos níveis (Sub/Micro) */
-.filter-group__count { font-weight: 400; color: rgb(var(--rgb-black) / 0.5); }
-.toggle-opt--sub { padding-left: 22px; }
-.toggle-opt--mic { padding-left: 38px; }
+/* Contagem no MESMO modelo das outras seções: número à direita, sem parênteses. */
+.filter-group__count { flex: 0 0 auto; margin-left: auto; font-weight: 400; font-size: 11px; color: rgb(var(--rgb-black) / 0.45); }
+/* Subcategorias com Microcategorias viram <details> aninhado (drop/expansão),
+   no mesmo padrão visual. O aninhamento dá a indentação — sem margem nos itens,
+   então a contagem não escapa para fora da barra. */
+.filter-group__body .filter-group { margin-top: 0; }
+.filter-group--nested { border: 0; border-radius: 0; background: transparent; }
+/* Subcategoria expansível: NÃO é negrito (negrito fica só para Categorias). */
+.filter-group--nested > summary { padding: 4px 8px 4px 12px; font-size: 11px; font-weight: 400; gap: 6px; }
+.filter-group--nested > .filter-group__body { border-top: 0; padding: 2px 0 2px 20px; }
+/* Frases "selecionar tudo": negrito p/ Categoria/Coleção, itálico p/ Subcategoria. */
+.toggle-opt--all-strong { font-weight: 600; }
+.toggle-opt--all-em { font-style: italic; }
+/* Microcategorias em caixa baixa (sentença) p/ distinguir das Subcategorias (caixa alta). */
+.toggle-opt--mic .toggle-opt__name { text-transform: lowercase; display: inline-block; }
+.toggle-opt--mic .toggle-opt__name::first-letter { text-transform: uppercase; }
+/* Microcategoria sem material ainda (revelada ao selecionar a subcategoria):
+   visível como estrutura de navegação, mas não interativa (em cinza). */
+.toggle-opt.is-disabled { color: rgb(var(--rgb-black) / 0.4); cursor: default; }
+.toggle-opt.is-disabled:hover { background: transparent; color: rgb(var(--rgb-black) / 0.4); }
+.toggle-opt.is-disabled .toggle-opt__box { border-style: dashed; opacity: 0.6; }
+.toggle-opt.is-disabled .toggle-opt__count { color: rgb(var(--rgb-black) / 0.35); }
 .facet-empty { padding: 6px 8px; font-size: 11px; color: rgb(var(--rgb-black) / 0.55); }
 .filter-panel .btn-apply { width: 100%; margin-top: 16px; }
 @media (max-width: 1023px) { .identity__divider, .library-mark { display: none; } }

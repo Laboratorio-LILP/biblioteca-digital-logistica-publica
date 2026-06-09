@@ -4,6 +4,8 @@ que satisfazem TODOS os outros filtros aplicados — exceto ele mesmo. Isso perm
 que o usuário troque um valor de filtro sem ficar com lista vazia.
 """
 
+import unicodedata
+
 from django.db.models import Count, Min, Max
 
 from .models import (
@@ -17,6 +19,13 @@ from .models import (
 )
 from .search import _apply_filters
 from .taxonomy_v6 import COLECOES_V6, colecao_v6_for_tipo
+
+
+def _sort_key(nome):
+    """Chave de ordenação alfabética acento-insensível (pt): 'Á' ordena junto
+    de 'a', não depois de 'z'. Usada nas facetas planas (Assunto/Natureza/Tipo)."""
+    decomp = unicodedata.normalize("NFKD", str(nome or ""))
+    return "".join(c for c in decomp if not unicodedata.combining(c)).casefold()
 
 
 def _facet_counts(filters, exclude_key, group_by):
@@ -59,8 +68,10 @@ def _string_facet(filters, exclude_key, field):
         .order_by("-count")
     )
     # `id` espelha `value` para uniformizar com as facetas de modelo
-    # (o template usa sempre opt.id como valor do checkbox).
-    return [{"id": r[field], "value": r[field], "nome": r[field], "count": r["count"]} for r in rows]
+    # (o template usa sempre opt.id como valor do checkbox). Ordem alfabética.
+    out = [{"id": r[field], "value": r[field], "nome": r[field], "count": r["count"]} for r in rows]
+    out.sort(key=lambda o: _sort_key(o["nome"]))
+    return out
 
 
 def _colecao_v6_facet(filters):
@@ -93,7 +104,13 @@ def colecao_v6_overview():
 
 
 def _tipos_por_colecao_facet(filters):
-    """Tipo de Informação agrupado por Coleção v6 (só tipos com resultados)."""
+    """Tipos de Informação agrupados por Coleção v6, em cascata. A seção é
+    exibida na interface como 'Coleção' (substitui a faceta simples antiga).
+
+    Cada grupo traz `slug` (para 'Toda a coleção' = colecao_v6), `total`
+    (soma dos tipos = contagem da coleção, pois cada doc tem 1 tipo), `active`
+    (abrir o <details> quando a coleção ou um de seus tipos está selecionado)
+    e os `tipos`. As 4 coleções aparecem sempre, como na faceta antiga."""
     flat = _attach_names(
         list(_facet_counts(filters, "typeinform_id", "typeinform_id")),
         "typeinform_id", TypeInformation, label_field="name",
@@ -102,25 +119,56 @@ def _tipos_por_colecao_facet(filters):
     for t in flat:
         nome = colecao_v6_for_tipo(t["nome"])["nome"]
         by_col[nome].append(t)
-    return [
-        {"colecao": c["nome"], "tipos": by_col[c["nome"]]}
-        for c in COLECOES_V6 if by_col[c["nome"]]
-    ]
+    for tipos in by_col.values():  # ordem alfabética dentro de cada coleção
+        tipos.sort(key=lambda t: _sort_key(t["nome"]))
+
+    f = filters or {}
+    sel_col = f.get("colecao_v6")
+    sel_tipos = f.get("typeinform_id") or []
+    if not isinstance(sel_tipos, (list, tuple, set)):
+        sel_tipos = [sel_tipos]
+    sel_tipos = {str(t) for t in sel_tipos}
+
+    out = []
+    for c in COLECOES_V6:
+        tipos = by_col[c["nome"]]
+        total = sum(t["count"] for t in tipos)
+        active = (sel_col == c["slug"]) or any(str(t["id"]) in sel_tipos for t in tipos)
+        out.append({
+            "colecao": c["nome"], "slug": c["slug"], "total": total,
+            "toda_disabled": total == 0, "active": active, "tipos": tipos,
+        })
+    return out
 
 
 def _categorias_hierarquia_facet(filters):
-    """Categoria → Subcategoria → Microcategoria aninhadas, com contagens
-    faceta-aware (cada nível conta excluindo o próprio filtro). Espelha
-    `_tipos_por_colecao_facet`, mas com três níveis.
+    """Categoria → Subcategoria → Microcategoria — taxonomia COMPLETA sempre.
 
-    Só inclui nós com resultados no contexto atual; ordena as Categorias pela
-    ordem canônica do ciclo de contratação (id 1..6) e Sub/Micro pelo `ordem`
-    do modelo. Cada Categoria recebe `active=True` quando ela ou um de seus
-    filhos é o filtro selecionado — o template usa isso para abrir o <details>.
+    Mostra todos os nós da árvore (mesmo com 0 documentos, exibidos `disabled`/
+    cinza). A poluição é controlada pela expansão aninhada (<details>): cada
+    Subcategoria que tem Microcategorias vira uma caixa expansível, no mesmo
+    padrão visual da Categoria.
+
+    Contagens ESTÁVEIS: os três níveis contam no MESMO contexto (todos os
+    filtros, EXCETO a própria hierarquia) — os números não "pulam" ao navegar.
+    A contagem de cada nó é "documentos naquele ramo"; a soma dos filhos pode
+    ser menor que o pai (docs classificados só no nível acima).
+
+    `open`/`active` ficam True quando o nó ou um descendente é o filtro
+    selecionado — o template usa para abrir os <details>.
     """
-    cat_counts = {r["category_id"]: r["count"] for r in _facet_counts(filters, "category_id", "category_id")}
-    sub_counts = {r["subcategoria_id"]: r["count"] for r in _facet_counts(filters, "subcategoria_id", "subcategoria_id")}
-    mic_counts = {r["microcategoria_id"]: r["count"] for r in _facet_counts(filters, "microcategoria_id", "microcategoria_id")}
+    f = filters or {}
+    # Base comum a todos os níveis: remove a hierarquia → contagens estáveis.
+    base = {k: v for k, v in f.items() if k not in ("category_id", "subcategoria_id", "microcategoria_id")}
+
+    def counts_by(group_by):
+        qs = _apply_filters(Document.objects.filter(status="a"), base)
+        rows = qs.exclude(**{f"{group_by}__isnull": True}).values(group_by).annotate(count=Count("id"))
+        return {r[group_by]: r["count"] for r in rows}
+
+    cat_counts = counts_by("category_id")
+    sub_counts = counts_by("subcategoria_id")
+    mic_counts = counts_by("microcategoria_id")
 
     cats = {c.id: c for c in NrCategory.objects.all()}
     subs_by_cat = {}
@@ -130,29 +178,33 @@ def _categorias_hierarquia_facet(filters):
     for m in Microcategoria.objects.all():
         mics_by_sub.setdefault(m.subcategoria_id, []).append(m)
 
-    f = filters or {}
     sel_cat, sel_sub, sel_mic = f.get("category_id"), f.get("subcategoria_id"), f.get("microcategoria_id")
 
     out = []
-    for cat_id in sorted(cat_counts):  # ordem canônica do ciclo de contratação
-        cat = cats.get(cat_id)
-        if not cat:
-            continue
-        active = str(cat_id) == (sel_cat or "")
+    for cat_id in sorted(cats):  # taxonomia completa, na ordem do ciclo (id 1..6)
+        cat = cats[cat_id]
+        cat_count = cat_counts.get(cat_id, 0)
+        cat_open = str(cat_id) == (sel_cat or "")
         subcategorias = []
         for s in subs_by_cat.get(cat_id, []):
-            if not sub_counts.get(s.id):
-                continue
-            if str(s.id) == (sel_sub or ""):
-                active = True
+            scnt = sub_counts.get(s.id, 0)
+            sub_open = str(s.id) == (sel_sub or "")
             micros = []
             for m in mics_by_sub.get(s.id, []):
-                if mic_counts.get(m.id):
-                    if str(m.id) == (sel_mic or ""):
-                        active = True
-                    micros.append({"id": m.id, "nome": m.nome, "count": mic_counts[m.id]})
-            subcategorias.append({"id": s.id, "nome": s.nome, "count": sub_counts[s.id], "microcategorias": micros})
-        out.append({"id": cat.id, "nome": cat.name, "count": cat_counts[cat_id], "active": active, "subcategorias": subcategorias})
+                mcnt = mic_counts.get(m.id, 0)
+                if str(m.id) == (sel_mic or ""):
+                    sub_open = True
+                micros.append({"id": m.id, "nome": m.nome, "count": mcnt, "disabled": mcnt == 0})
+            if sub_open:
+                cat_open = True
+            subcategorias.append({
+                "id": s.id, "nome": s.nome, "count": scnt, "disabled": scnt == 0,
+                "open": sub_open, "has_micros": bool(micros), "microcategorias": micros,
+            })
+        out.append({
+            "id": cat.id, "nome": cat.name, "count": cat_count, "disabled": cat_count == 0,
+            "active": cat_open, "subcategorias": subcategorias,
+        })
     return out
 
 
@@ -167,8 +219,11 @@ def compute_facets(filters):
     facets["categorias_hierarquia"] = _categorias_hierarquia_facet(filters)
 
     # Hierarquia taxonômica
-    facets["assuntos"] = _attach_names(
-        list(_facet_counts(filters, "assunto_id", "assunto_id")), "assunto_id", Assunto
+    facets["assuntos"] = sorted(
+        _attach_names(
+            list(_facet_counts(filters, "assunto_id", "assunto_id")), "assunto_id", Assunto
+        ),
+        key=lambda a: _sort_key(a["nome"]),
     )
     facets["categorias"] = _attach_names(
         list(_facet_counts(filters, "category_id", "category_id")), "category_id", NrCategory, label_field="name"

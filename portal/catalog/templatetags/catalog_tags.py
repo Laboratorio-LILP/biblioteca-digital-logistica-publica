@@ -116,6 +116,17 @@ def split_keywords(value):
     return [kw.strip() for kw in value.split() if kw.strip()]
 
 
+@register.filter
+def selected_in(current, opt_id):
+    """True se `opt_id` está selecionado em `current` — que pode ser um valor
+    único (faceta single-select) ou uma lista (faceta multi-select). Comparação
+    sempre por string, para casar com `opt.id` (int) e querystring (str)."""
+    sid = str(opt_id)
+    if isinstance(current, (list, tuple, set)):
+        return sid in {str(c) for c in current}
+    return current not in (None, "") and sid == str(current)
+
+
 @register.simple_tag
 def querystring_replace(querydict, key, value):
     """Reescreve a querystring atual substituindo uma chave por um valor.
