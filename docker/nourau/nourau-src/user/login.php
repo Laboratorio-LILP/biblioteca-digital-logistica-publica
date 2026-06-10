@@ -12,8 +12,7 @@ echo "<head>";
 echo "<meta charset='UTF-8' />";
 echo "<title>Formulário de Login e Registro com HTML5 e CSS3</title>";
 echo "<meta name='viewport' content='width=device-width, initial-scale=1.0'> ";
-echo "<link rel='stylesheet' type='text/css' href='https://www.bibliotecadigital.unicamp.br/manager/layout/estilo_login.css' />";
-echo "<script src='https://www.google.com/recaptcha/api.js' async defer></script>";
+echo "<link rel='stylesheet' type='text/css' href='../layout/estilo_login.css' />";
 echo "</head>";
 
 
