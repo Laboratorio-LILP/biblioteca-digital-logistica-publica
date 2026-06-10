@@ -477,15 +477,17 @@ main { flex: 1 0 auto; }
    então a contagem não escapa para fora da barra. */
 .filter-group__body .filter-group { margin-top: 0; }
 .filter-group--nested { border: 0; border-radius: 0; background: transparent; }
-/* Subcategoria expansível: NÃO é negrito (negrito fica só para Categorias). */
-.filter-group--nested > summary { padding: 4px 8px 4px 12px; font-size: 11px; font-weight: 400; gap: 6px; }
+/* Subcategoria expansível: mesma fonte e tamanho das subcategorias selecionáveis
+   (.toggle-opt, font-sans 12px) — só não é negrito (negrito fica para Categorias). */
+.filter-group--nested > summary { padding: 4px 8px 4px 12px; font-family: var(--font-sans); font-size: 12px; font-weight: 400; gap: 6px; }
 .filter-group--nested > .filter-group__body { border-top: 0; padding: 2px 0 2px 20px; }
 /* Frases "selecionar tudo": negrito p/ Categoria/Coleção, itálico p/ Subcategoria. */
 .toggle-opt--all-strong { font-weight: 600; }
 .toggle-opt--all-em { font-style: italic; }
-/* Microcategorias em caixa baixa (sentença) p/ distinguir das Subcategorias (caixa alta). */
-.toggle-opt--mic .toggle-opt__name { text-transform: lowercase; display: inline-block; }
-.toggle-opt--mic .toggle-opt__name::first-letter { text-transform: uppercase; }
+/* Microcategorias: Title Case vem do dado (titulo_pt); fonte um pouco menor
+   que as Subcategorias para distingui-las. "Toda a subcategoria" (toggle-opt--all-em)
+   não recebe --mic, então fica no tamanho das subs, em itálico. */
+.toggle-opt--mic { font-size: 11px; }
 /* Microcategoria sem material ainda (revelada ao selecionar a subcategoria):
    visível como estrutura de navegação, mas não interativa (em cinza). */
 .toggle-opt.is-disabled { color: rgb(var(--rgb-black) / 0.4); cursor: default; }

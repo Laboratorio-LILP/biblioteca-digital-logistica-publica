@@ -16,7 +16,7 @@ preservando a busca (q). Renderiza só quando há ao menos um filtro.
   <ul class="applied-filters__list">
     {% for chip in chips %}
     <li class="applied-filter-chip">
-      <span class="applied-filter-chip__label">{{ chip.texto }}</span>
+      <span class="applied-filter-chip__label" title="{{ chip.texto }}">{{ chip.texto }}</span>
       <a class="applied-filter-chip__remove" href="{{ chip.remove_url }}" aria-label="{{ chip.aria }}">
         <svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg>
       </a>

@@ -87,6 +87,10 @@ _TITULO_SIGLAS = {"PCA", "ETP", "TR", "TIC", "RP", "PMI", "ODS", "MPE"}
 # Cada token é uma sequência de letras/dígitos (com acento) OU uma sequência de
 # separadores/pontuação — nunca misturados, para preservar '/', '-', '(', ')'.
 _TITULO_TOKEN_RE = re.compile(r"[0-9A-Za-zÀ-ÖØ-öø-ÿ]+|[^0-9A-Za-zÀ-ÖØ-öø-ÿ]+")
+# Numerais romanos (I, II, IV, VIII...) — preservados em maiúsculas nos rótulos
+# das microcategorias ("EMERGÊNCIA - Inciso VIII", "incisos I e II"). O
+# lookahead garante token só com letras romanas (sem casar string vazia).
+_TITULO_ROMANO_RE = re.compile(r"^(?=[MDCLXVI]+$)M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")
 
 
 @register.filter
@@ -112,7 +116,7 @@ def titulo_pt(value):
             out.append(tok)
             continue
         upper = tok.upper()
-        if upper in _TITULO_SIGLAS:
+        if upper in _TITULO_SIGLAS or _TITULO_ROMANO_RE.match(upper):
             out.append(upper)
         else:
             lower = tok.lower()
@@ -299,7 +303,7 @@ def _chip_dimensao_valor(param, value):
     if param == "subcategoria_id":
         return "Subcategoria", titulo_pt(_subcategoria_names().get(sid, value))
     if param == "microcategoria_id":
-        return "Microcategoria", _microcategoria_names().get(sid, value)
+        return "Microcategoria", titulo_pt(_microcategoria_names().get(sid, value))
     if param == "assunto_id":
         return "Assunto", _assunto_names().get(sid, value)
     if param == "natureza":

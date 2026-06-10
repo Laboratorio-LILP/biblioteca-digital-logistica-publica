@@ -50,6 +50,7 @@
       {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto. "Coleção" é a cascata de tipos agrupada por coleção (substitui a faceta simples). Manter em UMA linha — comentário multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Coleção</h3>
+        <p class="side-section__hint">Agrupa os documentos por tipo, em quatro coleções.</p>
         {% for grp in facets.tipos_por_colecao %}
         <details class="filter-group"{% if grp.active %} open{% endif %}>
           <summary><span class="filter-group__label">{{ grp.colecao }}</span></summary>
@@ -66,6 +67,7 @@
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Categorias</h3>
+        <p class="side-section__hint">Cada categoria é uma etapa do processo de contratação pública.</p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias ainda, ex.: PCA, Ciclo Completo) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
@@ -79,7 +81,7 @@
               <div class="filter-group__body">
                 {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-em" %}
                 {% for mic in sub.microcategorias %}
-                {% include "_partials/_cat_toggle.html" with param="microcategoria_id" id=mic.id nome=mic.nome count=mic.count disabled=mic.disabled current=filters.microcategoria_id noun="microcategoria" klass="toggle-opt--mic" %}
+                {% include "_partials/_cat_toggle.html" with param="microcategoria_id" id=mic.id nome=mic.nome|titulo_pt count=mic.count disabled=mic.disabled current=filters.microcategoria_id noun="microcategoria" klass="toggle-opt--mic" %}
                 {% endfor %}
               </div>
             </details>
@@ -94,11 +96,13 @@
 
       <section class="side-section">
         <h3>Natureza</h3>
+        <p class="side-section__hint">O objeto da contratação: materiais, serviços, obras ou TIC.</p>
         {% include "_partials/_facet_options.html" with facet=facets.naturezas param="natureza" current=filters.natureza empty_msg="Sem materiais classificados por natureza ainda." %}
       </section>
 
       <section class="side-section">
         <h3>Assunto</h3>
+        <p class="side-section__hint">O tema tratado no documento.</p>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
       </section>
 
