@@ -547,6 +547,10 @@ main { flex: 1 0 auto; }
 .page-info { font-size: 12px; color: rgb(var(--rgb-black) / 0.62); padding-inline: 8px; }
 .pagination__status { text-align: center; margin-top: 8px; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); font-family: var(--font-subtitle); }
 
+/* Continuidade (T3): a lista esmaece durante o submit (refresh = "atualizando", não página nova) */
+.acervo-results.is-updating { opacity: 0.55; transition: opacity 120ms ease; }
+@media (prefers-reduced-motion: reduce) { .acervo-results.is-updating { transition: none; } }
+
 /* ============================================================
    Detalhe do documento
    ============================================================ */

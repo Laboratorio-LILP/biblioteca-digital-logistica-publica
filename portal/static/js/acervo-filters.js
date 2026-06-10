@@ -58,6 +58,13 @@
   // Submete o form preservando o estado (rolagem + grupos abertos).
   function doSubmit() {
     saveState();
+    // Microcontinuidade (T3): sinaliza "atualizando" antes do reload do GET,
+    // para o refresh parecer atualização, não página nova. O texto é anunciado
+    // por aria-live e a lista esmaece; ambos somem no reload (estado fresco).
+    const statusEl = document.getElementById("acervo-status");
+    if (statusEl) statusEl.textContent = "Atualizando resultados…";
+    const results = document.querySelector(".acervo-results");
+    if (results) results.classList.add("is-updating");
     form.submit();
   }
 

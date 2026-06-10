@@ -126,6 +126,8 @@
     </aside>
 
     <div class="acervo-results">
+      {# Continuidade (T3): região viva e vazia no HTML inicial; o JS troca só o texto no submit ("Atualizando resultados…"). Nunca recriar o elemento, senão o leitor de tela não anuncia. #}
+      <p class="sr-only" role="status" aria-live="polite" id="acervo-status"></p>
       <button type="button" class="acervo-mobile-toggle" aria-expanded="false" aria-controls="acervo-sidebar">
         <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
         Filtros{% if filters %} ({{ filters|length }}){% endif %}
@@ -161,8 +163,16 @@
       {% else %}
       <div class="sp-panel empty-state">
         <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
+        {% if filters %}
+        <strong>Nenhum documento com esses filtros</strong>
+        <p>Remova um filtro ou amplie o intervalo de anos para ver mais resultados. <a href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}">Limpar tudo</a></p>
+        {% elif query %}
         <strong>Nenhum documento encontrado</strong>
-        <p>Tente outros filtros ou termos de pesquisa para ampliar a busca.{% if filters or query %} <a href="{% url 'catalog:search' %}">Limpar tudo</a>{% endif %}</p>
+        <p>Tente outros termos de pesquisa.</p>
+        {% else %}
+        <strong>Nenhum documento encontrado</strong>
+        <p>Tente outros termos de pesquisa para começar.</p>
+        {% endif %}
       </div>
       {% endif %}
 
