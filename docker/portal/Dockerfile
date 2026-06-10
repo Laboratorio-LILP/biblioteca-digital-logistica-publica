@@ -19,13 +19,14 @@ RUN pip install --no-cache-dir \
     "gunicorn>=22.0" \
     "django-environ>=0.11" \
     "openpyxl>=3.1" \
-    "whitenoise>=6.7"
+    "whitenoise>=6.7" \
+    "django-csp>=3.8,<4.0"
 
 # Copiar código do portal
 COPY portal/ /app/
 
 # Coletar arquivos estáticos
-RUN DJANGO_SECRET_KEY=build-placeholder python manage.py collectstatic --noinput 2>/dev/null || true
+RUN DJANGO_SECRET_KEY=build-placeholder python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

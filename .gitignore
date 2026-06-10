@@ -226,3 +226,7 @@ migration/*.log
 # Claude Code — estado local da máquina (não versionar)
 .claude/settings.local.json
 .claude/worktrees/
+
+# Backups locais de manutenção (não versionar)
+*.bak-*
+*preflip*

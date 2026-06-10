@@ -82,7 +82,10 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 if FORCE_SCRIPT_NAME:
     SESSION_COOKIE_PATH = FORCE_SCRIPT_NAME
     CSRF_COOKIE_PATH = FORCE_SCRIPT_NAME
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -93,18 +96,23 @@ NOURAU_ARCHIVE_DIR = env("NOURAU_ARCHIVE_DIR", default="/nourau/archive")
 # Itens por página nos resultados de busca
 SEARCH_RESULTS_PER_PAGE = 20
 
-# Segurança (ativar em produção)
+# Segurança. Flags que EXIGEM HTTPS ficam sob SECURE_SSL (separado de DEBUG),
+# para que DEBUG=false funcione na VM de homologação (somente HTTP/:80).
+# Em produção com TLS (Prodesp): SECURE_SSL=true.
+SECURE_SSL = env.bool("SECURE_SSL", default=False)
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+if SECURE_SSL:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    X_FRAME_OPTIONS = "DENY"
-    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+if not DEBUG:
 
     # Content-Security-Policy via django-csp.
     # Inserido após SecurityMiddleware para que CSP atue antes do whitenoise

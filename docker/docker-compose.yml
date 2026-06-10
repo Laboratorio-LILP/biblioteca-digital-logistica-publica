@@ -35,7 +35,7 @@ services:
     volumes:
       - nourau_data:/nourau
     ports:
-      - "${NOURAU_PORT:-8080}:80"
+      - "127.0.0.1:${NOURAU_PORT:-8080}:80"
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,7 +64,7 @@ services:
     volumes:
       - nourau_data:/nourau:ro
     ports:
-      - "${PORTAL_PORT:-8000}:8000"
+      - "127.0.0.1:${PORTAL_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
