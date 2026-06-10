@@ -94,7 +94,7 @@ NOURAU_BASE_URL = env("NOURAU_SITE_URL", default="http://localhost:8080")
 NOURAU_ARCHIVE_DIR = env("NOURAU_ARCHIVE_DIR", default="/nourau/archive")
 
 # Itens por página nos resultados de busca
-SEARCH_RESULTS_PER_PAGE = 20
+SEARCH_RESULTS_PER_PAGE = 10
 
 # Segurança. Flags que EXIGEM HTTPS ficam sob SECURE_SSL (separado de DEBUG),
 # para que DEBUG=false funcione na VM de homologação (somente HTTP/:80).
