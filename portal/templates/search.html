@@ -42,10 +42,10 @@
           <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
           <h2>Filtros</h2>
         </span>
-        {% if filters %}
-        <a class="clear-btn" href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}"><svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg> Limpar {{ filters|length }}</a>
-        {% endif %}
       </div>
+
+      {# Painel "Seus filtros" (T1): chips removíveis um a um + único "Limpar tudo" (substitui o antigo "Limpar N" do cabeçalho). #}
+      {% include "_partials/_applied_filters.html" %}
 
       {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto. "Coleção" é a cascata de tipos agrupada por coleção (substitui a faceta simples). Manter em UMA linha — comentário multi-linha vaza como texto. #}
       <section class="side-section">

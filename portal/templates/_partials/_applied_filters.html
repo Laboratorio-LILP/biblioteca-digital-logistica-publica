@@ -1,0 +1,27 @@
+{% comment %}
+Painel "Seus filtros" (T1): um chip por filtro ativo, com × que remove só
+aquele valor (link GET — funciona sem JS), e "Limpar tudo" que zera os filtros
+preservando a busca (q). Renderiza só quando há ao menos um filtro.
+{% endcomment %}
+{% load catalog_tags %}
+{% applied_filters request.GET as chips %}
+{% if chips %}
+<section class="applied-filters" aria-label="Seus filtros">
+  <div class="applied-filters__head">
+    <h3 class="applied-filters__title">Seus filtros ({{ chips|length }})</h3>
+    <a class="clear-btn" href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}" aria-label="Limpar todos os filtros">
+      <svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg> Limpar tudo
+    </a>
+  </div>
+  <ul class="applied-filters__list">
+    {% for chip in chips %}
+    <li class="applied-filter-chip">
+      <span class="applied-filter-chip__label">{{ chip.texto }}</span>
+      <a class="applied-filter-chip__remove" href="{{ chip.remove_url }}" aria-label="{{ chip.aria }}">
+        <svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}

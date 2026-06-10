@@ -4,8 +4,8 @@ from urllib.parse import urlencode, urlparse
 
 from django import template
 
-from ..models import Assunto, TypeInformation
-from ..taxonomy_v6 import colecao_v6_for_tipo
+from ..models import Assunto, Microcategoria, NrCategory, Subcategoria, Topic, TypeInformation
+from ..taxonomy_v6 import COLECOES_BY_SLUG, colecao_v6_for_tipo
 
 register = template.Library()
 
@@ -239,3 +239,121 @@ def extra_authors(doc):
         return 0
     parts = [p for p in author.split(";") if p.strip()]
     return max(0, len(parts) - 1)
+
+
+# =====================================================================
+# Painel "Seus filtros" — chips de filtros ativos (T1).
+# Resolve cada par (param, valor) da query string num rótulo legível
+# ({Dimensão}: {valor}) e numa URL que remove só aquele valor (multi mantém
+# os demais) e volta para a página 1. Funciona sem JS: cada chip é um link GET.
+# =====================================================================
+
+@lru_cache(maxsize=1)
+def _category_names():
+    """{id: nome} de NrCategory (anti-N+1)."""
+    return {c.id: c.name for c in NrCategory.objects.all()}
+
+
+@lru_cache(maxsize=1)
+def _subcategoria_names():
+    """{id: nome} de Subcategoria (anti-N+1)."""
+    return {s.id: s.nome for s in Subcategoria.objects.all()}
+
+
+@lru_cache(maxsize=1)
+def _microcategoria_names():
+    """{id: nome} de Microcategoria (anti-N+1)."""
+    return {m.id: m.nome for m in Microcategoria.objects.all()}
+
+
+@lru_cache(maxsize=1)
+def _topic_names():
+    """{id: nome} de Topic/Coleção (anti-N+1)."""
+    return {t.id: t.name for t in Topic.objects.all()}
+
+
+def _safe_int(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _chip_dimensao_valor(param, value):
+    """(Dimensão legível, valor legível) para um filtro ativo.
+
+    Tipos e coleção compartilham o prefixo "Coleção" (a seção da barra se chama
+    Coleção); Categoria/Subcategoria recebem Title Case (titulo_pt), coerente
+    com a T6; microcategoria fica como está.
+    """
+    sid = _safe_int(value)
+    if param == "colecao_v6":
+        col = COLECOES_BY_SLUG.get(value)
+        return "Coleção", (col["nome"] if col else value)
+    if param == "typeinform_id":
+        return "Coleção", _type_names().get(sid, value)
+    if param == "topic_id":
+        return "Coleção", _topic_names().get(sid, value)
+    if param == "category_id":
+        return "Categoria", titulo_pt(_category_names().get(sid, value))
+    if param == "subcategoria_id":
+        return "Subcategoria", titulo_pt(_subcategoria_names().get(sid, value))
+    if param == "microcategoria_id":
+        return "Microcategoria", _microcategoria_names().get(sid, value)
+    if param == "assunto_id":
+        return "Assunto", _assunto_names().get(sid, value)
+    if param == "natureza":
+        return "Natureza", value
+    if param == "permissao":
+        return "Permissão", value
+    if param == "complexidade":
+        return "Complexidade", value
+    if param == "etapa":
+        return "Etapa", value
+    return param, value
+
+
+def _remove_value_url(querydict, param, value, is_multi):
+    """Querystring atual menos (param, value), com a página resetada para 1."""
+    params = querydict.copy()
+    params.pop("page", None)
+    if is_multi:
+        restantes = [v for v in params.getlist(param) if v != value]
+        if restantes:
+            params.setlist(param, restantes)
+        else:
+            params.pop(param, None)
+    else:
+        params.pop(param, None)
+    qs = params.urlencode()
+    return ("?" + qs) if qs else "?"
+
+
+@register.simple_tag
+def applied_filters(querydict):
+    """Lista de chips de filtros ativos: [{texto, aria, remove_url}].
+
+    Uso: {% applied_filters request.GET as chips %}. Ignora q/sort/page —
+    só os filtros de FILTER_PARAMS viram chip.
+    """
+    from ..views import FILTER_PARAMS, MULTI_PARAMS
+
+    chips = []
+    for param in FILTER_PARAMS:
+        for value in (v for v in querydict.getlist(param) if v):
+            if param == "ano_min":
+                texto = "A partir de %s" % value
+                aria = "Remover filtro Ano: a partir de %s" % value
+            elif param == "ano_max":
+                texto = "Até %s" % value
+                aria = "Remover filtro Ano: até %s" % value
+            else:
+                dim, val = _chip_dimensao_valor(param, value)
+                texto = "%s: %s" % (dim, val)
+                aria = "Remover filtro %s: %s" % (dim, val)
+            chips.append({
+                "texto": texto,
+                "aria": aria,
+                "remove_url": _remove_value_url(querydict, param, value, param in MULTI_PARAMS),
+            })
+    return chips
