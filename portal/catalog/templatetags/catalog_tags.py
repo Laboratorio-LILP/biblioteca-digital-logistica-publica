@@ -76,6 +76,54 @@ def pluralize_pt(value, singular):
     return singular + "s"
 
 
+# Title Case em pt-BR para rótulos de Categoria/Subcategoria, que vêm em CAIXA
+# ALTA no seed (07-categories.sql). Conectores ficam minúsculos (exceto na 1ª
+# palavra); siglas do domínio são preservadas; '/' e '-' são separadores.
+_TITULO_CONECTORES = {
+    "de", "da", "do", "das", "dos", "e", "em", "na", "no", "a", "o",
+    "para", "por", "com",
+}
+_TITULO_SIGLAS = {"PCA", "ETP", "TR", "TIC", "RP", "PMI", "ODS", "MPE"}
+# Cada token é uma sequência de letras/dígitos (com acento) OU uma sequência de
+# separadores/pontuação — nunca misturados, para preservar '/', '-', '(', ')'.
+_TITULO_TOKEN_RE = re.compile(r"[0-9A-Za-zÀ-ÖØ-öø-ÿ]+|[^0-9A-Za-zÀ-ÖØ-öø-ÿ]+")
+
+
+@register.filter
+def titulo_pt(value):
+    """Title Case em português, idempotente, para Categoria/Subcategoria.
+
+    - 1ª palavra sempre capitalizada; conectores (de, da, e, em...) ficam
+      minúsculos nas demais posições;
+    - siglas do domínio (PCA, ETP, TR, TIC, RP, PMI, ODS, MPE) preservadas;
+    - '/' e '-' tratados como separadores: "PLANEJAMENTO/FASE PREPARATÓRIA" →
+      "Planejamento/Fase Preparatória"; "FASE PREPARATÓRIA - ETP" →
+      "Fase Preparatória - ETP".
+
+    Idempotente: as subcategorias de "Conteúdos Transversais" já vêm em caixa
+    mista no seed e devem sair intactas (rodar 2x não muda nada).
+    """
+    if not value:
+        return value
+    out = []
+    first_word_done = False
+    for tok in _TITULO_TOKEN_RE.findall(str(value)):
+        if not tok.isalnum():  # separador/pontuação: mantém como está
+            out.append(tok)
+            continue
+        upper = tok.upper()
+        if upper in _TITULO_SIGLAS:
+            out.append(upper)
+        else:
+            lower = tok.lower()
+            if first_word_done and lower in _TITULO_CONECTORES:
+                out.append(lower)
+            else:
+                out.append(lower[:1].upper() + lower[1:])
+        first_word_done = True
+    return "".join(out)
+
+
 @register.filter
 def url_domain(value):
     """Extrai o host de uma URL para exibir como hint sob botões de

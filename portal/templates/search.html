@@ -69,13 +69,13 @@
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias ainda, ex.: PCA, Ciclo Completo) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
-          <summary><span class="filter-group__label">{{ cat.nome }}</span></summary>
+          <summary><span class="filter-group__label">{{ cat.nome|titulo_pt }}</span></summary>
           <div class="filter-group__body">
             {% include "_partials/_cat_toggle.html" with param="category_id" id=cat.id nome="Toda a categoria" count=cat.count disabled=cat.disabled current=filters.category_id noun="categoria" klass="toggle-opt--all-strong" %}
             {% for sub in cat.subcategorias %}
             {% if sub.has_micros %}
             <details class="filter-group filter-group--nested"{% if sub.open %} open{% endif %}>
-              <summary><span class="filter-group__label">{{ sub.nome }}</span></summary>
+              <summary><span class="filter-group__label">{{ sub.nome|titulo_pt }}</span></summary>
               <div class="filter-group__body">
                 {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-em" %}
                 {% for mic in sub.microcategorias %}
@@ -84,7 +84,7 @@
               </div>
             </details>
             {% else %}
-            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
+            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome|titulo_pt count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
             {% endif %}
             {% endfor %}
           </div>
