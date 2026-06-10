@@ -101,7 +101,7 @@ def _apply_filters(qs, filters):
 
 
 # Ordenação exposta ao usuário (restrição Lina: Autor/Título/Ano).
-SORT_CHOICES = ("autor", "titulo", "ano", "recente")
+SORT_CHOICES = ("autor", "titulo", "ano", "ano_asc", "recente")
 
 
 def _apply_sort(qs, sort, default):
@@ -124,6 +124,8 @@ def _apply_sort(qs, sort, default):
         return qs.order_by("title", "-pk")
     if sort == "ano":
         return qs.order_by(F("ano").desc(nulls_last=True), "title", "-pk")
+    if sort == "ano_asc":
+        return qs.order_by(F("ano").asc(nulls_last=True), "title", "-pk")
     if sort == "recente":
         return qs.order_by("-created", "-pk")
     return qs.order_by(default, "-pk")

@@ -102,6 +102,26 @@
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
       </section>
 
+      {# Ano (T2): intervalo De/Até em inputs number — base acessível (WCAG2AA) e auto-submit via acervo-filters.js. Posição ao final, preservando a ordem da Lina. #}
+      <section class="side-section">
+        <h3 id="ano-label">Ano</h3>
+        <p class="side-section__hint">Filtra os documentos pelo ano de publicação.</p>
+        <div class="year-fields" role="group" aria-labelledby="ano-label">
+          <span class="year-field">
+            <label for="ano_min">De</label>
+            <input type="number" id="ano_min" name="ano_min" inputmode="numeric" step="1"
+                   min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
+                   placeholder="{{ facets.ano_bounds.min }}" value="{{ filters.ano_min|default:'' }}">
+          </span>
+          <span class="year-field">
+            <label for="ano_max">Até</label>
+            <input type="number" id="ano_max" name="ano_max" inputmode="numeric" step="1"
+                   min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
+                   placeholder="{{ facets.ano_bounds.max }}" value="{{ filters.ano_max|default:'' }}">
+          </span>
+        </div>
+      </section>
+
       <button type="submit" class="sp-button-primary btn-apply">Aplicar filtros</button>
     </aside>
 
@@ -121,10 +141,11 @@
         <label class="results-bar__sort">Ordenar por
           <select name="sort">
             <option value="">Relevância</option>
-            <option value="recente"{% if sort == 'recente' %} selected{% endif %}>Mais recente</option>
-            <option value="autor"{% if sort == 'autor' %} selected{% endif %}>Autor</option>
+            <option value="recente"{% if sort == 'recente' %} selected{% endif %}>Adicionados recentemente</option>
+            <option value="ano"{% if sort == 'ano' %} selected{% endif %}>Ano (mais recente)</option>
+            <option value="ano_asc"{% if sort == 'ano_asc' %} selected{% endif %}>Ano (mais antigo)</option>
+            <option value="autor"{% if sort == 'autor' %} selected{% endif %}>Autor (A–Z)</option>
             <option value="titulo"{% if sort == 'titulo' %} selected{% endif %}>Título (A–Z)</option>
-            <option value="ano"{% if sort == 'ano' %} selected{% endif %}>Ano</option>
           </select>
         </label>
       </div>

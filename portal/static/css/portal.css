@@ -432,6 +432,14 @@ main { flex: 1 0 auto; }
 .side-section > h3 { font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; color: var(--sp-black); margin: 0 0 8px; }
 .side-section__opts { display: flex; flex-direction: column; gap: 4px; }
 
+/* Filtro de Ano (T2) — intervalo De/Até (base acessível; slider é polimento futuro) */
+.side-section__hint { font-size: 11px; line-height: 1.4; color: var(--sp-gray-dark); margin: 0 0 10px; }
+.year-fields { display: flex; gap: 10px; }
+.year-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.year-field label { font-family: var(--font-subtitle); font-weight: 600; font-size: 11px; color: rgb(var(--rgb-black) / 0.7); }
+.year-field input { width: 100%; padding: 6px 8px; border: 1px solid rgb(var(--rgb-gray-medium) / 0.7); border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--sp-black); background: var(--sp-white); }
+.year-field input:focus-visible { outline: 2px solid var(--sp-blue); outline-offset: 1px; border-color: var(--sp-blue); }
+
 .toggle-opt {
   display: flex; align-items: center; gap: 8px; width: 100%;
   min-height: 32px; padding: 4px 8px; border-radius: 6px;
