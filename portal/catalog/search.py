@@ -5,27 +5,6 @@ from .models import Document, TypeInformation
 from .taxonomy_v6 import colecao_v6_for_tipo
 
 
-# Filtros suportados pela busca; o helper apply_filters reutiliza esta lista
-FILTERABLE_FIELDS = (
-    "topic_id",
-    "colecao_v6",
-    "category_id",
-    "subcategoria_id",
-    "microcategoria_id",
-    "assunto_id",
-    "natureza",
-    "etapa",
-    "complexidade",
-    "typeinform_id",
-    "permissao",
-    "ano_min",
-    "ano_max",
-    # Compatibilidade retroativa: year_from/year_to ainda aceitos
-    "year_from",
-    "year_to",
-)
-
-
 def _typeinform_ids_for_colecao(slug):
     """Ids de Tipo de Informação que compõem uma coleção v6.
 

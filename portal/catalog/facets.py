@@ -208,64 +208,93 @@ def _categorias_hierarquia_facet(filters):
     return out
 
 
-def compute_facets(filters):
-    """Devolve um dict com as facetas disponíveis dado o conjunto de filtros aplicado."""
+# Facetas que a página de busca (search.html) realmente renderiza. A view passa
+# este subconjunto a compute_facets para não computar (nem consultar) as demais;
+# a API /api/facets/ chama sem `keys` e recebe o conjunto completo.
+SEARCH_FACET_KEYS = frozenset({
+    "tipos_por_colecao", "categorias_hierarquia", "naturezas", "assuntos", "ano_bounds",
+})
+
+
+def compute_facets(filters, keys=None):
+    """Devolve um dict com as facetas disponíveis dado o conjunto de filtros aplicado.
+
+    `keys`: se None (padrão, usado por /api/facets/), computa TODAS as facetas.
+    A view de busca passa SEARCH_FACET_KEYS — só o que o template usa — evitando
+    ~8 facetas e suas queries de agregação por request.
+    """
+    def want(k):
+        return keys is None or k in keys
+
     facets = {}
 
     # Coleção v6 (derivada do Tipo de Informação)
-    facets["colecoes_v6"] = _colecao_v6_facet(filters)
-    facets["tipos_por_colecao"] = _tipos_por_colecao_facet(filters)
+    if want("colecoes_v6"):
+        facets["colecoes_v6"] = _colecao_v6_facet(filters)
+    if want("tipos_por_colecao"):
+        facets["tipos_por_colecao"] = _tipos_por_colecao_facet(filters)
     # Categorias em cascata (accordion <details>): Categoria → Sub → Micro
-    facets["categorias_hierarquia"] = _categorias_hierarquia_facet(filters)
+    if want("categorias_hierarquia"):
+        facets["categorias_hierarquia"] = _categorias_hierarquia_facet(filters)
 
     # Hierarquia taxonômica
-    facets["assuntos"] = sorted(
-        _attach_names(
-            list(_facet_counts(filters, "assunto_id", "assunto_id")), "assunto_id", Assunto
-        ),
-        key=lambda a: _sort_key(a["nome"]),
-    )
-    facets["categorias"] = _attach_names(
-        list(_facet_counts(filters, "category_id", "category_id")), "category_id", NrCategory, label_field="name"
-    )
-    facets["subcategorias"] = _attach_names(
-        list(_facet_counts(filters, "subcategoria_id", "subcategoria_id")),
-        "subcategoria_id",
-        Subcategoria,
-    )
-    facets["microcategorias"] = _attach_names(
-        list(_facet_counts(filters, "microcategoria_id", "microcategoria_id")),
-        "microcategoria_id",
-        Microcategoria,
-    )
+    if want("assuntos"):
+        facets["assuntos"] = sorted(
+            _attach_names(
+                list(_facet_counts(filters, "assunto_id", "assunto_id")), "assunto_id", Assunto
+            ),
+            key=lambda a: _sort_key(a["nome"]),
+        )
+    if want("categorias"):
+        facets["categorias"] = _attach_names(
+            list(_facet_counts(filters, "category_id", "category_id")), "category_id", NrCategory, label_field="name"
+        )
+    if want("subcategorias"):
+        facets["subcategorias"] = _attach_names(
+            list(_facet_counts(filters, "subcategoria_id", "subcategoria_id")),
+            "subcategoria_id",
+            Subcategoria,
+        )
+    if want("microcategorias"):
+        facets["microcategorias"] = _attach_names(
+            list(_facet_counts(filters, "microcategoria_id", "microcategoria_id")),
+            "microcategoria_id",
+            Microcategoria,
+        )
 
     # Coleção e tipo de informação
-    facets["colecoes"] = _attach_names(
-        list(_facet_counts(filters, "topic_id", "topic_id")), "topic_id", Topic, label_field="name"
-    )
-    facets["tipos_informacao"] = _attach_names(
-        list(_facet_counts(filters, "typeinform_id", "typeinform_id")),
-        "typeinform_id",
-        TypeInformation,
-        label_field="name",
-    )
+    if want("colecoes"):
+        facets["colecoes"] = _attach_names(
+            list(_facet_counts(filters, "topic_id", "topic_id")), "topic_id", Topic, label_field="name"
+        )
+    if want("tipos_informacao"):
+        facets["tipos_informacao"] = _attach_names(
+            list(_facet_counts(filters, "typeinform_id", "typeinform_id")),
+            "typeinform_id",
+            TypeInformation,
+            label_field="name",
+        )
 
     # Natureza (objeto da contratação, v6) e demais atributos string
-    facets["naturezas"] = _string_facet(filters, "natureza", "natureza")
-    facets["complexidades"] = _string_facet(filters, "complexidade", "complexidade")
-    facets["permissoes"] = _string_facet(filters, "permissao", "permissao")
+    if want("naturezas"):
+        facets["naturezas"] = _string_facet(filters, "natureza", "natureza")
+    if want("complexidades"):
+        facets["complexidades"] = _string_facet(filters, "complexidade", "complexidade")
+    if want("permissoes"):
+        facets["permissoes"] = _string_facet(filters, "permissao", "permissao")
 
     # Ano: min/max para o slider (ignorando o próprio ano nos filtros)
-    f_year = {
-        k: v for k, v in (filters or {}).items()
-        if k not in ("ano_min", "ano_max", "year_from", "year_to")
-    }
-    qs = Document.objects.filter(status="a", ano__isnull=False)
-    qs = _apply_filters(qs, f_year)
-    bounds = qs.aggregate(min=Min("ano"), max=Max("ano"))
-    facets["ano_bounds"] = {
-        "min": bounds["min"] or 2000,
-        "max": bounds["max"] or 2025,
-    }
+    if want("ano_bounds"):
+        f_year = {
+            k: v for k, v in (filters or {}).items()
+            if k not in ("ano_min", "ano_max", "year_from", "year_to")
+        }
+        qs = Document.objects.filter(status="a", ano__isnull=False)
+        qs = _apply_filters(qs, f_year)
+        bounds = qs.aggregate(min=Min("ano"), max=Max("ano"))
+        facets["ano_bounds"] = {
+            "min": bounds["min"] or 2000,
+            "max": bounds["max"] or 2025,
+        }
 
     return facets
