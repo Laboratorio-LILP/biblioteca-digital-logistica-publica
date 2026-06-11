@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
 
-from .facets import compute_facets, colecao_v6_overview, SEARCH_FACET_KEYS
+from .facets import compute_facets, colecao_v6_overview
 from .models import Document, NrCategory, Topic, TypeInformation
 from .search import filter_documents, search_documents
 
@@ -149,7 +149,7 @@ def search(request):
     paginator = Paginator(results, settings.SEARCH_RESULTS_PER_PAGE)
     page_obj = paginator.get_page(page_number)
 
-    facets = compute_facets(filters, keys=SEARCH_FACET_KEYS)
+    facets = compute_facets(filters)
 
     return render(request, "search.html", {
         "query": query,
