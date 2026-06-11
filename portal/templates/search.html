@@ -136,6 +136,8 @@
         <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
         Filtros{% if filters %} ({{ filters|length }}){% endif %}
       </button>
+      {# Região trocada via AJAX (acervo-filters.js): só esta parte + a barra lateral são atualizadas ao filtrar, sem reload → sem salto. #}
+      <div id="acervo-results-content">
       <div class="sp-panel results-bar">
         <div class="results-bar__left">
           <span class="results-bar__icon"><svg class="fi" aria-hidden="true"><use href="#fi-filter"/></svg></span>
@@ -204,6 +206,7 @@
       </nav>
       <p class="pagination__status">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
       {% endif %}
+      </div>{# /#acervo-results-content #}
     </div>
   </div>
 </form>
