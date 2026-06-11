@@ -42,14 +42,15 @@
           <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
           <h2>Filtros</h2>
         </span>
-        {% if filters %}
-        <a class="clear-btn" href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}"><svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg> Limpar {{ filters|length }}</a>
-        {% endif %}
       </div>
+
+      {# Painel "Seus filtros" (T1): chips removíveis um a um + único "Limpar tudo" (substitui o antigo "Limpar N" do cabeçalho). #}
+      {% include "_partials/_applied_filters.html" %}
 
       {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto. "Coleção" é a cascata de tipos agrupada por coleção (substitui a faceta simples). Manter em UMA linha — comentário multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Coleção</h3>
+        <p class="side-section__hint">Agrupa os documentos por tipo, em quatro coleções.</p>
         {% for grp in facets.tipos_por_colecao %}
         <details class="filter-group"{% if grp.active %} open{% endif %}>
           <summary><span class="filter-group__label">{{ grp.colecao }}</span></summary>
@@ -66,25 +67,26 @@
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <section class="side-section">
         <h3>Categorias</h3>
+        <p class="side-section__hint">Cada categoria é uma etapa do processo de contratação pública.</p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias ainda, ex.: PCA, Ciclo Completo) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
-          <summary><span class="filter-group__label">{{ cat.nome }}</span></summary>
+          <summary><span class="filter-group__label">{{ cat.nome|titulo_pt }}</span></summary>
           <div class="filter-group__body">
             {% include "_partials/_cat_toggle.html" with param="category_id" id=cat.id nome="Toda a categoria" count=cat.count disabled=cat.disabled current=filters.category_id noun="categoria" klass="toggle-opt--all-strong" %}
             {% for sub in cat.subcategorias %}
             {% if sub.has_micros %}
             <details class="filter-group filter-group--nested"{% if sub.open %} open{% endif %}>
-              <summary><span class="filter-group__label">{{ sub.nome }}</span></summary>
+              <summary><span class="filter-group__label">{{ sub.nome|titulo_pt }}</span></summary>
               <div class="filter-group__body">
-                {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-em" %}
+                {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-sub" %}
                 {% for mic in sub.microcategorias %}
-                {% include "_partials/_cat_toggle.html" with param="microcategoria_id" id=mic.id nome=mic.nome count=mic.count disabled=mic.disabled current=filters.microcategoria_id noun="microcategoria" klass="toggle-opt--mic" %}
+                {% include "_partials/_cat_toggle.html" with param="microcategoria_id" id=mic.id nome=mic.nome|titulo_pt count=mic.count disabled=mic.disabled current=filters.microcategoria_id noun="microcategoria" klass="toggle-opt--mic" %}
                 {% endfor %}
               </div>
             </details>
             {% else %}
-            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
+            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome|titulo_pt count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
             {% endif %}
             {% endfor %}
           </div>
@@ -94,12 +96,34 @@
 
       <section class="side-section">
         <h3>Natureza</h3>
+        <p class="side-section__hint">O objeto da contratação: materiais, serviços, obras ou TIC.</p>
         {% include "_partials/_facet_options.html" with facet=facets.naturezas param="natureza" current=filters.natureza empty_msg="Sem materiais classificados por natureza ainda." %}
       </section>
 
       <section class="side-section">
         <h3>Assunto</h3>
+        <p class="side-section__hint">O tema tratado no documento.</p>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
+      </section>
+
+      {# Ano (T2): intervalo De/Até em inputs number — base acessível (WCAG2AA) e auto-submit via acervo-filters.js. Posição ao final, preservando a ordem da Lina. #}
+      <section class="side-section">
+        <h3 id="ano-label">Ano</h3>
+        <p class="side-section__hint">Filtra os documentos pelo ano de publicação.</p>
+        <div class="year-fields" role="group" aria-labelledby="ano-label">
+          <span class="year-field">
+            <label for="ano_min">De</label>
+            <input type="number" id="ano_min" name="ano_min" inputmode="numeric" step="1"
+                   min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
+                   placeholder="{{ facets.ano_bounds.min }}" value="{{ filters.ano_min|default:'' }}">
+          </span>
+          <span class="year-field">
+            <label for="ano_max">Até</label>
+            <input type="number" id="ano_max" name="ano_max" inputmode="numeric" step="1"
+                   min="{{ facets.ano_bounds.min }}" max="{{ facets.ano_bounds.max }}"
+                   placeholder="{{ facets.ano_bounds.max }}" value="{{ filters.ano_max|default:'' }}">
+          </span>
+        </div>
       </section>
 
       <button type="submit" class="sp-button-primary btn-apply">Aplicar filtros</button>
@@ -121,10 +145,11 @@
         <label class="results-bar__sort">Ordenar por
           <select name="sort">
             <option value="">Relevância</option>
-            <option value="recente"{% if sort == 'recente' %} selected{% endif %}>Mais recente</option>
-            <option value="autor"{% if sort == 'autor' %} selected{% endif %}>Autor</option>
+            <option value="recente"{% if sort == 'recente' %} selected{% endif %}>Adicionados recentemente</option>
+            <option value="ano"{% if sort == 'ano' %} selected{% endif %}>Ano (mais recente)</option>
+            <option value="ano_asc"{% if sort == 'ano_asc' %} selected{% endif %}>Ano (mais antigo)</option>
+            <option value="autor"{% if sort == 'autor' %} selected{% endif %}>Autor (A–Z)</option>
             <option value="titulo"{% if sort == 'titulo' %} selected{% endif %}>Título (A–Z)</option>
-            <option value="ano"{% if sort == 'ano' %} selected{% endif %}>Ano</option>
           </select>
         </label>
       </div>
@@ -140,29 +165,42 @@
       {% else %}
       <div class="sp-panel empty-state">
         <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
+        {% if filters %}
+        <strong>Nenhum documento com esses filtros</strong>
+        <p>Remova um filtro ou amplie o intervalo de anos para ver mais resultados. <a href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}">Limpar tudo</a></p>
+        {% elif query %}
         <strong>Nenhum documento encontrado</strong>
-        <p>Tente outros filtros ou termos de pesquisa para ampliar a busca.{% if filters or query %} <a href="{% url 'catalog:search' %}">Limpar tudo</a>{% endif %}</p>
+        <p>Tente outros termos de pesquisa.</p>
+        {% else %}
+        <strong>Nenhum documento encontrado</strong>
+        <p>Tente outros termos de pesquisa para começar.</p>
+        {% endif %}
       </div>
       {% endif %}
 
       {% if page_obj.has_other_pages %}
       <nav class="pagination" aria-label="Paginação dos resultados">
         {% if page_obj.has_previous %}
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' 1 %}" aria-label="Primeira página">Primeira</a>
         <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}" aria-label="Página anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>
         {% else %}
+        <span class="page-btn is-disabled" aria-disabled="true">Primeira</span>
         <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-left"/></svg></span>
         {% endif %}
         {% for num in page_obj.paginator.page_range %}
           {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
-          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}"{% if num == page_obj.number %} aria-current="page"{% endif %}>{{ num }}</a>
+          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}"{% if num == page_obj.number %} aria-current="page"{% endif %} aria-label="Página {{ num }}">{{ num }}</a>
           {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
         <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}" aria-label="Próxima página"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.paginator.num_pages %}" aria-label="Última página">Última</a>
         {% else %}
         <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-right"/></svg></span>
+        <span class="page-btn is-disabled" aria-disabled="true">Última</span>
         {% endif %}
       </nav>
+      <p class="pagination__status">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
       {% endif %}
     </div>
   </div>

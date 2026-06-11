@@ -62,4 +62,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # existir para que settings.py não quebre na importação).
 NOURAU_BASE_URL = "http://localhost:8080"
 NOURAU_ARCHIVE_DIR = "/tmp/nourau-archive"
-SEARCH_RESULTS_PER_PAGE = 20
+SEARCH_RESULTS_PER_PAGE = 10

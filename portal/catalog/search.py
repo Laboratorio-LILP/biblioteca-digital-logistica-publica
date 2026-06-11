@@ -5,27 +5,6 @@ from .models import Document, TypeInformation
 from .taxonomy_v6 import colecao_v6_for_tipo
 
 
-# Filtros suportados pela busca; o helper apply_filters reutiliza esta lista
-FILTERABLE_FIELDS = (
-    "topic_id",
-    "colecao_v6",
-    "category_id",
-    "subcategoria_id",
-    "microcategoria_id",
-    "assunto_id",
-    "natureza",
-    "etapa",
-    "complexidade",
-    "typeinform_id",
-    "permissao",
-    "ano_min",
-    "ano_max",
-    # Compatibilidade retroativa: year_from/year_to ainda aceitos
-    "year_from",
-    "year_to",
-)
-
-
 def _typeinform_ids_for_colecao(slug):
     """Ids de Tipo de Informação que compõem uma coleção v6.
 
@@ -101,7 +80,7 @@ def _apply_filters(qs, filters):
 
 
 # Ordenação exposta ao usuário (restrição Lina: Autor/Título/Ano).
-SORT_CHOICES = ("autor", "titulo", "ano", "recente")
+SORT_CHOICES = ("autor", "titulo", "ano", "ano_asc", "recente")
 
 
 def _apply_sort(qs, sort, default):
@@ -124,6 +103,8 @@ def _apply_sort(qs, sort, default):
         return qs.order_by("title", "-pk")
     if sort == "ano":
         return qs.order_by(F("ano").desc(nulls_last=True), "title", "-pk")
+    if sort == "ano_asc":
+        return qs.order_by(F("ano").asc(nulls_last=True), "title", "-pk")
     if sort == "recente":
         return qs.order_by("-created", "-pk")
     return qs.order_by(default, "-pk")

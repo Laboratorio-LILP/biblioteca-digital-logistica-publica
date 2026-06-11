@@ -14,7 +14,6 @@ from .models import (
     Microcategoria,
     NrCategory,
     Subcategoria,
-    Topic,
     TypeInformation,
 )
 from .search import _apply_filters
@@ -209,53 +208,30 @@ def _categorias_hierarquia_facet(filters):
 
 
 def compute_facets(filters):
-    """Devolve um dict com as facetas disponíveis dado o conjunto de filtros aplicado."""
+    """Devolve as facetas que a página de busca renderiza, dado o conjunto de filtros.
+
+    Calcula só o que o `search.html` consome (Coleção, Categorias, Assunto,
+    Natureza e os limites de Ano). As demais facetas planas (categorias/sub/
+    micro/coleções/tipos/complexidade/permissão) eram servidas pelo antigo
+    endpoint /api/facets/ — removido por não ter consumidor.
+    """
     facets = {}
 
-    # Coleção v6 (derivada do Tipo de Informação)
-    facets["colecoes_v6"] = _colecao_v6_facet(filters)
+    # Coleção (Tipos de Informação agrupados por Coleção v6, em cascata)
     facets["tipos_por_colecao"] = _tipos_por_colecao_facet(filters)
     # Categorias em cascata (accordion <details>): Categoria → Sub → Micro
     facets["categorias_hierarquia"] = _categorias_hierarquia_facet(filters)
-
-    # Hierarquia taxonômica
+    # Assunto (eixo transversal, multi-select)
     facets["assuntos"] = sorted(
         _attach_names(
             list(_facet_counts(filters, "assunto_id", "assunto_id")), "assunto_id", Assunto
         ),
         key=lambda a: _sort_key(a["nome"]),
     )
-    facets["categorias"] = _attach_names(
-        list(_facet_counts(filters, "category_id", "category_id")), "category_id", NrCategory, label_field="name"
-    )
-    facets["subcategorias"] = _attach_names(
-        list(_facet_counts(filters, "subcategoria_id", "subcategoria_id")),
-        "subcategoria_id",
-        Subcategoria,
-    )
-    facets["microcategorias"] = _attach_names(
-        list(_facet_counts(filters, "microcategoria_id", "microcategoria_id")),
-        "microcategoria_id",
-        Microcategoria,
-    )
-
-    # Coleção e tipo de informação
-    facets["colecoes"] = _attach_names(
-        list(_facet_counts(filters, "topic_id", "topic_id")), "topic_id", Topic, label_field="name"
-    )
-    facets["tipos_informacao"] = _attach_names(
-        list(_facet_counts(filters, "typeinform_id", "typeinform_id")),
-        "typeinform_id",
-        TypeInformation,
-        label_field="name",
-    )
-
-    # Natureza (objeto da contratação, v6) e demais atributos string
+    # Natureza (objeto da contratação, v6)
     facets["naturezas"] = _string_facet(filters, "natureza", "natureza")
-    facets["complexidades"] = _string_facet(filters, "complexidade", "complexidade")
-    facets["permissoes"] = _string_facet(filters, "permissao", "permissao")
 
-    # Ano: min/max para o slider (ignorando o próprio ano nos filtros)
+    # Ano: min/max para os campos De/Até (ignorando o próprio ano nos filtros)
     f_year = {
         k: v for k, v in (filters or {}).items()
         if k not in ("ano_min", "ano_max", "year_from", "year_to")
