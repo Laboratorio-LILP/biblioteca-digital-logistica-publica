@@ -23,7 +23,7 @@ def _norm(s):
 COLECOES_V6 = [
     {"nome": "Jurisprudência", "slug": "jurisprudencia", "icon": "fi-shield", "color": "c-bluedark",
      "descricao": "Decisões, súmulas, enunciados e documentos normativos que orientam como aplicar a lei."},
-    {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-layers", "color": "c-blue",
+    {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-graduation-cap", "color": "c-blue",
      "descricao": "Teses, dissertações, monografias e TCCs produzidos em universidades."},
     {"nome": "Doutrina e Conteúdo Técnico", "slug": "doutrina", "icon": "fi-book-open", "color": "c-red",
      "descricao": "Livros, artigos, relatórios e notas técnicas que analisam e explicam o tema."},
@@ -32,6 +32,46 @@ COLECOES_V6 = [
 ]
 COLECOES_BY_NOME = {c["nome"]: c for c in COLECOES_V6}
 COLECOES_BY_SLUG = {c["slug"]: c for c in COLECOES_V6}
+
+# Temas em destaque — buscas temáticas que NÃO são coleções formais (não se
+# encaixam na taxonomia v6 por Tipo de Informação). Fonte única para os dois
+# usos na Home: os cards de atalho em "Explorar o acervo" e os blocos de
+# "Temas em Alta". Cada tema abre uma busca full-text (`query`); a contagem do
+# card vem dessa MESMA busca, então o número bate com o que o usuário vê ao
+# clicar. `docs` lista códigos curados para "Temas em Alta" (vazio = cai para a
+# busca por `fallback_kw`). Descrições em Linguagem Simples (público: comprador
+# público — termos do campo são mantidos de propósito).
+TEMAS_DESTAQUE = [
+    {
+        "slug": "lei-14133",
+        "label": "Lei 14.133/21",
+        "query": "14.133",
+        "fallback_kw": "14.133",
+        "icon": "icon-balanca",
+        "color": "c-petrol",
+        "card_desc": "A nova Lei de Licitações e Contratos: o que muda nas regras, "
+                     "prazos e modalidades das compras públicas.",
+        "alta_intro": "Materiais selecionados para entender e aplicar a nova Lei de "
+                      "Licitações e Contratos (Lei 14.133/21) nas contratações públicas.",
+        "docs": ["bdlp-000352", "bdlp-000300", "bdlp-000411"],
+    },
+    {
+        "slug": "sustentabilidade",
+        "label": "Sustentabilidade e ODS",
+        "query": "Sustentabilidade",
+        "fallback_kw": "sustentab",
+        # Tem Assunto curado correspondente: a busca do card/tema filtra por Assunto
+        # (contagem bate com a faceta lateral e com a lista ao clicar), em vez de texto.
+        "assunto_nome": "Sustentabilidade e ODS",
+        "icon": "fi-leaf",
+        "color": "c-green",
+        "card_desc": "Compras públicas que protegem o meio ambiente e seguem os "
+                     "Objetivos de Desenvolvimento Sustentável (ODS).",
+        "alta_intro": "Materiais indicados para apoiar compras públicas sustentáveis, "
+                      "desenvolvimento responsável e inovação aplicada à cadeia de suprimentos.",
+        "docs": ["bdlp-000273", "bdlp-000248", "bdlp-000421"],
+    },
+]
 
 # Tipos de Informação EXATOS por coleção (planilha v6, aba "Coleção, Assunto e Natureza")
 _TIPOS_POR_COLECAO = {

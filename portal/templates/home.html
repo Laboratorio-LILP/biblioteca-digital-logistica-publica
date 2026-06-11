@@ -25,16 +25,12 @@
     </form>
 
     <div class="hero__tags" aria-label="Atalhos de busca">
-      {% if artigos_id %}
-      <a class="tag active" href="{% url 'catalog:search' %}?typeinform_id={{ artigos_id }}">Artigos</a>
-      {% else %}
-      <a class="tag active" href="{% url 'catalog:search' %}?q=artigo">Artigos</a>
-      {% endif %}
-      <a class="tag" href="{% url 'catalog:search' %}?q=Contrata%C3%A7%C3%A3o+Direta">Contratação Direta</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Planejamento">Planejamento</a>
       <a class="tag" href="{% url 'catalog:search' %}?q=Preg%C3%A3o">Pregão</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Registro+de+Pre%C3%A7os">Registro de Preços</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=ODS">ODS</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=TCE">TCE</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Contrata%C3%A7%C3%A3o+Direta">Contratação Direta</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Gest%C3%A3o+de+Contratos">Gestão de Contratos</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Tribunal+de+Contas">Tribunal de Contas</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Fiscaliza%C3%A7%C3%A3o">Fiscalização</a>
     </div>
 
     <div class="hero__geometry">
@@ -50,8 +46,8 @@
   <div class="sp-container stats-grid">
     <div class="stat"><div class="stat__value">{{ total_docs }}</div><div class="stat__label">Documentos catalogados</div></div>
     <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções curatoriais</div></div>
-    <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Áreas temáticas</div></div>
-    <div class="stat"><div class="stat__value">{{ pct_aberto }}%</div><div class="stat__label">Em acesso aberto</div></div>
+    <div class="stat"><div class="stat__value">{{ cobertura.macroetapas }}</div><div class="stat__label">Categorias processuais</div></div>
+    <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Assuntos temáticos</div></div>
   </div>
 </section>
 
@@ -62,46 +58,32 @@
         <span class="eyebrow">Explorar o acervo</span>
         <h2>Coleções organizadas para a tomada de decisão pública</h2>
       </div>
-      <a class="sp-button-secondary" href="{% url 'catalog:collection_list' %}">Consultar acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+      <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Consultar acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
     <div class="collections-grid">
-      {% for c in colecoes_v6 %}
-      <a class="sp-card collection-card" href="{% url 'catalog:search' %}?colecao_v6={{ c.id }}">
-        <span class="collection-card__icon {{ c.color }}"><svg class="fi" aria-hidden="true"><use href="#{{ c.icon }}"/></svg></span>
-        <span>
-          <span class="collection-card__label">{{ c.nome }}</span>
-          <span class="collection-card__count">{{ c.count }} {{ c.count|pluralize_pt:"documento" }}</span>
-        </span>
-        <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
-      </a>
-      {% endfor %}
-      <a class="sp-card collection-card" href="{% url 'catalog:search' %}?q=Aspectos+Jur%C3%ADdicos">
-        <span class="collection-card__icon c-bluedark"><svg class="fi" aria-hidden="true"><use href="#fi-shield"/></svg></span>
-        <span><span class="collection-card__label">Aspectos Jurídicos</span><span class="collection-card__count">Buscar no acervo</span></span>
-        <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
-      </a>
-      <a class="sp-card collection-card" href="{% url 'catalog:search' %}?q=Sustentabilidade">
-        <span class="collection-card__icon c-green"><svg class="fi" aria-hidden="true"><use href="#fi-trending-up"/></svg></span>
-        <span><span class="collection-card__label">Sustentabilidade e ODS</span><span class="collection-card__count">Buscar no acervo</span></span>
-        <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
-      </a>
+      {% for card in cards_explorar %}{% include "_partials/_collection_card.html" %}{% endfor %}
     </div>
   </div>
 </section>
 
 <section class="sp-section sp-section--alt">
-  <div class="sp-container">
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow">Temas em alta</span>
-        <h2>Sustentabilidade e ODS</h2>
+  <div class="sp-container temas-em-alta">
+    <span class="eyebrow">Temas em alta</span>
+    {% for tema in temas_em_alta %}
+    <div class="tema-grupo">
+      <div class="tema-grupo__cab">
+        <h2 class="tema-grupo__titulo">
+          <span class="tema-grupo__icone {{ tema.color }}" aria-hidden="true"><svg class="fi"><use href="#{{ tema.icon }}"/></svg></span>
+          <span>{{ tema.label }}</span>
+        </h2>
+        <a class="sp-button-secondary" href="{{ tema.href }}">Ver tema no acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
       </div>
-      <a class="sp-button-secondary" href="{% url 'catalog:search' %}?q=Sustentabilidade">Ver tema no acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+      <p class="tema-grupo__intro">{{ tema.intro }}</p>
+      <div class="doc-grid doc-grid--3">
+        {% for doc in tema.docs %}{% include "_partials/_doc_card.html" %}{% endfor %}
+      </div>
     </div>
-    <p class="page__intro">Materiais indicados para apoiar compras públicas sustentáveis, desenvolvimento responsável e inovação aplicada à cadeia de suprimentos.</p>
-    <div class="doc-grid doc-grid--3">
-      {% for doc in trending_docs %}{% include "_partials/_doc_card.html" %}{% endfor %}
-    </div>
+    {% endfor %}
   </div>
 </section>
 {% endblock %}

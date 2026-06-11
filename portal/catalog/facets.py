@@ -16,8 +16,8 @@ from .models import (
     Subcategoria,
     TypeInformation,
 )
-from .search import _apply_filters
-from .taxonomy_v6 import COLECOES_V6, colecao_v6_for_tipo
+from .search import _apply_filters, search_documents
+from .taxonomy_v6 import COLECOES_V6, TEMAS_DESTAQUE, colecao_v6_for_tipo
 
 
 def _sort_key(nome):
@@ -100,6 +100,41 @@ def _colecao_v6_facet(filters):
 def colecao_v6_overview():
     """As 4 coleções v6 com contagem total — usada na home e na página de coleções."""
     return _colecao_v6_facet(None)
+
+
+def tema_busca(tema):
+    """Filtro de busca de um tema em destaque: devolve (params_querystring, count).
+
+    Se o tema aponta para um Assunto curado (`assunto_nome`) que existe no banco,
+    a busca é por Assunto — a contagem do card passa a bater com a faceta lateral
+    de Assuntos e com a lista exibida ao clicar. Caso contrário, cai para busca
+    textual full-text (`query`), usada quando não há Assunto correspondente.
+    """
+    nome = tema.get("assunto_nome")
+    if nome:
+        aid = Assunto.objects.filter(nome=nome).values_list("id", flat=True).first()
+        if aid:
+            count = Document.objects.filter(status="a", assunto_id=aid).count()
+            return {"assunto_id": aid}, count
+    return {"q": tema["query"]}, search_documents(tema["query"]).count()
+
+
+def cards_tematicos_overview():
+    """Temas em destaque (buscas temáticas) com contagem e parâmetros de busca.
+
+    A contagem e o link do card usam o MESMO filtro (Assunto curado ou texto),
+    então o número do card bate com a página de busca ao clicar. `descricao` vem
+    do `card_desc` em Linguagem Simples.
+    """
+    out = []
+    for t in TEMAS_DESTAQUE:
+        params, count = tema_busca(t)
+        out.append({
+            "slug": t["slug"], "label": t["label"], "params": params,
+            "icon": t["icon"], "color": t["color"], "descricao": t["card_desc"],
+            "count": count,
+        })
+    return out
 
 
 def _tipos_por_colecao_facet(filters):

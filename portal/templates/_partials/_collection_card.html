@@ -1,0 +1,11 @@
+{% load catalog_tags %}
+{# Card de coleção unificado (Home + Coleções). Espera `card` com: href, color, icon, label, desc, count. #}
+<a class="sp-card collection-card" href="{{ card.href }}">
+  <span class="collection-card__icon {{ card.color }}" aria-hidden="true"><svg class="fi"><use href="#{{ card.icon }}"/></svg></span>
+  <span class="collection-card__body">
+    <span class="collection-card__label">{{ card.label }}</span>
+    {% if card.desc %}<span class="collection-card__desc">{{ card.desc }}</span>{% endif %}
+    <span class="collection-card__count">{{ card.count }} {{ card.count|pluralize_pt:"documento" }}</span>
+  </span>
+  <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+</a>

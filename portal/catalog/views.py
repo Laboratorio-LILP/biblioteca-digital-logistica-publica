@@ -1,11 +1,16 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.db.models import Count, Q
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 
-from .facets import compute_facets, colecao_v6_overview
+from .facets import cards_tematicos_overview, colecao_v6_overview, compute_facets, tema_busca
 from .models import Document, NrCategory, Topic, TypeInformation
 from .search import filter_documents, search_documents
+from .taxonomy_v6 import TEMAS_DESTAQUE
 
 
 def _artigos_type_id():
@@ -22,17 +27,76 @@ def _artigos_type_id():
     )
 
 
-def home(request):
-    """Homepage: busca, stats, coleções e últimas adições."""
-    from django.db.models import Count, Q
+def _search_url(**params):
+    """URL da página de busca (Acervo) com querystring — ex.: ?colecao_v6=… ou ?q=…"""
+    return f"{reverse('catalog:search')}?{urlencode(params)}"
 
-    recent_docs = Document.objects.filter(status="a").order_by("-created", "-pk")[:10]
-    # Tema em alta (Sustentabilidade e ODS) — dados reais; cai para recentes se vazio
-    trending_docs = list(
+
+def _card_colecao(c):
+    """Normaliza uma coleção formal (colecao_v6_overview) para o card unificado."""
+    return {
+        "href": _search_url(colecao_v6=c["id"]),
+        "color": c["color"], "icon": c["icon"], "label": c["nome"],
+        "desc": c.get("descricao", ""), "count": c["count"],
+    }
+
+
+def _card_tematico(t):
+    """Normaliza um card temático (cards_tematicos_overview) para o card unificado."""
+    return {
+        "href": _search_url(**t["params"]),
+        "color": t["color"], "icon": t["icon"], "label": t["label"],
+        "desc": t["descricao"], "count": t["count"],
+    }
+
+
+def _docs_do_tema(tema, recent_docs):
+    """Documentos de um bloco de 'Temas em Alta'.
+
+    Usa os códigos curados em `tema["docs"]` (preservando a ordem da curadoria);
+    se vazio ou sem correspondência, cai para busca por palavra-chave
+    (`fallback_kw`) e, em último caso, para os documentos mais recentes.
+    """
+    codes = tema.get("docs") or []
+    if codes:
+        by_code = {d.code: d for d in Document.objects.filter(status="a", code__in=codes)}
+        docs = [by_code[c] for c in codes if c in by_code]
+        if docs:
+            return docs[:3]
+    kw = tema.get("fallback_kw") or tema["query"]
+    docs = list(
         Document.objects.filter(status="a")
-        .filter(Q(keywords__icontains="sustentab") | Q(title__icontains="sustentab") | Q(abstract__icontains="sustentab"))
+        .filter(Q(keywords__icontains=kw) | Q(title__icontains=kw) | Q(abstract__icontains=kw))
         .order_by("-created", "-pk")[:3]
-    ) or list(recent_docs[:3])
+    )
+    return docs or list(recent_docs[:3])
+
+
+def home(request):
+    """Homepage: busca, stats, coleções, temas em destaque e últimas adições."""
+    recent_docs = Document.objects.filter(status="a").order_by("-created", "-pk")[:10]
+
+    colecoes_v6 = colecao_v6_overview()
+    tematicos = cards_tematicos_overview()
+
+    # "Explorar o acervo": 4 coleções formais + cards temáticos que têm resultados
+    # (oculta o card temático cuja busca não retorna documentos — sem beco sem saída).
+    cards_explorar = [_card_colecao(c) for c in colecoes_v6]
+    cards_explorar += [_card_tematico(t) for t in tematicos if t["count"] > 0]
+
+    # "Temas em Alta": um bloco por tema, com até 3 documentos em destaque. O link
+    # "Ver tema" usa o mesmo filtro do card (Assunto curado ou texto).
+    temas_em_alta = [
+        {
+            "label": t["label"],
+            "intro": t["alta_intro"],
+            "icon": t["icon"],
+            "color": t["color"],
+            "href": _search_url(**tema_busca(t)[0]),
+            "docs": _docs_do_tema(t, recent_docs),
+        }
+        for t in TEMAS_DESTAQUE
+    ]
 
     # Stat 1: total de materiais
     total_docs = Document.objects.filter(status="a").count()
@@ -67,20 +131,15 @@ def home(request):
         "macroetapas": NrCategory.objects.count(),
     }
 
-    # Stat 4: % de acesso aberto
-    aberto = Document.objects.filter(status="a", permissao="Aberto").count()
-    pct_aberto = round(100 * aberto / total_docs) if total_docs else 0
-
     return render(request, "home.html", {
-        "colecoes_v6": colecao_v6_overview(),
+        "colecoes_v6": colecoes_v6,
+        "cards_explorar": cards_explorar,
+        "temas_em_alta": temas_em_alta,
         "recent_docs": recent_docs,
-        "trending_docs": trending_docs,
         "total_docs": total_docs,
         "tipos_top": tipos_top,
         "tipos_distintos": tipos_distintos,
         "cobertura": cobertura,
-        "pct_aberto": pct_aberto,
-        "artigos_id": _artigos_type_id(),
     })
 
 
@@ -170,7 +229,11 @@ def document_detail(request, code):
 
 def collection_list(request):
     """As 4 coleções v6 (derivadas do Tipo de Informação) com contagem real."""
-    return render(request, "collection_list.html", {"colecoes_v6": colecao_v6_overview()})
+    colecoes_v6 = colecao_v6_overview()
+    return render(request, "collection_list.html", {
+        "colecoes_v6": colecoes_v6,
+        "cards": [_card_colecao(c) for c in colecoes_v6],
+    })
 
 
 def collection_detail(request, topic_id):
