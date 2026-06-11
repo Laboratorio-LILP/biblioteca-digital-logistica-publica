@@ -40,6 +40,13 @@
   --border: 1px solid rgb(var(--rgb-gray-medium) / 0.5);
   --radius: 8px;
 
+  /* Escala de espaçamento (base 4px) — --space-N = N×4px */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-7: 28px; --space-8: 32px; --space-10: 40px;
+  --space-section: clamp(48px, 7vw, 84px);     /* seções full-bleed (.sp-section) */
+  --space-page-top: var(--space-8);            /* topo do conteúdo após hero/breadcrumb */
+  --space-page-bottom: clamp(64px, 8vw, 96px); /* respiro consistente antes do rodapé */
+
   --font-sans: Verdana, Geneva, sans-serif;
   --font-heading: "Futura PT", "Futura", "Montserrat", Verdana, Geneva, sans-serif;
   --font-subtitle: "Montserrat", Verdana, Geneva, sans-serif;
@@ -104,11 +111,11 @@ h1, h2, h3 { margin: 0; }
    Utilitários e componentes base (espelham globals.css)
    ============================================================ */
 .sp-container { width: min(1180px, calc(100% - 32px)); margin-inline: auto; }
-.sp-section { padding-block: clamp(48px, 7vw, 84px); background: var(--sp-white); }
+.sp-section { padding-block: var(--space-section); background: var(--sp-white); }
 .sp-section--alt { background: var(--sp-gray-light); }
 /* Respiro generoso entre a última seção da Home e o rodapé (mesma medida das
    páginas internas .page), convenção de sites consolidados. */
-main > .sp-section:last-child { padding-bottom: clamp(64px, 8vw, 96px); }
+main > .sp-section:last-child { padding-bottom: var(--space-page-bottom); }
 .sp-title { font-family: var(--font-heading); font-weight: 700; letter-spacing: 0; }
 .sp-subtitle { font-family: var(--font-subtitle); font-weight: 600; letter-spacing: 0; }
 main { flex: 1 0 auto; }
@@ -265,7 +272,7 @@ main { flex: 1 0 auto; }
   height: 4px;
   background: linear-gradient(90deg, var(--sp-red) 0 36%, var(--sp-white) 36% 42%, var(--sp-blue) 42% 100%);
 }
-.footer-grid { display: grid; gap: 40px; padding-block: 40px 0; grid-template-columns: 1fr; }
+.footer-grid { display: grid; gap: var(--space-10); padding-block: var(--space-10) 0; grid-template-columns: 1fr; }
 .footer-identity { border: 1px solid rgb(var(--rgb-white) / 0.15); background: rgb(var(--rgb-white) / 0.05); border-radius: 8px; padding: 20px; }
 .footer-identity__top { display: flex; flex-direction: column; gap: 20px; }
 .footer-identity__logo { height: 64px; width: auto; }
@@ -278,7 +285,7 @@ main { flex: 1 0 auto; }
 .footer-bottom {
   display: flex; flex-direction: column; gap: 12px;
   border-top: 1px solid rgb(var(--rgb-white) / 0.12);
-  margin-top: 32px; padding-top: 20px; padding-bottom: 40px; font-size: 11px; color: rgb(var(--rgb-white) / 0.55);
+  margin-top: var(--space-8); padding-top: var(--space-5); padding-bottom: var(--space-10); font-size: 11px; color: rgb(var(--rgb-white) / 0.55);
 }
 @media (min-width: 768px) {
   .footer-grid { grid-template-columns: 1.2fr 0.8fr 0.8fr; }
@@ -291,7 +298,7 @@ main { flex: 1 0 auto; }
    ============================================================ */
 .hero { position: relative; overflow: hidden; border-bottom: var(--border); background: var(--sp-gray-light); }
 .hero__pattern { position: absolute; inset: 0; opacity: 0.7; }
-.hero__inner { position: relative; padding-block: 40px; }
+.hero__inner { position: relative; padding-block: var(--space-10); }
 .hero__badge {
   display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px;
   border: 1px solid rgb(var(--rgb-blue) / 0.2); border-radius: 6px;
@@ -340,7 +347,7 @@ main { flex: 1 0 auto; }
 /* ============================================================
    Indicadores (stats)
    ============================================================ */
-.stats { border-bottom: var(--border); background: var(--sp-white); padding-block: 32px; }
+.stats { border-bottom: var(--border); background: var(--sp-white); padding-block: var(--space-page-top); }
 .stats-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
 .stat { border-left: 4px solid var(--sp-red); background: var(--sp-gray-light); padding: 20px; }
 .stat__value { font-family: var(--font-heading); font-weight: 700; font-size: 26px; }
@@ -425,7 +432,7 @@ main { flex: 1 0 auto; }
 /* ============================================================
    Faixa “Contribua”
    ============================================================ */
-.contribute { background: var(--sp-petrol); color: var(--sp-white); padding-block: 40px; }
+.contribute { background: var(--sp-petrol); color: var(--sp-white); padding-block: var(--space-10); }
 .contribute__inner { display: flex; flex-direction: column; gap: 24px; }
 .contribute h2 { font-family: var(--font-heading); font-weight: 700; font-size: 26px; }
 .contribute p { margin: 8px 0 0; max-width: 680px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-white) / 0.72); }
@@ -441,14 +448,14 @@ main { flex: 1 0 auto; }
 .breadcrumb .sep { color: var(--sp-gray-dark); font-size: 14px; }
 
 .catalog-hero { border-bottom: var(--border); background: var(--sp-white); }
-.catalog-hero__inner { padding-block: 32px; }
+.catalog-hero__inner { padding-block: var(--space-page-top); }
 .catalog-hero__crumb { font-size: 12px; color: rgb(var(--rgb-black) / 0.55); }
 .catalog-hero__grid { display: grid; gap: 24px; margin-top: 24px; grid-template-columns: 1fr; align-items: end; }
 .catalog-hero h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(32px, 4vw, 46px); line-height: 1.12; }
 .catalog-hero p { margin: 12px 0 0; max-width: 620px; font-size: 14px; line-height: 1.65; color: rgb(var(--rgb-black) / 0.66); }
 @media (min-width: 1024px) { .catalog-hero__grid { grid-template-columns: 0.82fr 1.18fr; } }
 
-.acervo-layout { display: grid; gap: 24px; padding-block: 32px; grid-template-columns: 1fr; align-items: start; }
+.acervo-layout { display: grid; gap: var(--space-6); padding-block: var(--space-page-top) var(--space-page-bottom); grid-template-columns: 1fr; align-items: start; }
 @media (min-width: 1024px) { .acervo-layout { grid-template-columns: 300px 1fr; } }
 
 .filter-panel { padding: 20px; }
@@ -607,7 +614,7 @@ html.js .btn-apply { display: none; }
 /* ============================================================
    Detalhe do documento
    ============================================================ */
-.doc-detail-hero { border-bottom: var(--border); background: var(--sp-white); padding-block: 32px; }
+.doc-detail-hero { border-bottom: var(--border); background: var(--sp-white); padding-block: var(--space-page-top); }
 .doc-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .doc-badge { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid var(--sp-gray-medium); border-radius: 6px; background: var(--sp-white); font-family: var(--font-subtitle); font-weight: 600; font-size: 11px; color: rgb(var(--rgb-black) / 0.7); }
 .doc-badge.aberto { border-color: rgb(var(--rgb-green) / 0.3); background: rgb(var(--rgb-green) / 0.1); color: var(--sp-green); }
@@ -616,7 +623,8 @@ html.js .btn-apply { display: none; }
 .doc-authors { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: rgb(var(--rgb-black) / 0.66); }
 .doc-authors span { display: inline-flex; align-items: center; gap: 8px; }
 .doc-authors .fi { color: var(--sp-blue); }
-.doc-detail-layout { display: grid; gap: 24px; padding-block: 32px; grid-template-columns: 1fr; align-items: start; }
+.doc-detail-layout { display: grid; gap: var(--space-6); padding-block: var(--space-page-top) var(--space-page-bottom); grid-template-columns: 1fr; align-items: start; }
+.doc-detail-layout:has(+ .doc-related) { padding-bottom: 0; }
 @media (min-width: 1024px) { .doc-detail-layout { grid-template-columns: 1fr 300px; } }
 .doc-panel { padding: 24px; }
 .doc-panel + .doc-panel { margin-top: 20px; }
@@ -638,10 +646,22 @@ html.js .btn-apply { display: none; }
 .doc-aside .sp-button-primary { width: 100%; }
 .doc-ref { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
 
+/* "Como citar" — referência + ações de copiar */
+.doc-cite__ref { margin: 12px 0 14px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.78); }
+.doc-cite__ref cite { font-style: italic; color: var(--sp-black); }
+.doc-cite__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.doc-cite__actions .sp-button-secondary { flex: 1 1 auto; }
+/* Feedback "Copiado!": borda/fundo verde (componente, ≥3:1); o texto segue azul (AA). */
+.sp-button-secondary.is-copied { border-color: var(--sp-green); background: rgb(var(--rgb-green) / 0.08); }
+
+/* Seção "Materiais relacionados" no fim do detalhe do documento */
+.doc-related { padding-top: var(--space-10); }
+.doc-related .doc-grid { margin-top: var(--space-7); }
+
 /* ============================================================
    Páginas internas (coleções, sobre, legais)
    ============================================================ */
-.page { padding-block: 32px clamp(64px, 8vw, 96px); }
+.page { padding-block: var(--space-page-top) var(--space-page-bottom); }
 .page > .eyebrow { display: block; }
 .page > h1 { font-family: var(--font-heading); font-weight: 700; margin: 8px 0 6px; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.14; }
 .page > h2 { font-family: var(--font-heading); font-weight: 700; margin: 30px 0 14px; font-size: 22px; }

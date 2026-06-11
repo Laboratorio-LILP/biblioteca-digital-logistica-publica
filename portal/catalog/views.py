@@ -224,7 +224,25 @@ def search(request):
 def document_detail(request, code):
     """Detalhes de um documento."""
     doc = get_object_or_404(Document, code=code, status="a")
-    return render(request, "document_detail.html", {"document": doc})
+
+    # Materiais relacionados: mesmo Assunto (fallback Categoria), exclui o próprio.
+    # Acaba com o "beco sem saída" no fim da leitura.
+    relacionados = []
+    if doc.assunto_id:
+        relacionados = list(
+            Document.objects.filter(status="a", assunto_id=doc.assunto_id)
+            .exclude(pk=doc.pk).order_by("-created", "-pk")[:3]
+        )
+    if not relacionados and doc.category_id:
+        relacionados = list(
+            Document.objects.filter(status="a", category_id=doc.category_id)
+            .exclude(pk=doc.pk).order_by("-created", "-pk")[:3]
+        )
+
+    return render(request, "document_detail.html", {
+        "document": doc,
+        "relacionados": relacionados,
+    })
 
 
 def collection_list(request):
