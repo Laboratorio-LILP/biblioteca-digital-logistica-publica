@@ -47,7 +47,7 @@ TEMAS_DESTAQUE = [
         "label": "Lei 14.133/21",
         "query": "14.133",
         "fallback_kw": "14.133",
-        "icon": "icon-balanca",
+        "icon": "fi-scale",
         "color": "c-petrol",
         "card_desc": "A nova Lei de Licitações e Contratos: o que muda nas regras, "
                      "prazos e modalidades das compras públicas.",

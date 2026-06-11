@@ -16,7 +16,6 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% include "_partials/_icons_sprite.html" %}
     {% include "_partials/_feather.html" %}
     {% include "_partials/_skip_links.html" %}
 
@@ -49,6 +48,9 @@
             <span><span class="library-mark__name">Biblioteca Digital</span><span class="library-mark__sub">Logística Pública</span></span>
           </span>
         </a>
+        <button type="button" class="nav-toggle" data-nav-toggle aria-controls="sp-menu" aria-expanded="false" aria-label="Abrir menu de navegação">
+          <svg class="fi" aria-hidden="true"><use href="#fi-menu"/></svg>
+        </button>
         <nav id="sp-menu" class="primary-nav" aria-label="Navegação principal">
           <a href="{% url 'catalog:home' %}"{% if current_url_name == 'home' %} class="active" aria-current="page"{% endif %}>Início</a>
           <a href="{% url 'catalog:search' %}"{% if current_url_name == 'search' %} class="active" aria-current="page"{% endif %}>Acervo</a>

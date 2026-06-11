@@ -25,7 +25,7 @@
   {% for c in colecoes_v6 %}
   <a class="sp-card collection-card" href="{% url 'catalog:search' %}?colecao_v6={{ c.id }}">
     <span class="collection-card__icon {{ c.color }}" aria-hidden="true"><svg class="fi"><use href="#{{ c.icon }}"/></svg></span>
-    <span>
+    <span class="collection-card__body">
       <span class="collection-card__label">{{ c.nome }}</span>
       <span class="collection-card__desc">{{ c.descricao }}</span>
       <span class="collection-card__count">{{ c.count }} {{ c.count|pluralize_pt:"documento" }}</span>
