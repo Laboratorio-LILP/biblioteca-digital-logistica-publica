@@ -336,10 +336,11 @@ def download(request, code):
 
 
 def curadoria(request):
-    """Página pública 'Como o acervo é organizado' — em Linguagem Simples,
-    sem processos internos de curadoria. Reusa a visão das 4 coleções v6
-    (mesma fonte da home e da página de coleções)."""
-    return render(request, "curadoria.html", {"colecoes_v6": colecao_v6_overview()})
+    """Rota legada: a Curadoria foi unificada na página de Coleções. Redireciona
+    links externos/marcados para /colecoes/ (a página agora explica a organização
+    do acervo abaixo dos cards das coleções)."""
+    from django.shortcuts import redirect
+    return redirect("catalog:collection_list")
 
 
 def about(request):

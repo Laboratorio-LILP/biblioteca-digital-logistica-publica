@@ -2,16 +2,86 @@
 {% load catalog_tags %}
 
 {% block title %}Coleções — Biblioteca Digital de Logística Pública{% endblock %}
+{% block meta_description %}As quatro coleções da Biblioteca Digital de Logística Pública e como o acervo é organizado: as dimensões de classificação (assunto, categoria e natureza) e como encontrar o que você precisa.{% endblock %}
 
-{% block content %}
-<span class="eyebrow">Acervo</span>
-<h1>Coleções</h1>
-<p class="page__intro">
-  O acervo está organizado em quatro coleções, definidas pelo tipo de
-  informação. Escolha uma coleção para explorar os materiais.
-</p>
+{% block content_raw %}
+<section class="sp-section colecoes-hero">
+  <div class="sp-container">
+    <span class="eyebrow">Acervo</span>
+    <h1>Coleções</h1>
+    <p class="page__intro">
+      O acervo se divide em quatro coleções, organizadas pelo tipo de informação.
+      Escolha uma para começar a explorar — e veja, abaixo, como cada documento é
+      classificado e como encontrar o que você precisa.
+    </p>
+    <div class="collections-grid collections-grid--quatro">
+      {% for card in cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
 
-<div class="collections-grid">
-  {% for card in cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
-</div>
+<section class="sp-section sp-section--alt">
+  <div class="sp-container colecoes-org">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Curadoria</span>
+        <h2>Como o acervo é organizado</h2>
+      </div>
+    </div>
+
+    <div class="colecoes-org__bloco">
+      <h3>Como cada documento é classificado</h3>
+      <p class="curadoria-texto">
+        Além da coleção, cada documento recebe três marcas. São elas que você combina
+        nos filtros do Acervo para estreitar a busca.
+      </p>
+      <ul class="curadoria-lista">
+        <li>
+          <strong>Assunto</strong> — o tema central do documento. Por exemplo:
+          governança, sustentabilidade ou uso de sistemas. São 14 assuntos.
+        </li>
+        <li>
+          <strong>Categoria</strong> — a etapa da contratação a que o documento se
+          refere. As categorias seguem o ciclo de uma contratação pública, do
+          planejamento à gestão do contrato:
+          <ul>
+            <li><strong>Plano Anual de Contratações</strong> — o que o órgão pretende contratar no ano.</li>
+            <li><strong>Planejamento / Fase Preparatória</strong> — estudos técnicos, termo de referência, gestão de riscos e pesquisa de preços.</li>
+            <li><strong>Seleção do Fornecedor</strong> — a licitação e suas formas, ou a contratação direta.</li>
+            <li><strong>Gestão Contratual</strong> — o acompanhamento e a fiscalização do contrato.</li>
+            <li><strong>Conteúdos Transversais</strong> — temas que valem para todas as fases, como governança, integridade e logística.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Natureza</strong> — o objeto da contratação: materiais, serviços,
+          obras de engenharia ou TIC (tecnologia da informação e comunicação).
+        </li>
+      </ul>
+    </div>
+
+    <div class="colecoes-org__bloco">
+      <h3>Como encontrar o que você precisa</h3>
+      <p class="curadoria-texto">Você chega ao material de duas formas:</p>
+      <ul class="curadoria-lista">
+        <li>
+          <strong>Buscar por palavra</strong> — digite um termo na barra de busca.
+          O sistema procura no título, no resumo e nas palavras-chave.
+        </li>
+        <li>
+          <strong>Filtrar pelo acervo</strong> — na página do Acervo, use os filtros
+          na lateral. Combine coleção, categoria, natureza e assunto. A cada escolha,
+          os números mostram quantos documentos restam.
+        </li>
+      </ul>
+      <p class="curadoria-dica">
+        <strong>Dica:</strong> comece largo e vá estreitando — primeiro a coleção,
+        depois o assunto, depois a categoria.
+      </p>
+    </div>
+
+    <p class="curadoria-acoes">
+      <a class="sp-button-primary" href="{% url 'catalog:search' %}">Ir para o Acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+    </p>
+  </div>
+</section>
 {% endblock %}
