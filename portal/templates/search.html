@@ -79,7 +79,7 @@
             <details class="filter-group filter-group--nested"{% if sub.open %} open{% endif %}>
               <summary><span class="filter-group__label">{{ sub.nome|titulo_pt }}</span></summary>
               <div class="filter-group__body">
-                {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-em" %}
+                {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-sub" %}
                 {% for mic in sub.microcategorias %}
                 {% include "_partials/_cat_toggle.html" with param="microcategoria_id" id=mic.id nome=mic.nome|titulo_pt count=mic.count disabled=mic.disabled current=filters.microcategoria_id noun="microcategoria" klass="toggle-opt--mic" %}
                 {% endfor %}
@@ -130,14 +130,10 @@
     </aside>
 
     <div class="acervo-results">
-      {# Continuidade (T3): região viva e vazia no HTML inicial; o JS troca só o texto no submit ("Atualizando resultados…"). Nunca recriar o elemento, senão o leitor de tela não anuncia. #}
-      <p class="sr-only" role="status" aria-live="polite" id="acervo-status"></p>
       <button type="button" class="acervo-mobile-toggle" aria-expanded="false" aria-controls="acervo-sidebar">
         <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
         Filtros{% if filters %} ({{ filters|length }}){% endif %}
       </button>
-      {# Região trocada via AJAX (acervo-filters.js): só esta parte + a barra lateral são atualizadas ao filtrar, sem reload → sem salto. #}
-      <div id="acervo-results-content">
       <div class="sp-panel results-bar">
         <div class="results-bar__left">
           <span class="results-bar__icon"><svg class="fi" aria-hidden="true"><use href="#fi-filter"/></svg></span>
@@ -206,7 +202,6 @@
       </nav>
       <p class="pagination__status">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
       {% endif %}
-      </div>{# /#acervo-results-content #}
     </div>
   </div>
 </form>
