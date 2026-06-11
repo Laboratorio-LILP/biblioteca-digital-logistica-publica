@@ -25,12 +25,12 @@
     </form>
 
     <div class="hero__tags" aria-label="Atalhos de busca">
-      <a class="tag" href="{% url 'catalog:search' %}?q=Planejamento">Planejamento</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Preg%C3%A3o">Pregão</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Contrata%C3%A7%C3%A3o+Direta">Contratação Direta</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Gest%C3%A3o+de+Contratos">Gestão de Contratos</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Tribunal+de+Contas">Tribunal de Contas</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Fiscaliza%C3%A7%C3%A3o">Fiscalização</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Compras+P%C3%BAblicas">Compras Públicas</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Intelig%C3%AAncia+Artificial">Inteligência Artificial</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Log%C3%ADstica">Logística</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Auditoria">Auditoria</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Gest%C3%A3o+de+Riscos">Gestão de Riscos</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Compliance">Compliance</a>
     </div>
 
     <div class="hero__geometry">
@@ -43,11 +43,19 @@
 </section>
 
 <section class="stats" aria-label="Indicadores do acervo">
-  <div class="sp-container stats-grid">
-    <div class="stat"><div class="stat__value">{{ total_docs }}</div><div class="stat__label">Documentos catalogados</div></div>
-    <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções curatoriais</div></div>
-    <div class="stat"><div class="stat__value">{{ cobertura.macroetapas }}</div><div class="stat__label">Categorias processuais</div></div>
-    <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Assuntos temáticos</div></div>
+  <div class="sp-container">
+    <div class="section-heading stats__heading">
+      <div>
+        <span class="eyebrow">Indicadores</span>
+        <h2>Acervo em números</h2>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><div class="stat__value">{{ total_docs }}</div><div class="stat__label">Documentos catalogados</div></div>
+      <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções curatoriais</div></div>
+      <div class="stat"><div class="stat__value">{{ cobertura.macroetapas }}</div><div class="stat__label">Categorias processuais</div></div>
+      <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Assuntos temáticos</div></div>
+    </div>
   </div>
 </section>
 

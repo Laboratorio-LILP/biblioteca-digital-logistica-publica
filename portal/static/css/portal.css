@@ -17,7 +17,8 @@
   --sp-blue-dark: #005992;
   --sp-petrol: #233254;
   --sp-green: #0B9247;
-  --sp-yellow: #FBB900;       /* PANTONE 123 C — secundária GESP (disponível) */
+  --sp-yellow: #FBB900;       /* PANTONE 123 C — secundária GESP */
+  --sp-yellow-dark: #8A6A00;  /* âmbar AA-safe: ícone/texto da coleção c-yellow (≥4.5:1) */
   --sp-olive: #94AA5A;
   --sp-black: #000000;
   --sp-white: #FFFFFF;
@@ -350,11 +351,12 @@ main { flex: 1 0 auto; }
 /* ============================================================
    Indicadores (stats)
    ============================================================ */
-.stats { border-bottom: var(--border); background: var(--sp-white); padding-block: var(--space-page-top); }
+.stats { border-bottom: var(--border); background: var(--sp-white); padding-block: var(--space-section); }
 .stats-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
 .stat { border-left: 4px solid var(--sp-red); background: var(--sp-gray-light); padding: 20px; }
 .stat__value { font-family: var(--font-heading); font-weight: 700; font-size: 26px; }
 .stat__label { margin-top: 4px; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
+.stats__heading { margin-bottom: var(--space-6); }
 @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
 
 /* ============================================================
@@ -385,6 +387,7 @@ main { flex: 1 0 auto; }
 .c-red { color: var(--sp-red); background: var(--gov-red-100); }
 .c-petrol { color: var(--sp-petrol); background: rgb(var(--rgb-petrol) / 0.1); }
 .c-bluedark { color: var(--sp-blue-dark); background: rgb(98 201 224 / 0.2); }
+.c-yellow { color: var(--sp-yellow-dark); background: rgb(var(--rgb-yellow) / 0.18); }
 
 /* ============================================================
    DocCard
@@ -406,10 +409,18 @@ main { flex: 1 0 auto; }
 .doc-card__type.c-red { border-color: rgb(var(--rgb-red) / 0.25); color: var(--sp-red-dark); }
 .doc-card__type.c-petrol { border-color: rgb(var(--rgb-olive) / 0.35); }
 .doc-card__type.c-bluedark { border-color: rgb(var(--rgb-blue) / 0.25); }
+.doc-card__type.c-yellow { border-color: rgb(var(--rgb-yellow) / 0.5); }
 .doc-card__year { margin-left: auto; flex-shrink: 0; border: 1px solid var(--sp-gray-medium); border-radius: 6px; background: var(--sp-white); padding: 4px 8px; font-size: 11px; color: rgb(var(--rgb-black) / 0.62); }
-.doc-card__title { font-family: var(--font-subtitle); font-weight: 600; font-size: 15px; line-height: 1.35; color: var(--sp-black); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 4.05em; }
+.doc-card__title { font-family: var(--font-subtitle); font-weight: 600; font-size: 15px; line-height: 1.35; color: var(--sp-black); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .doc-card:hover .doc-card__title { color: var(--sp-blue); }
-.doc-card__resumo { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 4.8em; }
+.doc-card__resumo { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* Reserva de 3 linhas SÓ na grade (Temas em alta), p/ alinhar os cards.
+   Na coluna única (busca/coleção) o card fica justo — sem gap título↔resumo. */
+.doc-grid--3 .doc-card__title { min-height: 4.05em; }
+.doc-grid--3 .doc-card__resumo { min-height: 4.8em; }
+/* Altura uniforme dos cards ENTRE os temas (dentro de cada tema a grade já
+   iguala) — fileiras consistentes em toda a seção Temas em alta. */
+.doc-grid--3 .doc-card { min-height: 23rem; }
 .doc-card__foot { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; }
 .doc-card__author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
 .doc-card__author .fi { color: var(--sp-blue); }
@@ -428,7 +439,9 @@ main { flex: 1 0 auto; }
    Temas em alta — seção única, grupos por tema
    ============================================================ */
 .temas-em-alta > .eyebrow { display: block; margin-bottom: clamp(24px, 3vw, 36px); }
-.tema-grupo + .tema-grupo { margin-top: clamp(40px, 6vw, 72px); padding-top: clamp(40px, 6vw, 72px); border-top: 1px solid rgb(var(--rgb-black) / 0.08); }
+/* Respiro entre temas: moderado (claramente < o gap entre seções), p/ a seção
+   ler como UMA unidade coesa. Divisor sutil mantém os grupos distinguíveis. */
+.tema-grupo + .tema-grupo { margin-top: var(--space-8); padding-top: var(--space-8); border-top: 1px solid rgb(var(--rgb-black) / 0.08); }
 .tema-grupo__cab { display: flex; flex-direction: column; gap: 14px; }
 @media (min-width: 768px) { .tema-grupo__cab { flex-direction: row; align-items: center; justify-content: space-between; } }
 .tema-grupo__titulo { margin: 0; display: flex; align-items: center; gap: 12px; font-family: var(--font-heading); font-weight: 700; font-size: clamp(22px, 2.4vw, 30px); line-height: 1.18; color: var(--sp-black); }
