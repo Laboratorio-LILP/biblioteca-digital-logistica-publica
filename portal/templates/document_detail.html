@@ -71,7 +71,7 @@
         {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value"><a href="{% url 'catalog:search' %}?assunto_id={{ document.assunto_id }}">{{ assunto.nome }}</a></div></div>{% endif %}{% endwith %}
         {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value"><a href="{% url 'catalog:search' %}?natureza={{ document.natureza|urlencode }}">{{ document.natureza }}</a></div></div>{% endif %}
         {% if document.category %}<div class="meta-item"><div class="label">Categoria</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ document.category.name }}</a></div></div>{% endif %}
-        {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?subcategoria_id={{ document.subcategoria_id }}">{{ sub.nome }}</a></div></div>{% endif %}{% endwith %}
+        {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?subcategoria_id={{ document.subcategoria_id }}">{{ sub.nome|rotulo_sub }}</a></div></div>{% endif %}{% endwith %}
         {% with mic=document.microcategoria %}{% if mic %}<div class="meta-item"><div class="label">Microcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?microcategoria_id={{ document.microcategoria_id }}">{{ mic.nome }}</a></div></div>{% endif %}{% endwith %}
       </div>
     </section>

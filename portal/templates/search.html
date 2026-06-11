@@ -77,7 +77,7 @@
             {% for sub in cat.subcategorias %}
             {% if sub.has_micros %}
             <details class="filter-group filter-group--nested"{% if sub.open %} open{% endif %}>
-              <summary><span class="filter-group__label">{{ sub.nome|titulo_pt }}</span></summary>
+              <summary><span class="filter-group__label">{{ sub.nome|rotulo_sub }}</span></summary>
               <div class="filter-group__body">
                 {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome="Toda a subcategoria" count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" klass="toggle-opt--all-sub" %}
                 {% for mic in sub.microcategorias %}
@@ -86,7 +86,7 @@
               </div>
             </details>
             {% else %}
-            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome|titulo_pt count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
+            {% include "_partials/_cat_toggle.html" with param="subcategoria_id" id=sub.id nome=sub.nome|rotulo_sub count=sub.count disabled=sub.disabled current=filters.subcategoria_id noun="subcategoria" %}
             {% endif %}
             {% endfor %}
           </div>
@@ -96,7 +96,7 @@
 
       <section class="side-section">
         <h3>Natureza</h3>
-        <p class="side-section__hint">O objeto da contratação: materiais, serviços, obras ou TIC.</p>
+        <p class="side-section__hint">A natureza da contratação — o objeto contratado: materiais, serviços, obras ou TIC.</p>
         {% include "_partials/_facet_options.html" with facet=facets.naturezas param="natureza" current=filters.natureza empty_msg="Sem materiais classificados por natureza ainda." %}
       </section>
 

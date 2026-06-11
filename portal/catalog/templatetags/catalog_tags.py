@@ -128,6 +128,28 @@ def titulo_pt(value):
     return "".join(out)
 
 
+# Rótulos de exibição p/ Subcategorias redundantes com a Categoria pai (camada de
+# UI; a taxonomia v8 canônica permanece intacta no banco e nos filtros). Chave =
+# nome canônico em CAIXA ALTA, espaços colapsados.
+SUBCAT_DISPLAY = {
+    "FASE PREPARATÓRIA - ETP": "Estudo Técnico Preliminar (ETP)",
+    "FASE PREPARATÓRIA - TR": "Termo de Referência (TR)",
+    "FASE PREPARATÓRIA - GESTÃO DE RISCOS": "Gestão de Riscos",
+    "FASE PREPARATÓRIA - PESQUISA DE PREÇOS": "Pesquisa de Preços",
+}
+
+
+@register.filter
+def rotulo_sub(nome):
+    """Rótulo de exibição de uma Subcategoria: usa o mapa curado (encurta a
+    redundância com a Categoria pai) ou cai para Title Case (`titulo_pt`). Só
+    apresentação — o nome canônico v8 segue no banco e nos filtros."""
+    if not nome:
+        return nome
+    key = " ".join(str(nome).upper().split())
+    return SUBCAT_DISPLAY.get(key) or titulo_pt(nome)
+
+
 @register.filter
 def url_domain(value):
     """Extrai o host de uma URL para exibir como hint sob botões de
@@ -301,7 +323,7 @@ def _chip_dimensao_valor(param, value):
     if param == "category_id":
         return "Categoria", titulo_pt(_category_names().get(sid, value))
     if param == "subcategoria_id":
-        return "Subcategoria", titulo_pt(_subcategoria_names().get(sid, value))
+        return "Subcategoria", rotulo_sub(_subcategoria_names().get(sid, value))
     if param == "microcategoria_id":
         return "Microcategoria", titulo_pt(_microcategoria_names().get(sid, value))
     if param == "assunto_id":
