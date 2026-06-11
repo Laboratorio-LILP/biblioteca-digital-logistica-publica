@@ -24,10 +24,20 @@
     form.querySelectorAll('input[name="' + name + '"]').forEach(function (el) { el.checked = false; });
   }
 
+  // Feedback de "atualizando" ao auto-submeter (a página recarrega no servidor).
+  var results = document.querySelector(".acervo-results");
+  var statusEl = document.getElementById("acervo-status");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function doSubmit() {
+    if (results && !reduce) results.classList.add("is-updating");
+    if (statusEl) statusEl.textContent = "Atualizando resultados…";
+    form.submit();
+  }
+
   var timer = null;
   function submitSoon(delay) {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(function () { form.submit(); }, delay);
+    timer = setTimeout(doSubmit, delay);
   }
 
   // Auto-submit em mudança de faceta (cascata), ordenação e ano.
@@ -44,7 +54,7 @@
       submitSoon(40);
       return;
     }
-    if (t.matches && t.matches('select[name="sort"]')) { form.submit(); return; }
+    if (t.matches && t.matches('select[name="sort"]')) { doSubmit(); return; }
     if (t.id === "ano_min" || t.id === "ano_max") { submitSoon(120); }
   });
 
@@ -52,7 +62,7 @@
   form.addEventListener("keydown", function (e) {
     if ((e.target.id === "ano_min" || e.target.id === "ano_max") && e.key === "Enter") {
       e.preventDefault();
-      form.submit();
+      doSubmit();
     }
   });
 

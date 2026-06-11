@@ -286,6 +286,17 @@ def collection_detail(request, topic_id):
     # `topic_ids` e contagem total dos documentos da coleção.
     subcollections_visiveis = [s for s in subcollections if s["doc_count"] > 0]
 
+    # Cards de subcoleção via o componente unificado (_collection_card.html).
+    subcollection_cards = [
+        {
+            "href": reverse("catalog:collection_detail", args=[s["topic"].id]),
+            "color": "c-blue", "icon": "fi-layers",
+            "label": s["topic"].name, "desc": s["topic"].description or "",
+            "count": s["doc_count"],
+        }
+        for s in subcollections_visiveis
+    ]
+
     # Breadcrumb
     breadcrumb = []
     if topic.parent_id != 0:
@@ -298,6 +309,7 @@ def collection_detail(request, topic_id):
         "topic": topic,
         "subcollections": subcollections,
         "subcollections_visiveis": subcollections_visiveis,
+        "subcollection_cards": subcollection_cards,
         "page_obj": page_obj,
         "breadcrumb": breadcrumb,
         "total_docs": paginator.count,

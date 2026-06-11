@@ -282,6 +282,9 @@ main { flex: 1 0 auto; }
 .footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .footer-col a { font-size: 12px; color: rgb(var(--rgb-white) / 0.7); transition: color 150ms ease; }
 .footer-col a:hover { color: var(--sp-white); }
+/* "Gerenciar cookies" — botão que reabre o modal; veste-se como link do rodapé. */
+.footer-cookies-btn { padding: 0; border: 0; background: transparent; font: inherit; font-size: 12px; text-align: left; color: rgb(var(--rgb-white) / 0.7); transition: color 150ms ease; }
+.footer-cookies-btn:hover { color: var(--sp-white); }
 .footer-bottom {
   display: flex; flex-direction: column; gap: 12px;
   border-top: 1px solid rgb(var(--rgb-white) / 0.12);
@@ -414,6 +417,9 @@ main { flex: 1 0 auto; }
 .doc-card__tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .doc-card__tag { border: 1px solid var(--sp-gray-medium); background: var(--sp-gray-light); border-radius: 6px; padding: 4px 8px; font-size: 10px; color: rgb(var(--rgb-black) / 0.7); }
 .doc-card__restrito { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--sp-gray-medium); background: var(--sp-white); border-radius: 6px; padding: 4px 8px; font-size: 10px; color: rgb(var(--rgb-black) / 0.62); }
+/* Selo "Aberto" (AA-safe): texto escuro + ícone verde (não-texto, ≥3:1). */
+.doc-card__aberto { display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgb(var(--rgb-green) / 0.4); background: rgb(var(--rgb-green) / 0.1); border-radius: 6px; padding: 4px 8px; font-size: 10px; color: rgb(var(--rgb-black) / 0.7); }
+.doc-card__aberto .fi { color: var(--sp-green); }
 .doc-card__bottom { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: var(--border); padding-top: 12px; }
 .doc-card__assunto { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: rgb(var(--rgb-black) / 0.55); }
 .doc-card__ver { flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--sp-red-dark); font-family: var(--font-subtitle); font-weight: 600; }
@@ -592,6 +598,8 @@ main { flex: 1 0 auto; }
 @media (min-width: 768px) { .results-bar { flex-direction: row; align-items: center; justify-content: space-between; } }
 .query-indicator { margin: 0 0 16px; font-size: 13px; color: rgb(var(--rgb-black) / 0.62); }
 .query-indicator strong { color: var(--sp-black); }
+/* Feedback de "atualizando" ao filtrar (a classe só é aplicada se não houver reduced-motion — ver acervo-filters.js). */
+.acervo-results.is-updating { opacity: 0.6; transition: opacity 120ms ease; }
 
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; padding: 32px; text-align: center; border-style: dashed; }
 .empty-state .fi { font-size: 42px; color: var(--sp-gray-dark); margin-bottom: 12px; }
@@ -693,6 +701,16 @@ html.js .btn-apply { display: none; }
 .sp-pagina-legal p, .sp-pagina-legal li { font-size: 14px; line-height: 1.7; color: rgb(var(--rgb-black) / 0.76); }
 .sp-pagina-legal a { color: var(--sp-blue); text-decoration: underline; }
 .sp-parceiros-imagens { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 16px; }
+
+/* Páginas legais — tabela de cookies, mapa do site e canais de contato.
+   Portado do design-system antigo (removido na higiene), com tokens vivos. */
+.sp-tabela-cookies { width: 100%; border-collapse: collapse; margin: var(--space-3) 0; font-size: 0.9rem; }
+.sp-tabela-cookies th, .sp-tabela-cookies td { border: 1px solid var(--sp-gray-medium); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+.sp-tabela-cookies th { background: var(--sp-gray-light); color: var(--sp-black); font-weight: 700; }
+.sp-mapa-site, .sp-mapa-site ul { list-style: disc; padding-left: 1.5rem; }
+.sp-mapa-site > li { margin-bottom: var(--space-2); }
+.sp-canais-contato dt { font-weight: 700; color: var(--sp-black); margin-top: var(--space-4); font-size: 1.05rem; }
+.sp-canais-contato dd { margin: var(--space-1) 0 var(--space-2); padding-left: 0; }
 
 /* aliases legados (.btn em páginas legais) */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border: var(--border); border-radius: 6px; background: var(--sp-white); color: var(--sp-blue); font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; }
