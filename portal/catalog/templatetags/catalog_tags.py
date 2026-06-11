@@ -24,6 +24,19 @@ def is_year_only(value):
     return bool(_YEAR_ONLY_RE.match(str(value)))
 
 
+@register.filter
+def ano_redundante(doc):
+    """True quando o ano do documento já aparece na imprenta (`source`) que será
+    exibida — evita repetir o ano em 'Como citar' (438/499 docs trazem o ano
+    embutido na fonte, ex.: 'Genebra, UNCITRAL/ONU, Janeiro 2010'). Se a `source`
+    é só o ano (year-only), ela fica escondida e o ano NÃO é redundante."""
+    fonte = (getattr(doc, "source", "") or "").strip()
+    if not fonte or is_year_only(fonte):
+        return False
+    ano = getattr(doc, "ano", None)
+    return bool(ano) and str(ano) in fonte
+
+
 _PLURAIS_PT = {
     # Casos irregulares ou "{singular}+s" não aplicável.
     # Adicione aqui ao introduzir nova palavra na UI.

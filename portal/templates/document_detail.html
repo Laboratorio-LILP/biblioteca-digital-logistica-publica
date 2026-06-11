@@ -24,7 +24,7 @@
         <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
         {% if document.type_info %}{{ document.type_info.name }}{% else %}{{ cv.nome }}{% endif %}
       </span>
-      {% if document.complexidade %}<span class="doc-badge">Complexidade: {{ document.complexidade }}</span>{% endif %}
+      {% with an=document|assunto_nome %}{% if an %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-bookmark"/></svg>{{ an }}</span>{% endif %}{% endwith %}
       {% if document.permissao %}
       <span class="doc-badge {{ document.permissao|lower }}">
         {% if document.permissao == 'Aberto' %}<svg class="fi" aria-hidden="true"><use href="#fi-unlock"/></svg>{% else %}<svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>{% endif %}
@@ -93,7 +93,7 @@
 
     <div class="sp-panel doc-panel doc-cite">
       <h2 class="doc-section-title">Como citar</h2>
-      <p class="doc-cite__ref" id="doc-cite-ref">{{ document.author|default:document.autor_principal }}. <cite>{{ document.title }}</cite>.{% if document.source and not document.source|is_year_only %} {{ document.source }}.{% endif %}{% if document.ano %} {{ document.ano }}.{% endif %}{% if document.doi %} DOI: {{ document.doi }}.{% endif %}</p>
+      <p class="doc-cite__ref" id="doc-cite-ref">{{ document.author|default:document.autor_principal }}. <cite>{{ document.title }}</cite>.{% if document.source and not document.source|is_year_only %} {{ document.source }}.{% endif %}{% if document.ano and not document|ano_redundante %} {{ document.ano }}.{% endif %}{% if document.doi %} DOI: {{ document.doi }}.{% endif %}</p>
       <div class="doc-cite__actions">
         <button type="button" class="sp-button-secondary" data-copy="#doc-cite-ref">
           <svg class="fi" aria-hidden="true"><use href="#fi-file-text"/></svg> <span class="copy-label">Copiar referência</span>
@@ -106,9 +106,8 @@
     </div>
 
     <div class="sp-panel doc-panel">
-      <h2 class="doc-section-title">Referência</h2>
+      <h2 class="doc-section-title">Ficha técnica</h2>
       <div class="doc-ref">
-        {% if document.source and not document.source|is_year_only %}<div class="meta-item"><div class="label">Imprenta</div><div class="value">{{ document.source }}</div></div>{% endif %}
         {% if document.edicao %}<div class="meta-item"><div class="label">Edição</div><div class="value">{{ document.edicao }}</div></div>{% endif %}
         {% if document.doi %}<div class="meta-item"><div class="label">DOI</div><div class="value"><a href="https://doi.org/{{ document.doi }}" target="_blank" rel="noopener">{{ document.doi }}</a></div></div>{% endif %}
         {% if document.nlspi %}<div class="meta-item"><div class="label">ISSN/ISBN</div><div class="value">{{ document.nlspi }}</div></div>{% endif %}

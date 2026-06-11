@@ -316,19 +316,21 @@ class Document(models.Model):
 
     @property
     def display_authors(self):
-        """Autores para exibição, sem duplicar 'Autor Principal' (author) e
-        'Autoridade Intelectual' (autor_principal) quando são equivalentes
-        (texto normalizado igual ou um contido no outro). Distintos → ambos."""
-        a = (self.author or "").strip()
-        ap = (self.autor_principal or "").strip()
-        if not a:
-            return [ap] if ap else []
-        if not ap:
-            return [a]
-        ka, kap = _author_key(a), _author_key(ap)
-        if ka == kap or ka in kap or kap in ka:
-            return [ap if len(ap) >= len(a) else a]
-        return [ap, a]
+        """Autores para exibição a partir de 'Autor Principal' (`author`), um por
+        item (separador ';'), deduplicados por nome normalizado. Fonte canônica
+        única — não cruza com 'Autoridade Intelectual' (`autor_principal`), o que
+        eliminava a duplicação quando o mesmo autor vinha em formatos diferentes
+        (ex.: 'Souza, R. de' × 'de Souza, R.'). Fallback para `autor_principal`
+        só quando `author` está vazio."""
+        bruto = (self.author or "").strip() or (self.autor_principal or "").strip()
+        vistos, saida = set(), []
+        for parte in bruto.split(";"):
+            nome = parte.strip()
+            chave = _author_key(nome)
+            if nome and chave not in vistos:
+                vistos.add(chave)
+                saida.append(nome)
+        return saida
 
 
 class NrOds(models.Model):
