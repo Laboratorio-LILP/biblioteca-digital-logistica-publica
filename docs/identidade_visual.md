@@ -29,8 +29,9 @@ como CSS custom properties (com canais RGB separados para compor `rgb(... / alph
 
 | Token | HEX | Pantone | Uso |
 |---|---|---|---|
-| `--sp-red` | `#ED1C24` | 485 C | Destaques, CTAs, botões primários, barras de seção. |
-| `--sp-red-dark` | `#BD0E15` | derivado | Hover do vermelho. |
+| `--sp-red` | `#ED1C24` | 485 C | Preenchimentos, ícones, bordas e faixas (não-texto). |
+| `--sp-red-dark` | `#BD0E15` | derivado | **Vermelho AA-safe**: texto vermelho em fundo claro + fundo de botão primário (≥4.5:1). |
+| `--sp-red-darker` | `#9B0B11` | derivado | Hover dos botões primários. |
 | `--sp-blue` | `#034EA2` | 2955 C | Cor institucional — links, foco, botões secundários. |
 | `--sp-green` | `#0B9247` | 347 C | Estado de sucesso (ex.: acesso aberto). |
 | `--sp-yellow` | `#FBB900` | 123 C | Secundária GESP — disponível (não usada por padrão). |
@@ -42,6 +43,9 @@ como CSS custom properties (com canais RGB separados para compor `rgb(... / alph
 > **Nota cromática:** o Manual GESP imprime o vermelho como "#FF161F", mas o
 > RGB-correto da Pantone 485 C (237,28,36) é **#ED1C24** — valor usado no portal.
 > O **foco visível é azul** (`rgb(var(--rgb-blue)/0.55)`, 3px), não amarelo.
+> O vermelho brilhante #ED1C24 falha 4.5:1 como texto pequeno e como fundo de
+> botão (4.34:1) → nesses casos usa-se `--sp-red-dark` (WCAG 2.0 AA / eMAG),
+> reservando #ED1C24 para não-texto.
 
 ## 3. Tipografia
 
