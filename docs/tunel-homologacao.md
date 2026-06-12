@@ -40,10 +40,37 @@ Mensagem pronta para enviar:
 > O link só funciona enquanto o ambiente estiver publicado. Se não abrir,
 > me avise.
 
+## Como deixar no ar sem terminal aberto (serviço)
+
+Para a equipe acessar a qualquer momento, instale o túnel como serviço do
+macOS:
+
+```sh
+make tunnel-service
+```
+
+O serviço sobe junto com o login do usuário e reinicia sozinho se cair.
+Não precisa de terminal aberto. Para ver a URL atual:
+
+```sh
+make tunnel-url
+```
+
+Condições para o serviço funcionar:
+
+- O Mac precisa estar **ligado e com o usuário logado** (Ajustes do Sistema →
+  Tela de Bloqueio/Bateria: impedir suspensão se for servir por longos períodos).
+- O stack precisa estar no ar (`make up`). Se não estiver, o serviço tenta
+  de novo a cada 60 segundos até o portal responder.
+- Logs do serviço: `~/Library/Logs/bdlp-tunnel.log`
+
 ## Como tirar do ar
 
-Pressione **Ctrl+C** no terminal onde o túnel roda. O acesso externo morre
-na hora. O portal continua rodando localmente em `http://localhost:8000`.
+- **Serviço:** `make tunnel-service-off` — remove o serviço e derruba o acesso.
+- **Terminal (`make tunnel`):** pressione **Ctrl+C**.
+
+Nos dois casos o acesso externo morre na hora. O portal continua rodando
+localmente em `http://localhost:8000`.
 
 ## Por que é seguro
 
