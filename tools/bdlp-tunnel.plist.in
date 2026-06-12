@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
   Template do LaunchAgent que mantém o túnel de homologação no ar
-  (instalado por `make tunnel-service`; @REPO@ e @HOME@ são substituídos).
-  KeepAlive reinicia o túnel se ele cair; se o portal estiver fora do ar
-  ou o túnel tiver expirado, o tunnel.sh trata e o launchd tenta de novo
-  a cada ThrottleInterval segundos.
+  (instalado por `make tunnel-service`; @SCRIPT@, @PORT@ e @HOME@ são
+  substituídos). O script roda de uma CÓPIA em ~/Library/Application Support:
+  o launchd não pode ler a pasta Desktop (proteção TCC do macOS), então o
+  serviço não referencia o repo. KeepAlive reinicia o túnel se ele cair;
+  se o portal estiver fora do ar ou o túnel tiver expirado, o tunnel.sh
+  trata e o launchd tenta de novo a cada ThrottleInterval segundos.
 -->
 <plist version="1.0">
 <dict>
@@ -15,11 +17,8 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>@REPO@/tools/tunnel.sh</string>
+        <string>@SCRIPT@</string>
     </array>
-
-    <key>WorkingDirectory</key>
-    <string>@REPO@</string>
 
     <key>RunAtLoad</key>
     <true/>
@@ -34,6 +33,8 @@
     <dict>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>PORTAL_PORT</key>
+        <string>@PORT@</string>
     </dict>
 
     <key>StandardOutPath</key>

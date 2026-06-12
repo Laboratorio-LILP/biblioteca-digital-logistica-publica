@@ -14,8 +14,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TUNNEL_ID="${BDLP_TUNNEL_ID:-bdlp-homolog}"
 
-# Porta do portal: respeita override no .env (ex.: 8001 na máquina do bcgsantos).
-PORT="$(grep -E '^PORTAL_PORT=' "$ROOT/.env" 2>/dev/null | cut -d= -f2 || true)"
+# Porta do portal: env PORTAL_PORT (serviço launchd) > .env do repo > 8000
+# (ex.: 8001 na máquina do bcgsantos).
+PORT="${PORTAL_PORT:-$(grep -E '^PORTAL_PORT=' "$ROOT/.env" 2>/dev/null | cut -d= -f2 || true)}"
 PORT="${PORT:-8000}"
 
 if ! command -v devtunnel >/dev/null 2>&1; then
