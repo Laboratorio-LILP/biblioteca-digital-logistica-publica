@@ -17,17 +17,23 @@ tunnel:
 
 # Túnel como serviço do macOS (launchd): sobe no login e reinicia se cair.
 # Não precisa de terminal aberto. Logs: ~/Library/Logs/bdlp-tunnel.log
+# O script roda de uma cópia em ~/Library/Application Support (o launchd não
+# lê a pasta Desktop — TCC). Rode de novo após alterar tools/tunnel.sh.
 TUNNEL_PLIST = $(HOME)/Library/LaunchAgents/br.gov.sp.lilp.bdlp-tunnel.plist
+TUNNEL_APPDIR = $(HOME)/Library/Application Support/lilp-bdlp
 tunnel-service:
-	@mkdir -p $(HOME)/Library/LaunchAgents $(HOME)/Library/Logs
-	sed -e "s|@REPO@|$(CURDIR)|g" -e "s|@HOME@|$(HOME)|g" tools/bdlp-tunnel.plist.in > $(TUNNEL_PLIST)
+	@mkdir -p "$(TUNNEL_APPDIR)" $(HOME)/Library/LaunchAgents $(HOME)/Library/Logs
+	install -m 755 tools/tunnel.sh "$(TUNNEL_APPDIR)/tunnel.sh"
+	sed -e "s|@SCRIPT@|$(TUNNEL_APPDIR)/tunnel.sh|g" -e "s|@HOME@|$(HOME)|g" \
+	    -e "s|@PORT@|$$( (grep -E '^PORTAL_PORT=' .env 2>/dev/null | cut -d= -f2 | grep . ) || echo 8000)|g" \
+	    tools/bdlp-tunnel.plist.in > $(TUNNEL_PLIST)
 	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(TUNNEL_PLIST)
 	@echo "Serviço ativo. URL em alguns segundos via: make tunnel-url"
 
 tunnel-service-off:
 	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel 2>/dev/null
-	rm -f $(TUNNEL_PLIST)
+	rm -f $(TUNNEL_PLIST) "$(TUNNEL_APPDIR)/tunnel.sh"
 	@echo "Serviço removido — o túnel está fora do ar."
 
 # URL pública atual do túnel (muda se o túnel expirar e for recriado)
