@@ -24,11 +24,59 @@
     form.querySelectorAll('input[name="' + name + '"]').forEach(function (el) { el.checked = false; });
   }
 
+  // Feedback de "atualizando" ao auto-submeter (a página recarrega no servidor).
+  var results = document.querySelector(".acervo-results");
+  var statusEl = document.getElementById("acervo-status");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function doSubmit() {
+    if (results && !reduce) results.classList.add("is-updating");
+    if (statusEl) statusEl.textContent = "Atualizando resultados…";
+    form.submit();
+  }
+
   var timer = null;
   function submitSoon(delay) {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(function () { form.submit(); }, delay);
+    timer = setTimeout(doSubmit, delay);
   }
+
+  // Valida os campos de Ano: clampa cada um à faixa [min,max] do input e, se De/Até
+  // ficarem invertidos, troca — antes de submeter. Evita valor fora da faixa
+  // (ex.: 2026 vira 2025) e o "salto" para o limite mínimo.
+  function validarAno() {
+    var lo = form.querySelector("#ano_min");
+    var hi = form.querySelector("#ano_max");
+    function clamp(el) {
+      if (!el || el.value === "") return null;
+      var v = parseInt(el.value, 10);
+      if (isNaN(v)) { el.value = ""; return null; }
+      var mn = parseInt(el.getAttribute("min"), 10);
+      var mx = parseInt(el.getAttribute("max"), 10);
+      if (!isNaN(mn) && v < mn) v = mn;
+      if (!isNaN(mx) && v > mx) v = mx;
+      el.value = String(v);
+      return v;
+    }
+    var a = clamp(lo), b = clamp(hi);
+    if (a !== null && b !== null && a > b) { lo.value = String(b); hi.value = String(a); }
+  }
+
+  // O spinner (setas ↑↓) de um <input type=number> VAZIO salta para o atributo
+  // `min` (1991), ignorando o placeholder — daí "subo e vai para 1991". Correção:
+  // se o valor pulou de vazio direto para o min, parte do placeholder (o limite do
+  // campo: 1991 no "De", 2025 no "Até"). Não afeta digitação (vai char a char).
+  function bindAnoSpinner(el) {
+    if (!el) return;
+    var prev = el.value;
+    el.addEventListener("input", function () {
+      if (prev === "" && el.value === el.getAttribute("min")) {
+        el.value = el.getAttribute("placeholder") || el.value;
+      }
+      prev = el.value;
+    });
+  }
+  bindAnoSpinner(form.querySelector("#ano_min"));
+  bindAnoSpinner(form.querySelector("#ano_max"));
 
   // Auto-submit em mudança de faceta (cascata), ordenação e ano.
   form.addEventListener("change", function (e) {
@@ -44,15 +92,16 @@
       submitSoon(40);
       return;
     }
-    if (t.matches && t.matches('select[name="sort"]')) { form.submit(); return; }
-    if (t.id === "ano_min" || t.id === "ano_max") { submitSoon(120); }
+    if (t.matches && t.matches('select[name="sort"]')) { doSubmit(); return; }
+    if (t.id === "ano_min" || t.id === "ano_max") { validarAno(); submitSoon(500); }
   });
 
   // Enter nos inputs de ano envia o form.
   form.addEventListener("keydown", function (e) {
     if ((e.target.id === "ano_min" || e.target.id === "ano_max") && e.key === "Enter") {
       e.preventDefault();
-      form.submit();
+      validarAno();
+      doSubmit();
     }
   });
 

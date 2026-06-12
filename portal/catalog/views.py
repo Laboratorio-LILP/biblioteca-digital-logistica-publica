@@ -224,7 +224,25 @@ def search(request):
 def document_detail(request, code):
     """Detalhes de um documento."""
     doc = get_object_or_404(Document, code=code, status="a")
-    return render(request, "document_detail.html", {"document": doc})
+
+    # Materiais relacionados: mesmo Assunto (fallback Categoria), exclui o próprio.
+    # Acaba com o "beco sem saída" no fim da leitura.
+    relacionados = []
+    if doc.assunto_id:
+        relacionados = list(
+            Document.objects.filter(status="a", assunto_id=doc.assunto_id)
+            .exclude(pk=doc.pk).order_by("-created", "-pk")[:3]
+        )
+    if not relacionados and doc.category_id:
+        relacionados = list(
+            Document.objects.filter(status="a", category_id=doc.category_id)
+            .exclude(pk=doc.pk).order_by("-created", "-pk")[:3]
+        )
+
+    return render(request, "document_detail.html", {
+        "document": doc,
+        "relacionados": relacionados,
+    })
 
 
 def collection_list(request):
@@ -268,6 +286,17 @@ def collection_detail(request, topic_id):
     # `topic_ids` e contagem total dos documentos da coleção.
     subcollections_visiveis = [s for s in subcollections if s["doc_count"] > 0]
 
+    # Cards de subcoleção via o componente unificado (_collection_card.html).
+    subcollection_cards = [
+        {
+            "href": reverse("catalog:collection_detail", args=[s["topic"].id]),
+            "color": "c-blue", "icon": "fi-layers",
+            "label": s["topic"].name, "desc": s["topic"].description or "",
+            "count": s["doc_count"],
+        }
+        for s in subcollections_visiveis
+    ]
+
     # Breadcrumb
     breadcrumb = []
     if topic.parent_id != 0:
@@ -280,6 +309,7 @@ def collection_detail(request, topic_id):
         "topic": topic,
         "subcollections": subcollections,
         "subcollections_visiveis": subcollections_visiveis,
+        "subcollection_cards": subcollection_cards,
         "page_obj": page_obj,
         "breadcrumb": breadcrumb,
         "total_docs": paginator.count,
@@ -306,10 +336,11 @@ def download(request, code):
 
 
 def curadoria(request):
-    """Página pública 'Como o acervo é organizado' — em Linguagem Simples,
-    sem processos internos de curadoria. Reusa a visão das 4 coleções v6
-    (mesma fonte da home e da página de coleções)."""
-    return render(request, "curadoria.html", {"colecoes_v6": colecao_v6_overview()})
+    """Rota legada: a Curadoria foi unificada na página de Coleções. Redireciona
+    links externos/marcados para /colecoes/ (a página agora explica a organização
+    do acervo abaixo dos cards das coleções)."""
+    from django.shortcuts import redirect
+    return redirect("catalog:collection_list")
 
 
 def about(request):

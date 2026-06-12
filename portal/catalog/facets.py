@@ -266,14 +266,11 @@ def compute_facets(filters):
     # Natureza (objeto da contratação, v6)
     facets["naturezas"] = _string_facet(filters, "natureza", "natureza")
 
-    # Ano: min/max para os campos De/Até (ignorando o próprio ano nos filtros)
-    f_year = {
-        k: v for k, v in (filters or {}).items()
-        if k not in ("ano_min", "ano_max", "year_from", "year_to")
-    }
-    qs = Document.objects.filter(status="a", ano__isnull=False)
-    qs = _apply_filters(qs, f_year)
-    bounds = qs.aggregate(min=Min("ano"), max=Max("ano"))
+    # Ano: limites ESTÁVEIS sobre o acervo inteiro (NÃO o conjunto filtrado), para
+    # os campos De/Até não "pularem" ao aplicar outros filtros (evita o salto).
+    bounds = Document.objects.filter(status="a", ano__isnull=False).aggregate(
+        min=Min("ano"), max=Max("ano")
+    )
     facets["ano_bounds"] = {
         "min": bounds["min"] or 2000,
         "max": bounds["max"] or 2025,

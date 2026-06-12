@@ -24,34 +24,40 @@ A reforma observa os seguintes instrumentos:
 
 ## 2. Paleta de cores
 
-Definida em `:root` de [portal/static/css/style.css](../portal/static/css/style.css)
-como CSS custom properties:
+Definida em `:root` de [portal/static/css/portal.css](../portal/static/css/portal.css)
+como CSS custom properties (com canais RGB separados para compor `rgb(... / alpha)`):
 
-| Token | HEX | Pantone | Uso recomendado |
+| Token | HEX | Pantone | Uso |
 |---|---|---|---|
-| `--sp-vermelho` | `#ED1C24` | 485 C | Destaques, CTAs, alertas, banner LAI (borda). |
-| `--sp-amarelo` | `#FBB900` | 123 C | Outline de foco, indicador de página atual, banner de cookies. |
-| `--sp-verde` | `#0B9247` | 347 C | Estado de sucesso, ODS. |
-| `--sp-azul` | `#034EA2` | 2955 C | Cor institucional principal — header, links, botões primários. |
-| `--sp-azul-escuro` | `#023A7A` | derivado | Hover do azul institucional. |
-| `--sp-fundo-claro` | `#F5F5F5` | — | Fundo de seções alternadas. |
-| `--sp-foco` | `#FFB800` | derivado | Outline de foco visível (3px). |
+| `--sp-red` | `#ED1C24` | 485 C | Preenchimentos, ícones, bordas e faixas (não-texto). |
+| `--sp-red-dark` | `#BD0E15` | derivado | **Vermelho AA-safe**: texto vermelho em fundo claro + fundo de botão primário (≥4.5:1). |
+| `--sp-red-darker` | `#9B0B11` | derivado | Hover dos botões primários. |
+| `--sp-blue` | `#034EA2` | 2955 C | Cor institucional — links, foco, botões secundários. |
+| `--sp-green` | `#0B9247` | 347 C | Estado de sucesso (ex.: acesso aberto). |
+| `--sp-yellow` | `#FBB900` | 123 C | Secundária GESP — disponível (não usada por padrão). |
+| `--sp-petrol` | `#233254` | — | Faixas escuras (banner de cookies, "Contribua"). |
+| `--sp-black` / `--sp-white` | `#000` / `#FFF` | Black / — | Govbar, rodapé, fundos. |
+| `--sp-gray-light` | `#F5F5F5` | — | Fundo de seções alternadas. |
+| `--sp-gray-medium` / `--sp-gray-dark` | `#BFBFBF` / `#808080` | 25% / 50% K | Bordas e texto auxiliar. |
 
-Tons neutros (branco, preto, cinza 25%, cinza 50%) e aliases legados
-(`--primary`, `--accent`, `--gray-*`) preservam as classes existentes
-(`.header`, `.btn-primary`, `.badge`) sem reescrita massiva.
+> **Nota cromática:** o Manual GESP imprime o vermelho como "#FF161F", mas o
+> RGB-correto da Pantone 485 C (237,28,36) é **#ED1C24** — valor usado no portal.
+> O **foco visível é azul** (`rgb(var(--rgb-blue)/0.55)`, 3px), não amarelo.
+> O vermelho brilhante #ED1C24 falha 4.5:1 como texto pequeno e como fundo de
+> botão (4.34:1) → nesses casos usa-se `--sp-red-dark` (WCAG 2.0 AA / eMAG),
+> reservando #ED1C24 para não-texto.
 
 ## 3. Tipografia
 
-- **Fonte principal**: Roboto (Google Fonts), pesos 400/500/700.
-- **Fallback**: Verdana (especificada no Manual GESP para sistema), depois
-  `system-ui` e Arial.
-- **Carregamento**: `<link>` no `<head>` de [base.html](../portal/templates/base.html)
-  com `preconnect` para `fonts.googleapis.com` e `fonts.gstatic.com` e
-  `display=swap`.
+- **Títulos** (`--font-heading`): Futura PT → fallback **Montserrat** (Google
+  Fonts) → Verdana. Subtítulos/rótulos (`--font-subtitle`): Montserrat.
+- **Corpo** (`--font-sans`): **Verdana**, Geneva, sans-serif.
+- **Carregamento**: `<link>` para Montserrat (500/600/700) no `<head>` de
+  [base.html](../portal/templates/base.html) com `preconnect` e `display=swap`.
+  Futura PT não é carregada (licença) — na prática os títulos caem em Montserrat.
 
-Escala (rem, base 16px): h1 36px / h2 28px / h3 22px / h4 18px /
-corpo 16px / legenda 14px. Line-height padrão 1.6 no corpo.
+Base do corpo: 14px (`0.875rem`), responde à escala de fonte da govbar
+(87,5%–150%). Line-height 1.6. Títulos com `clamp()` fluido.
 
 ## 4. Grid e breakpoints
 
@@ -72,41 +78,33 @@ Mobile-first: cada breakpoint adiciona, não substitui.
 
 ```
 portal/templates/
-├── base.html                       (orquestrador)
-├── home.html
-├── search.html  document_detail.html
+├── base.html              (orquestrador — govbar, header e rodapé inline)
+├── home.html  search.html  document_detail.html
 ├── collection_list.html  collection_detail.html
-├── about.html
+├── about.html  curadoria.html
 ├── _partials/
-│   ├── _icons_sprite.html
+│   ├── _feather.html          (sprite SVG único — ícones fi-*)
 │   ├── _skip_links.html
-│   ├── _barra_govsp.html
-│   ├── _header_institucional.html
-│   ├── _menu_principal.html
-│   ├── _rodape_institucional.html
-│   ├── _banner_lai.html
 │   ├── _banner_cookies.html
-│   └── _aviso_rascunho.html
+│   ├── _applied_filters.html  _cat_toggle.html  _facet_options.html
+│   └── _collection_card.html  _doc_card.html
 └── legal/
     ├── transparencia.html  acessibilidade.html
     ├── politica_privacidade.html  politica_cookies.html
     ├── mapa_site.html  fale_conosco.html
 ```
 
-Todos os partials começam com `_` (convenção de inclusão). Páginas
-legais isoladas em `legal/` para facilitar inclusão do aviso de
-rascunho compartilhado.
+Todos os partials começam com `_` (convenção de inclusão). O shell
+institucional (barra do Governo, cabeçalho, rodapé) é **inline** no
+`base.html`. Páginas legais isoladas em `legal/`.
 
-## 6. CSS em duas camadas
+## 6. CSS — folha única
 
-1. [portal/static/css/sp-design-system.css](../portal/static/css/sp-design-system.css)
-   — componentes novos (prefixo `.sp-`).
-2. [portal/static/css/style.css](../portal/static/css/style.css) — paleta,
-   tipografia, classes legadas atualizadas.
-
-A ordem de carregamento em `base.html` é `sp-design-system.css` ANTES
-de `style.css`, para que regras de página tenham precedência em caso
-de colisão.
+[portal/static/css/portal.css](../portal/static/css/portal.css) é a **única**
+folha de estilo do portal (port fiel do protótipo Next.js para CSS puro, sem
+build). Concentra paleta, tipografia, componentes (`.sp-*`), o shell e a
+acessibilidade. As folhas `style.css` e `sp-design-system.css` de iterações
+anteriores foram **removidas** — eram órfãs (nenhum `<link>` as carregava).
 
 ## 7. JavaScript — `main.js` único
 
@@ -153,9 +151,10 @@ Implementadas as seguintes recomendações do eMAG 3.1:
   com 3 ações (aceitar todos, apenas essenciais, personalizar) e modal
   com 3 categorias de cookies. Persistência em localStorage. Nenhum
   cookie de análise é disparado antes do consentimento explícito.
-- **Banner LAI** ([_banner_lai.html](../portal/templates/_partials/_banner_lai.html))
-  na home apontando para `/transparencia/` (Decreto Federal 7.724/2012,
-  art. 7º).
+- **Acesso à Informação (LAI)**: atendido pela barra do Governo (links
+  Ouvidoria/Transparência/SIC/Acesso à Informação, presentes em todas as
+  páginas) + página `/transparencia/` (Decreto Federal 7.724/2012, art. 7º).
+  O antigo banner de home (`_banner_lai.html`) era órfão e foi removido.
 - **6 páginas legais** em [portal/templates/legal/](../portal/templates/legal/)
   — todas com aviso amarelo de rascunho aguardando validação jurídica.
 
@@ -180,8 +179,8 @@ Em produção (`DEBUG=False`):
   (acima da dobra).
 - `loading="lazy"` em logos do rodapé e da página Sobre.
 - `decoding="async"` em todas as PNGs.
-- SVG sprite inline (`_icons_sprite.html`) — uma requisição para
-  todos os ícones, herda `currentColor` (sem CSS extra).
+- SVG sprite inline (`_feather.html`, ícones `fi-*`) — uma requisição para
+  todos os ícones, herda `currentColor` via `.fi` (sem CSS extra).
 - Total CSS+JS minificável ≤ 200KB (alvo).
 
 ## 12. Decisões de design por divergência

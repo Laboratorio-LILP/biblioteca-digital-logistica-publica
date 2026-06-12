@@ -157,10 +157,9 @@
        ======================================================== */
     var Menu = {
         init: function () {
-            this.toggleBtn = document.querySelector('.sp-menu-principal__toggle');
-            this.container = document.querySelector('.sp-menu-principal');
-            this.lista = document.getElementById('sp-menu-lista');
-            if (!this.toggleBtn || !this.container || !this.lista) return;
+            this.toggleBtn = document.querySelector('[data-nav-toggle]');
+            this.nav = document.getElementById('sp-menu');
+            if (!this.toggleBtn || !this.nav) return;
 
             this.toggleBtn.addEventListener('click', this.toggle.bind(this));
             document.addEventListener('keydown', this.onKey.bind(this));
@@ -168,23 +167,22 @@
         },
 
         abrir: function () {
-            this.container.setAttribute('data-aberto', 'true');
+            this.nav.classList.add('is-open');
             this.toggleBtn.setAttribute('aria-expanded', 'true');
             this.toggleBtn.setAttribute('aria-label', 'Fechar menu de navegação');
-            var primeiro = this.lista.querySelector('a');
+            var primeiro = this.nav.querySelector('a');
             if (primeiro) primeiro.focus();
         },
 
         fechar: function (devolverFoco) {
-            this.container.removeAttribute('data-aberto');
+            this.nav.classList.remove('is-open');
             this.toggleBtn.setAttribute('aria-expanded', 'false');
             this.toggleBtn.setAttribute('aria-label', 'Abrir menu de navegação');
             if (devolverFoco) this.toggleBtn.focus();
         },
 
         toggle: function () {
-            var aberto = this.container.getAttribute('data-aberto') === 'true';
-            if (aberto) {
+            if (this.nav.classList.contains('is-open')) {
                 this.fechar(false);
             } else {
                 this.abrir();
@@ -192,14 +190,14 @@
         },
 
         onKey: function (event) {
-            if (event.key === 'Escape' && this.container.getAttribute('data-aberto') === 'true') {
+            if (event.key === 'Escape' && this.nav.classList.contains('is-open')) {
                 this.fechar(true);
             }
         },
 
         onDocClick: function (event) {
-            if (this.container.getAttribute('data-aberto') !== 'true') return;
-            if (this.container.contains(event.target)) return;
+            if (!this.nav.classList.contains('is-open')) return;
+            if (this.nav.contains(event.target) || this.toggleBtn.contains(event.target)) return;
             this.fechar(false);
         }
     };
@@ -330,64 +328,6 @@
     };
 
     /* ========================================================
-       Módulo: Sincroniza filtros da busca com URL params
-       Quando o usuário chega à página de busca via link tipo
-       /busca/?tipologia=Normativo, o select correspondente fica
-       visualmente selecionado mesmo se o contexto Django não tiver
-       marcado a option (defesa contra perda de filtros entre forms
-       parciais). Aplica também em filtros que não estão no formulário
-       de filtros — preserva via input[type=hidden] dinâmico.
-       ======================================================== */
-    var Filters = {
-        init: function () {
-            var form = document.getElementById('filter-form');
-            if (!form) return;
-            var params;
-            try {
-                params = new URLSearchParams(window.location.search);
-            } catch (e) {
-                return;  // browser muito antigo
-            }
-
-            // Sincroniza selects e inputs que existem no formulário
-            var camposExistentes = {};
-            var fields = form.querySelectorAll('select[name], input[name]');
-            for (var i = 0; i < fields.length; i++) {
-                var f = fields[i];
-                var name = f.getAttribute('name');
-                camposExistentes[name] = true;
-                if (!params.has(name)) continue;
-                var value = params.get(name);
-                if (f.tagName === 'SELECT') {
-                    // Confirma que a option existe; senão, ignora silenciosamente
-                    var opt = f.querySelector('option[value="' + (window.CSS && CSS.escape ? CSS.escape(value) : value) + '"]');
-                    if (opt) f.value = value;
-                } else if (f.type !== 'submit' && f.type !== 'hidden') {
-                    f.value = value;
-                }
-            }
-
-            // Preserva via hidden input qualquer param que esteja na URL
-            // mas não no formulário (ex.: etapa, year_from). Assim ao
-            // re-submeter o filtro, esses params NÃO são perdidos.
-            var iter = params.entries();
-            var item = iter.next();
-            while (!item.done) {
-                var key = item.value[0];
-                var val = item.value[1];
-                if (key && val && !camposExistentes[key]) {
-                    var hidden = document.createElement('input');
-                    hidden.type = 'hidden';
-                    hidden.name = key;
-                    hidden.value = val;
-                    form.appendChild(hidden);
-                }
-                item = iter.next();
-            }
-        }
-    };
-
-    /* ========================================================
        Inicialização
        ======================================================== */
     function init() {
@@ -395,7 +335,6 @@
         try { Atalhos.init(); } catch (e) { console.error('[BDLP] Atalhos init falhou:', e); }
         try { Menu.init(); }    catch (e) { console.error('[BDLP] Menu init falhou:', e); }
         try { Cookies.init(); } catch (e) { console.error('[BDLP] Cookies init falhou:', e); }
-        try { Filters.init(); } catch (e) { console.error('[BDLP] Filters init falhou:', e); }
     }
 
     if (document.readyState === 'loading') {

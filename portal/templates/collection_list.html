@@ -2,16 +2,109 @@
 {% load catalog_tags %}
 
 {% block title %}Coleções — Biblioteca Digital de Logística Pública{% endblock %}
+{% block meta_description %}As quatro coleções da Biblioteca Digital de Logística Pública e como o acervo é organizado: as dimensões de classificação (assunto, categoria e natureza) e como encontrar o que você precisa.{% endblock %}
 
-{% block content %}
-<span class="eyebrow">Acervo</span>
-<h1>Coleções</h1>
-<p class="page__intro">
-  O acervo está organizado em quatro coleções definidas pelo tipo de informação
-  (taxonomia v6). Escolha uma coleção para explorar os materiais.
-</p>
+{% block content_raw %}
+<section class="sp-section colecoes-hero">
+  <div class="sp-container">
+    <span class="eyebrow">Acervo</span>
+    <h1>Coleções</h1>
+    <p class="page__intro">
+      O acervo se divide em quatro coleções, organizadas pelo tipo de informação.
+      Escolha uma para começar a explorar — e veja, abaixo, como cada documento é
+      classificado e como encontrar o que você precisa.
+    </p>
+    <div class="collections-grid collections-grid--quatro">
+      {% for card in cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
 
-<div class="collections-grid">
-  {% for card in cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
-</div>
+<section class="sp-section sp-section--alt">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Organização</span>
+        <h2>Como cada documento é classificado</h2>
+      </div>
+    </div>
+    <p class="page__intro">
+      Além da coleção, cada documento recebe três marcas: assunto, categoria e
+      natureza. Você combina essas marcas nos filtros do Acervo para estreitar a busca.
+    </p>
+
+    <div class="org-grid org-grid--3">
+      <article class="sp-card org-card">
+        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-bookmark"/></svg></span>
+        <h3>Assunto</h3>
+        <p>O tema central do documento — por exemplo, governança, sustentabilidade ou uso de sistemas.</p>
+        <p class="org-card__nota">Hoje são 14 assuntos.</p>
+      </article>
+
+      <article class="sp-card org-card">
+        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-layers"/></svg></span>
+        <h3>Categoria</h3>
+        <p>A etapa da contratação a que o documento se refere. Segue o ciclo de uma contratação, do planejamento à gestão do contrato:</p>
+        <ul>
+          <li>Plano Anual de Contratações</li>
+          <li>Planejamento e Fase Preparatória</li>
+          <li>Seleção do Fornecedor</li>
+          <li>Gestão Contratual</li>
+          <li>Conteúdos Transversais</li>
+        </ul>
+      </article>
+
+      <article class="sp-card org-card">
+        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-package"/></svg></span>
+        <h3>Natureza</h3>
+        <p>O objeto da contratação — o que se contrata:</p>
+        <ul>
+          <li>Materiais</li>
+          <li>Serviços</li>
+          <li>Obras e serviços de engenharia</li>
+          <li>Tecnologia da informação e comunicação (TIC)</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sp-section">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Busca</span>
+        <h2>Como encontrar o que você procura</h2>
+      </div>
+    </div>
+    <p class="page__intro">Você chega ao material de duas formas:</p>
+
+    <div class="org-grid org-grid--2">
+      <article class="sp-card org-card org-card--busca">
+        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-search"/></svg></span>
+        <div>
+          <h3>Buscar por palavra</h3>
+          <p>Digite um termo na barra de busca. O sistema procura no título, no resumo e nas palavras-chave.</p>
+        </div>
+      </article>
+
+      <article class="sp-card org-card org-card--busca">
+        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-filter"/></svg></span>
+        <div>
+          <h3>Filtrar pelo acervo</h3>
+          <p>No Acervo, use os filtros ao lado. Combine coleção, categoria, natureza e assunto. A cada escolha, os números mostram quantos documentos restam.</p>
+        </div>
+      </article>
+    </div>
+
+    <p class="curadoria-dica">
+      <strong>Dica:</strong> comece largo e vá estreitando — primeiro a coleção,
+      depois o assunto, depois a categoria.
+    </p>
+
+    <p class="curadoria-acoes">
+      <a class="sp-button-primary" href="{% url 'catalog:search' %}">Ir para o Acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+    </p>
+  </div>
+</section>
 {% endblock %}

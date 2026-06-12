@@ -28,10 +28,10 @@ Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de I
     {% endif %}
     {% endwith %}
 
-    {% if doc.keywords or doc.permissao == 'Restrito' %}
+    {% if doc.keywords or doc.permissao %}
     <div class="doc-card__tags">
       {% for kw in doc.keywords|split_keywords|slice:":3" %}<span class="doc-card__tag">{{ kw }}</span>{% endfor %}
-      {% if doc.permissao == 'Restrito' %}<span class="doc-card__restrito"><svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>Restrito</span>{% endif %}
+      {% if doc.permissao == 'Aberto' %}<span class="doc-card__aberto"><svg class="fi" aria-hidden="true"><use href="#fi-unlock"/></svg>Aberto</span>{% elif doc.permissao == 'Restrito' %}<span class="doc-card__restrito"><svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>Restrito</span>{% endif %}
     </div>
     {% endif %}
 

@@ -16,7 +16,6 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% include "_partials/_icons_sprite.html" %}
     {% include "_partials/_feather.html" %}
     {% include "_partials/_skip_links.html" %}
 
@@ -49,11 +48,13 @@
             <span><span class="library-mark__name">Biblioteca Digital</span><span class="library-mark__sub">Logística Pública</span></span>
           </span>
         </a>
+        <button type="button" class="nav-toggle" data-nav-toggle aria-controls="sp-menu" aria-expanded="false" aria-label="Abrir menu de navegação">
+          <svg class="fi" aria-hidden="true"><use href="#fi-menu"/></svg>
+        </button>
         <nav id="sp-menu" class="primary-nav" aria-label="Navegação principal">
           <a href="{% url 'catalog:home' %}"{% if current_url_name == 'home' %} class="active" aria-current="page"{% endif %}>Início</a>
           <a href="{% url 'catalog:search' %}"{% if current_url_name == 'search' %} class="active" aria-current="page"{% endif %}>Acervo</a>
           <a href="{% url 'catalog:collection_list' %}"{% if current_url_name == 'collection_list' or current_url_name == 'collection_detail' %} class="active" aria-current="page"{% endif %}>Coleções</a>
-          <a href="{% url 'catalog:curadoria' %}"{% if current_url_name == 'curadoria' %} class="active" aria-current="page"{% endif %}>Curadoria</a>
           <a href="{% url 'catalog:about' %}"{% if current_url_name == 'about' %} class="active" aria-current="page"{% endif %}>Sobre</a>
         </nav>
       </div>
@@ -90,7 +91,6 @@
           <ul>
             <li><a href="{% url 'catalog:search' %}">Acervo</a></li>
             <li><a href="{% url 'catalog:collection_list' %}">Coleções</a></li>
-            <li><a href="{% url 'catalog:curadoria' %}">Curadoria</a></li>
             <li><a href="{% url 'catalog:about' %}">Sobre</a></li>
             <li><a href="{% url 'catalog:mapa_site' %}">Mapa do site</a></li>
           </ul>
@@ -102,6 +102,7 @@
             <li><a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a></li>
             <li><a href="{% url 'catalog:politica_privacidade' %}">Privacidade</a></li>
             <li><a href="{% url 'catalog:fale_conosco' %}">Contato</a></li>
+            <li><button type="button" class="footer-cookies-btn" data-cookies-action="customize">Gerenciar cookies</button></li>
           </ul>
         </div>
       </div>

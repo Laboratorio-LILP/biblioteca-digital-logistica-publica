@@ -14,16 +14,10 @@
 <h1>{{ topic.name }}</h1>
 {% if topic.description %}<p class="page__intro">{{ topic.description }}</p>{% endif %}
 
-{% if subcollections_visiveis %}
+{% if subcollection_cards %}
 <h2>Subcoleções</h2>
 <div class="collections-grid">
-  {% for sub in subcollections_visiveis %}
-  <a class="sp-card collection-card" href="{% url 'catalog:collection_detail' sub.topic.id %}">
-    <span class="collection-card__icon c-blue" aria-hidden="true"><svg class="fi"><use href="#fi-layers"/></svg></span>
-    <span><span class="collection-card__label">{{ sub.topic.name }}</span><span class="collection-card__count">{{ sub.doc_count }} {{ sub.doc_count|pluralize_pt:"documento" }}</span></span>
-    <svg class="fi collection-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
-  </a>
-  {% endfor %}
+  {% for card in subcollection_cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
 </div>
 {% endif %}
 

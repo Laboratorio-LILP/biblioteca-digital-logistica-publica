@@ -24,6 +24,19 @@ def is_year_only(value):
     return bool(_YEAR_ONLY_RE.match(str(value)))
 
 
+@register.filter
+def ano_redundante(doc):
+    """True quando o ano do documento já aparece na imprenta (`source`) que será
+    exibida — evita repetir o ano em 'Como citar' (438/499 docs trazem o ano
+    embutido na fonte, ex.: 'Genebra, UNCITRAL/ONU, Janeiro 2010'). Se a `source`
+    é só o ano (year-only), ela fica escondida e o ano NÃO é redundante."""
+    fonte = (getattr(doc, "source", "") or "").strip()
+    if not fonte or is_year_only(fonte):
+        return False
+    ano = getattr(doc, "ano", None)
+    return bool(ano) and str(ano) in fonte
+
+
 _PLURAIS_PT = {
     # Casos irregulares ou "{singular}+s" não aplicável.
     # Adicione aqui ao introduzir nova palavra na UI.
@@ -126,6 +139,28 @@ def titulo_pt(value):
                 out.append(lower[:1].upper() + lower[1:])
         first_word_done = True
     return "".join(out)
+
+
+# Rótulos de exibição p/ Subcategorias redundantes com a Categoria pai (camada de
+# UI; a taxonomia v8 canônica permanece intacta no banco e nos filtros). Chave =
+# nome canônico em CAIXA ALTA, espaços colapsados.
+SUBCAT_DISPLAY = {
+    "FASE PREPARATÓRIA - ETP": "Estudo Técnico Preliminar (ETP)",
+    "FASE PREPARATÓRIA - TR": "Termo de Referência (TR)",
+    "FASE PREPARATÓRIA - GESTÃO DE RISCOS": "Gestão de Riscos",
+    "FASE PREPARATÓRIA - PESQUISA DE PREÇOS": "Pesquisa de Preços",
+}
+
+
+@register.filter
+def rotulo_sub(nome):
+    """Rótulo de exibição de uma Subcategoria: usa o mapa curado (encurta a
+    redundância com a Categoria pai) ou cai para Title Case (`titulo_pt`). Só
+    apresentação — o nome canônico v8 segue no banco e nos filtros."""
+    if not nome:
+        return nome
+    key = " ".join(str(nome).upper().split())
+    return SUBCAT_DISPLAY.get(key) or titulo_pt(nome)
 
 
 @register.filter
@@ -301,7 +336,7 @@ def _chip_dimensao_valor(param, value):
     if param == "category_id":
         return "Categoria", titulo_pt(_category_names().get(sid, value))
     if param == "subcategoria_id":
-        return "Subcategoria", titulo_pt(_subcategoria_names().get(sid, value))
+        return "Subcategoria", rotulo_sub(_subcategoria_names().get(sid, value))
     if param == "microcategoria_id":
         return "Microcategoria", titulo_pt(_microcategoria_names().get(sid, value))
     if param == "assunto_id":

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load catalog_tags %}
+{% load static catalog_tags %}
 
 {% block title %}{{ document.title }} — Biblioteca Digital de Logística Pública{% endblock %}
 
@@ -10,6 +10,8 @@
     <a href="{% url 'catalog:home' %}">Início</a>
     <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
     <a href="{% url 'catalog:search' %}">Acervo</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <a href="{% url 'catalog:search' %}?colecao_v6={{ cv.slug }}">{{ cv.nome }}</a>
     <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
     <span>{{ document.title|truncatechars:60 }}</span>
   </div>
@@ -22,7 +24,7 @@
         <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
         {% if document.type_info %}{{ document.type_info.name }}{% else %}{{ cv.nome }}{% endif %}
       </span>
-      {% if document.complexidade %}<span class="doc-badge">Complexidade: {{ document.complexidade }}</span>{% endif %}
+      {% with an=document|assunto_nome %}{% if an %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-bookmark"/></svg>{{ an }}</span>{% endif %}{% endwith %}
       {% if document.permissao %}
       <span class="doc-badge {{ document.permissao|lower }}">
         {% if document.permissao == 'Aberto' %}<svg class="fi" aria-hidden="true"><use href="#fi-unlock"/></svg>{% else %}<svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>{% endif %}
@@ -50,7 +52,7 @@
       {% if document.metodo %}<div class="doc-callout"><h3 class="doc-section-title">Método</h3><p>{{ document.metodo }}</p></div>{% endif %}
       {% if document.resultado %}<div class="doc-callout"><h3 class="doc-section-title">Resultados</h3><p>{{ document.resultado }}</p></div>{% endif %}
       {% if document.referencias %}<div class="doc-callout"><h3 class="doc-section-title">Referências</h3><p>{{ document.referencias }}</p></div>{% endif %}
-      {% if document.abstract_en %}<div class="doc-callout"><h3 class="doc-section-title">Abstract</h3><p>{{ document.abstract_en }}</p></div>{% endif %}
+      {% if document.abstract_en %}<div class="doc-callout" lang="en"><h3 class="doc-section-title">Abstract</h3><p>{{ document.abstract_en }}</p></div>{% endif %}
       {% if document.event_description %}<div class="doc-callout"><h3 class="doc-section-title">Apresentações do evento</h3><p>{{ document.event_description }}</p></div>{% endif %}
       {% if document.description %}<div class="doc-callout"><h3 class="doc-section-title">Informações adicionais</h3><p>{{ document.description }}</p></div>{% endif %}
 
@@ -64,13 +66,13 @@
     <section class="sp-panel doc-panel">
       <h2 class="doc-section-title">Classificação BDLP</h2>
       <div class="meta-grid">
-        <div class="meta-item"><div class="label">Coleção</div><div class="value">{{ cv.nome }}</div></div>
-        {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de Informação</div><div class="value">{{ document.type_info.name }}</div></div>{% endif %}
-        {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value">{{ assunto.nome }}</div></div>{% endif %}{% endwith %}
-        {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value">{{ document.natureza }}</div></div>{% endif %}
-        {% if document.category %}<div class="meta-item"><div class="label">Categoria</div><div class="value">{{ document.category.name }}</div></div>{% endif %}
-        {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value">{{ sub.nome }}</div></div>{% endif %}{% endwith %}
-        {% with mic=document.microcategoria %}{% if mic %}<div class="meta-item"><div class="label">Microcategoria</div><div class="value">{{ mic.nome }}</div></div>{% endif %}{% endwith %}
+        <div class="meta-item"><div class="label">Coleção</div><div class="value"><a href="{% url 'catalog:search' %}?colecao_v6={{ cv.slug }}">{{ cv.nome }}</a></div></div>
+        {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de Informação</div><div class="value"><a href="{% url 'catalog:search' %}?typeinform_id={{ document.typeinform_id }}">{{ document.type_info.name }}</a></div></div>{% endif %}
+        {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value"><a href="{% url 'catalog:search' %}?assunto_id={{ document.assunto_id }}">{{ assunto.nome }}</a></div></div>{% endif %}{% endwith %}
+        {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value"><a href="{% url 'catalog:search' %}?natureza={{ document.natureza|urlencode }}">{{ document.natureza }}</a></div></div>{% endif %}
+        {% if document.category %}<div class="meta-item"><div class="label">Categoria</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ document.category.name }}</a></div></div>{% endif %}
+        {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?subcategoria_id={{ document.subcategoria_id }}">{{ sub.nome|rotulo_sub }}</a></div></div>{% endif %}{% endwith %}
+        {% with mic=document.microcategoria %}{% if mic %}<div class="meta-item"><div class="label">Microcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?microcategoria_id={{ document.microcategoria_id }}">{{ mic.nome }}</a></div></div>{% endif %}{% endwith %}
       </div>
     </section>
   </div>
@@ -89,10 +91,23 @@
       </div>
     </div>
 
+    <div class="sp-panel doc-panel doc-cite">
+      <h2 class="doc-section-title">Como citar</h2>
+      <p class="doc-cite__ref" id="doc-cite-ref">{{ document.author|default:document.autor_principal }}. <cite>{{ document.title }}</cite>.{% if document.source and not document.source|is_year_only %} {{ document.source }}.{% endif %}{% if document.ano and not document|ano_redundante %} {{ document.ano }}.{% endif %}{% if document.doi %} DOI: {{ document.doi }}.{% endif %}</p>
+      <div class="doc-cite__actions">
+        <button type="button" class="sp-button-secondary" data-copy="#doc-cite-ref">
+          <svg class="fi" aria-hidden="true"><use href="#fi-file-text"/></svg> <span class="copy-label">Copiar referência</span>
+        </button>
+        <button type="button" class="sp-button-secondary" data-copy-link>
+          <svg class="fi" aria-hidden="true"><use href="#fi-link"/></svg> <span class="copy-label">Copiar link</span>
+        </button>
+      </div>
+      <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+    </div>
+
     <div class="sp-panel doc-panel">
-      <h2 class="doc-section-title">Referência</h2>
+      <h2 class="doc-section-title">Ficha técnica</h2>
       <div class="doc-ref">
-        {% if document.source and not document.source|is_year_only %}<div class="meta-item"><div class="label">Imprenta</div><div class="value">{{ document.source }}</div></div>{% endif %}
         {% if document.edicao %}<div class="meta-item"><div class="label">Edição</div><div class="value">{{ document.edicao }}</div></div>{% endif %}
         {% if document.doi %}<div class="meta-item"><div class="label">DOI</div><div class="value"><a href="https://doi.org/{{ document.doi }}" target="_blank" rel="noopener">{{ document.doi }}</a></div></div>{% endif %}
         {% if document.nlspi %}<div class="meta-item"><div class="label">ISSN/ISBN</div><div class="value">{{ document.nlspi }}</div></div>{% endif %}
@@ -102,4 +117,24 @@
     </div>
   </aside>
 </div>
+
+{% if relacionados %}
+<section class="sp-section sp-section--alt doc-related">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Continue explorando</span>
+        <h2>Materiais relacionados</h2>
+      </div>
+    </div>
+    <div class="doc-grid doc-grid--3">
+      {% for doc in relacionados %}{% include "_partials/_doc_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/doc-detail.js' %}" defer></script>
 {% endblock %}
