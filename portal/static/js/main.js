@@ -291,13 +291,38 @@
             // Foca primeiro elemento focável dentro do modal
             var primeiro = this.modal.querySelector('button, input, [tabindex]');
             if (primeiro) primeiro.focus();
+            // Focus trap: contém o foco no modal (aria-modal exige; WCAG 2.4.3).
+            this._trap = this._onModalKeydown.bind(this);
+            this.modal.addEventListener('keydown', this._trap);
         },
 
         fecharModal: function () {
             if (!this.modal) return;
             this.modal.setAttribute('hidden', '');
+            if (this._trap) { this.modal.removeEventListener('keydown', this._trap); this._trap = null; }
             if (this.previousFocus && this.previousFocus.focus) {
                 this.previousFocus.focus();
+            }
+        },
+
+        _focaveis: function () {
+            if (!this.modal) return [];
+            var sel = 'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])';
+            return Array.prototype.filter.call(
+                this.modal.querySelectorAll(sel),
+                function (el) { return el.offsetParent !== null; }   // só visíveis
+            );
+        },
+
+        _onModalKeydown: function (event) {
+            if (event.key !== 'Tab') return;
+            var f = this._focaveis();
+            if (!f.length) return;
+            var primeiro = f[0], ultimo = f[f.length - 1];
+            if (event.shiftKey && document.activeElement === primeiro) {
+                event.preventDefault(); ultimo.focus();
+            } else if (!event.shiftKey && document.activeElement === ultimo) {
+                event.preventDefault(); primeiro.focus();
             }
         },
 
