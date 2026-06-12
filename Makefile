@@ -1,4 +1,4 @@
-.PHONY: up down logs shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
+.PHONY: up down logs tunnel shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
 
 # Ambiente de desenvolvimento
 up:
@@ -9,6 +9,11 @@ down:
 
 logs:
 	docker compose --env-file .env -f docker/docker-compose.yml logs -f
+
+# Túnel de homologação sem VPN (Microsoft Dev Tunnels, login corporativo).
+# Detalhes e troubleshooting: docs/tunel-homologacao.md
+tunnel:
+	bash tools/tunnel.sh
 
 # Ambiente de produção (Caddy + HTTPS Let's Encrypt). Requer DOMAIN no .env.
 prod-up:
