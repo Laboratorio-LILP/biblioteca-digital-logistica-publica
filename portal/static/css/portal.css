@@ -599,7 +599,14 @@ main { flex: 1 0 auto; }
 .toggle-opt.is-disabled .toggle-opt__count { color: rgb(var(--rgb-black) / 0.35); }
 .facet-empty { padding: 6px 8px; font-size: 11px; color: rgb(var(--rgb-black) / 0.55); }
 .filter-panel .btn-apply { width: 100%; margin-top: 16px; }
-@media (max-width: 1023px) { .identity__divider, .library-mark { display: none; } }
+/* Mobile/tablet: mantém o NOME da biblioteca ao lado do brasão (antes some por
+   inteiro), só ocultando o divisor e o ícone-livro para caber. Ancora a
+   identidade no celular, onde o brasão sozinho ficava solto. */
+@media (max-width: 1023px) { .identity__divider, .library-mark__book { display: none; } }
+@media (max-width: 767px) {
+  .library-mark__name { font-size: 14px; }
+  .library-mark__sub { font-size: 10px; }
+}
 
 /* Drawer de filtros no mobile/tablet: a sidebar vira painel deslizante.
    A lógica (toggle .is-open, overlay, ESC) já está em acervo-filters.js;
