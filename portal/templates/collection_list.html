@@ -80,26 +80,26 @@
     <p class="page__intro">Você chega ao material de duas formas:</p>
 
     <div class="org-grid org-grid--2">
-      <article class="sp-card org-card org-card--busca">
+      <a class="sp-card org-card org-card--busca" href="{% url 'catalog:search' %}">
         <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-search"/></svg></span>
         <div>
           <h3>Buscar por palavra</h3>
           <p>Digite um termo na barra de busca. O sistema procura no título, no resumo e nas palavras-chave.</p>
         </div>
-      </article>
+      </a>
 
-      <article class="sp-card org-card org-card--busca">
+      <a class="sp-card org-card org-card--busca" href="{% url 'catalog:search' %}">
         <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-filter"/></svg></span>
         <div>
           <h3>Filtrar pelo acervo</h3>
           <p>No Acervo, use os filtros ao lado. Combine coleção, categoria, natureza e assunto. A cada escolha, os números mostram quantos documentos restam.</p>
         </div>
-      </article>
+      </a>
     </div>
 
     <p class="curadoria-dica">
       <strong>Dica:</strong> comece largo e vá estreitando — primeiro a coleção,
-      depois o assunto, depois a categoria.
+      depois a categoria, depois o assunto.
     </p>
 
     <p class="curadoria-acoes">
