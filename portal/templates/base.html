@@ -41,7 +41,11 @@
     <header class="site-header">
       <div class="sp-container header-inner">
         <a class="identity" href="{% url 'catalog:home' %}" aria-label="Página inicial — Biblioteca Digital de Logística Pública">
-          <img class="identity__logo" src="{% static 'img/brand/sp-gov-br-horizontal-rgb.png' %}" alt="SP.GOV.BR — Governo do Estado de São Paulo">
+          {% comment %}TEMPORÁRIO — período eleitoral: usar o Brasão oficial do Estado
+             (símbolo institucional, impessoal) no lugar da marca da gestão (SP.GOV.BR/
+             GESP). Reverter este commit após o período. Marca original:
+             'img/brand/sp-gov-br-horizontal-rgb.png'.{% endcomment %}
+          <img class="identity__logo" src="{% static 'img/brand/brasao-estado-sp.svg' %}" alt="Brasão do Estado de São Paulo">
           <span class="identity__divider" aria-hidden="true"></span>
           <span class="library-mark">
             <span class="library-mark__book" aria-hidden="true"><svg class="fi"><use href="#fi-book-open"/></svg></span>
@@ -75,7 +79,12 @@
       <div class="sp-container footer-grid">
         <div class="footer-identity">
           <div class="footer-identity__top">
-            <img class="footer-identity__logo" src="{% static 'img/brand/sp-gov-br-vertical-white.png' %}" alt="SP.GOV.BR — Governo do Estado de São Paulo">
+            {% comment %}TEMPORÁRIO — período eleitoral: Brasão oficial do Estado em selo
+               branco (o rodapé é escuro). Reverter após o período. Marca original:
+               'img/brand/sp-gov-br-vertical-white.png'.{% endcomment %}
+            <span class="footer-identity__selo">
+              <img class="footer-identity__logo" src="{% static 'img/brand/brasao-estado-sp.svg' %}" alt="Brasão do Estado de São Paulo">
+            </span>
             <span class="library-mark">
               <span><span class="library-mark__name">Biblioteca Digital</span><span class="library-mark__sub">Logística Pública</span></span>
             </span>

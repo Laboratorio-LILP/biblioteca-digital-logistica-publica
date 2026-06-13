@@ -227,7 +227,9 @@ main { flex: 1 0 auto; }
 }
 .header-inner { display: flex; align-items: center; gap: 24px; min-height: 78px; padding-block: 12px; }
 .identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
-.identity__logo { height: clamp(36px, 8vw, 48px); width: auto; max-width: 100%; display: block; }
+/* Altura um pouco maior que um wordmark: o brasão é um emblema detalhado e
+   precisa de ~56px (desktop) para ler bem; encolhe a 42px no mobile. */
+.identity__logo { height: clamp(42px, 9vw, 56px); width: auto; max-width: 100%; display: block; }
 .identity__divider { height: 40px; width: 1px; background: var(--sp-gray-medium); }
 .library-mark { display: flex; align-items: center; gap: 12px; }
 .library-mark__book {
@@ -291,6 +293,10 @@ main { flex: 1 0 auto; }
    @768px troca para row + center. */
 .footer-identity__top { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
 .footer-identity__logo { height: clamp(48px, 12vw, 64px); width: auto; max-width: 100%; display: block; }
+/* Selo branco sob o brasão colorido no rodapé escuro (período eleitoral). O
+   emblema heráldico precisa de fundo claro para ler — silhueta branca perde o
+   detalhe. Remover junto com a reversão da troca. */
+.footer-identity__selo { display: inline-flex; background: var(--sp-white); border-radius: 10px; padding: 8px 12px; }
 .footer-identity .library-mark__name, .footer-identity .library-mark__sub { color: var(--sp-white); }
 .footer-identity__desc { margin: 20px 0 0; max-width: 560px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-white) / 0.72); }
 .footer-col h2 { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: var(--sp-white); margin-bottom: 14px; }
