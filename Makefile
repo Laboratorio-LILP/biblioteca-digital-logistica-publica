@@ -1,4 +1,4 @@
-.PHONY: up down logs shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
+.PHONY: up down logs tunnel tunnel-service tunnel-service-off tunnel-url shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
 
 # Ambiente de desenvolvimento
 up:
@@ -9,6 +9,36 @@ down:
 
 logs:
 	docker compose --env-file .env -f docker/docker-compose.yml logs -f
+
+# Túnel de homologação sem VPN (Microsoft Dev Tunnels, login corporativo).
+# Detalhes e troubleshooting: docs/tunel-homologacao.md
+tunnel:
+	bash tools/tunnel.sh
+
+# Túnel como serviço do macOS (launchd): sobe no login e reinicia se cair.
+# Não precisa de terminal aberto. Logs: ~/Library/Logs/bdlp-tunnel.log
+# O script roda de uma cópia em ~/Library/Application Support (o launchd não
+# lê a pasta Desktop — TCC). Rode de novo após alterar tools/tunnel.sh.
+TUNNEL_PLIST = $(HOME)/Library/LaunchAgents/br.gov.sp.lilp.bdlp-tunnel.plist
+TUNNEL_APPDIR = $(HOME)/Library/Application Support/lilp-bdlp
+tunnel-service:
+	@mkdir -p "$(TUNNEL_APPDIR)" $(HOME)/Library/LaunchAgents $(HOME)/Library/Logs
+	install -m 755 tools/tunnel.sh "$(TUNNEL_APPDIR)/tunnel.sh"
+	sed -e "s|@SCRIPT@|$(TUNNEL_APPDIR)/tunnel.sh|g" -e "s|@HOME@|$(HOME)|g" \
+	    -e "s|@PORT@|$$( (grep -E '^PORTAL_PORT=' .env 2>/dev/null | cut -d= -f2 | grep . ) || echo 8000)|g" \
+	    tools/bdlp-tunnel.plist.in > $(TUNNEL_PLIST)
+	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel 2>/dev/null
+	launchctl bootstrap gui/$$(id -u) $(TUNNEL_PLIST)
+	@echo "Serviço ativo. URL em alguns segundos via: make tunnel-url"
+
+tunnel-service-off:
+	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel 2>/dev/null
+	rm -f $(TUNNEL_PLIST) "$(TUNNEL_APPDIR)/tunnel.sh"
+	@echo "Serviço removido — o túnel está fora do ar."
+
+# URL pública atual do túnel (muda se o túnel expirar e for recriado)
+tunnel-url:
+	@devtunnel show $${BDLP_TUNNEL_ID:-bdlp-homolog} 2>/dev/null | grep -o 'https://[a-z0-9-]*\.[a-z0-9]*\.devtunnels\.ms[^ ]*' | head -1 || echo "Túnel não encontrado — rode make tunnel-service (ou make tunnel)."
 
 # Ambiente de produção (Caddy + HTTPS Let's Encrypt). Requer DOMAIN no .env.
 prod-up:

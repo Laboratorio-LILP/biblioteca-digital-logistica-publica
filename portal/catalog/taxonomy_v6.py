@@ -36,30 +36,28 @@ COLECOES_BY_SLUG = {c["slug"]: c for c in COLECOES_V6}
 # Temas em destaque — buscas temáticas que NÃO são coleções formais (não se
 # encaixam na taxonomia v6 por Tipo de Informação). Fonte única para os dois
 # usos na Home: os cards de atalho em "Explorar o acervo" e os blocos de
-# "Temas em Alta". Cada tema abre uma busca full-text (`query`); a contagem do
-# card vem dessa MESMA busca, então o número bate com o que o usuário vê ao
-# clicar. `docs` lista códigos curados para "Temas em Alta" (vazio = cai para a
-# busca por `fallback_kw`). Descrições em Linguagem Simples (público: comprador
-# público — termos do campo são mantidos de propósito).
+# "Temas em Alta". `tema_busca` (facets.py) define o filtro do tema — por
+# Assunto curado (`assunto_nome`, quando existe no banco) ou busca full-text
+# (`query`). O MESMO filtro alimenta o link "Ver tema", a contagem do card e os
+# documentos de preview dos "Temas em Alta", então tudo bate com o que o usuário
+# vê ao clicar. Descrições em Linguagem Simples (público: comprador público —
+# termos do campo são mantidos de propósito).
 TEMAS_DESTAQUE = [
     {
         "slug": "lei-14133",
         "label": "Lei 14.133/21",
         "query": "14.133",
-        "fallback_kw": "14.133",
         "icon": "fi-scale",
         "color": "c-petrol",
         "card_desc": "A nova Lei de Licitações e Contratos: o que muda nas regras, "
                      "prazos e modalidades das compras públicas.",
         "alta_intro": "Materiais selecionados para entender e aplicar a nova Lei de "
                       "Licitações e Contratos (Lei 14.133/21) nas contratações públicas.",
-        "docs": ["bdlp-000352", "bdlp-000300", "bdlp-000411"],
     },
     {
         "slug": "sustentabilidade",
         "label": "Sustentabilidade e ODS",
         "query": "Sustentabilidade",
-        "fallback_kw": "sustentab",
         # Tem Assunto curado correspondente: a busca do card/tema filtra por Assunto
         # (contagem bate com a faceta lateral e com a lista ao clicar), em vez de texto.
         "assunto_nome": "Sustentabilidade e ODS",
@@ -69,7 +67,6 @@ TEMAS_DESTAQUE = [
                      "Objetivos de Desenvolvimento Sustentável (ODS).",
         "alta_intro": "Materiais indicados para apoiar compras públicas sustentáveis, "
                       "desenvolvimento responsável e inovação aplicada à cadeia de suprimentos.",
-        "docs": ["bdlp-000273", "bdlp-000248", "bdlp-000421"],
     },
 ]
 
