@@ -48,8 +48,8 @@
       {% include "_partials/_applied_filters.html" %}
 
       {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto. "Coleção" é a cascata de tipos agrupada por coleção (substitui a faceta simples). Manter em UMA linha — comentário multi-linha vaza como texto. #}
-      <section class="side-section">
-        <h3>Coleção</h3>
+      <details class="side-section"{% if filters.colecao_v6 or filters.typeinform_id %} open{% endif %}>
+        <summary><h3>Coleção</h3></summary>
         <p class="side-section__hint">Agrupa os documentos por tipo, em quatro coleções.</p>
         {% for grp in facets.tipos_por_colecao %}
         <details class="filter-group"{% if grp.active %} open{% endif %}>
@@ -62,11 +62,11 @@
           </div>
         </details>
         {% endfor %}
-      </section>
+      </details>
 
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
-      <section class="side-section">
-        <h3>Categorias</h3>
+      <details class="side-section"{% if filters.category_id or filters.subcategoria_id or filters.microcategoria_id %} open{% endif %}>
+        <summary><h3>Categorias</h3></summary>
         <p class="side-section__hint">Cada categoria é uma etapa do processo de contratação pública.</p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias ainda, ex.: PCA, Ciclo Completo) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
@@ -92,23 +92,23 @@
           </div>
         </details>
         {% endfor %}
-      </section>
+      </details>
 
-      <section class="side-section">
-        <h3>Natureza</h3>
+      <details class="side-section"{% if filters.natureza %} open{% endif %}>
+        <summary><h3>Natureza</h3></summary>
         <p class="side-section__hint">A natureza da contratação — o objeto contratado: materiais, serviços, obras ou TIC.</p>
         {% include "_partials/_facet_options.html" with facet=facets.naturezas param="natureza" current=filters.natureza empty_msg="Sem materiais classificados por natureza ainda." %}
-      </section>
+      </details>
 
-      <section class="side-section">
-        <h3>Assunto</h3>
+      <details class="side-section"{% if filters.assunto_id %} open{% endif %}>
+        <summary><h3>Assunto</h3></summary>
         <p class="side-section__hint">O tema tratado no documento.</p>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
-      </section>
+      </details>
 
       {# Ano (T2): intervalo De/Até em inputs number — base acessível (WCAG2AA) e auto-submit via acervo-filters.js. Posição ao final, preservando a ordem da Lina. #}
-      <section class="side-section">
-        <h3 id="ano-label">Ano</h3>
+      <details class="side-section"{% if filters.ano_min or filters.ano_max %} open{% endif %}>
+        <summary><h3 id="ano-label">Ano</h3></summary>
         <p class="side-section__hint">Filtra os documentos pelo ano de publicação.</p>
         <div class="year-fields" role="group" aria-labelledby="ano-label">
           <span class="year-field">
@@ -124,7 +124,7 @@
                    placeholder="{{ facets.ano_bounds.max }}" value="{{ filters.ano_max|default:'' }}">
           </span>
         </div>
-      </section>
+      </details>
 
       <button type="submit" class="sp-button-primary btn-apply">Aplicar filtros</button>
     </aside>
