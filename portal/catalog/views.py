@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -50,32 +50,26 @@ def _card_tematico(t):
     }
 
 
-def _docs_do_tema(tema, recent_docs):
-    """Documentos de um bloco de 'Temas em Alta'.
+def _docs_do_tema(tema):
+    """Documentos de preview de um bloco de 'Temas em Alta'.
 
-    Usa os códigos curados em `tema["docs"]` (preservando a ordem da curadoria);
-    se vazio ou sem correspondência, cai para busca por palavra-chave
-    (`fallback_kw`) e, em último caso, para os documentos mais recentes.
+    Os 3 cards são os documentos mais representativos do MESMO filtro que define
+    o tema (`tema_busca`: por Assunto curado ou busca textual) — exatamente o que
+    alimenta o link "Ver tema no acervo" e a contagem do card. Assim o preview é
+    sempre uma amostra do que o usuário vê ao clicar, nunca fora do tema. Lista
+    vazia se o tema não tem documentos — a home oculta o bloco (antes caía para
+    "mais recentes", que trazia documentos fora do tema).
     """
-    codes = tema.get("docs") or []
-    if codes:
-        by_code = {d.code: d for d in Document.objects.filter(status="a", code__in=codes)}
-        docs = [by_code[c] for c in codes if c in by_code]
-        if docs:
-            return docs[:3]
-    kw = tema.get("fallback_kw") or tema["query"]
-    docs = list(
-        Document.objects.filter(status="a")
-        .filter(Q(keywords__icontains=kw) | Q(title__icontains=kw) | Q(abstract__icontains=kw))
-        .order_by("-created", "-pk")[:3]
-    )
-    return docs or list(recent_docs[:3])
+    params, _ = tema_busca(tema)
+    if "assunto_id" in params:
+        base = Document.objects.filter(status="a", assunto_id=params["assunto_id"]).order_by("-created", "-pk")
+    else:
+        base = search_documents(params["q"])  # ordenado por relevância (-rank)
+    return list(base[:3])
 
 
 def home(request):
-    """Homepage: busca, stats, coleções, temas em destaque e últimas adições."""
-    recent_docs = Document.objects.filter(status="a").order_by("-created", "-pk")[:10]
-
+    """Homepage: busca, stats, coleções e temas em destaque."""
     colecoes_v6 = colecao_v6_overview()
     tematicos = cards_tematicos_overview()
 
@@ -93,10 +87,13 @@ def home(request):
             "icon": t["icon"],
             "color": t["color"],
             "href": _search_url(**tema_busca(t)[0]),
-            "docs": _docs_do_tema(t, recent_docs),
+            "docs": _docs_do_tema(t),
         }
         for t in TEMAS_DESTAQUE
     ]
+    # Não renderiza um bloco de tema sem documentos no próprio tema (em vez de
+    # cair para "mais recentes", que mostrava documentos fora do tema).
+    temas_em_alta = [t for t in temas_em_alta if t["docs"]]
 
     # Stat 1: total de materiais
     total_docs = Document.objects.filter(status="a").count()
@@ -135,7 +132,6 @@ def home(request):
         "colecoes_v6": colecoes_v6,
         "cards_explorar": cards_explorar,
         "temas_em_alta": temas_em_alta,
-        "recent_docs": recent_docs,
         "total_docs": total_docs,
         "tipos_top": tipos_top,
         "tipos_distintos": tipos_distintos,
