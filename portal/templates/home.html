@@ -74,6 +74,27 @@
   </div>
 </section>
 
+<section class="sp-section">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Comece pela etapa</span>
+        <h2>Encontre materiais pela etapa da contratação</h2>
+      </div>
+      <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Ver todo o acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+    </div>
+    <div class="collections-grid collections-grid--quatro">
+      {% for card in cards_etapas %}{% include "_partials/_collection_card.html" %}{% endfor %}
+    </div>
+    {% if cards_transversais %}
+    <p class="etapas-trans-head">Visões transversais</p>
+    <div class="collections-grid collections-grid--quatro">
+      {% for card in cards_transversais %}{% include "_partials/_collection_card.html" %}{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
 <section class="sp-section sp-section--alt">
   <div class="sp-container temas-em-alta">
     <span class="eyebrow">Temas em alta</span>

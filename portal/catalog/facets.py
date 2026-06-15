@@ -102,6 +102,79 @@ def colecao_v6_overview():
     return _colecao_v6_facet(None)
 
 
+# ---------------------------------------------------------------------------
+# Categorias processuais (macroetapas) p/ a seção "Comece pela etapa da
+# contratação" na home. A ordem segue a sequência da Lei 14.133/21: o PCA inicia
+# o ciclo anual (Art. 12, VII) e as três macrofases vêm na ordem do processo —
+# Planejamento/Fase Preparatória (Art. 18) → Seleção do Fornecedor (Arts. 17, 28,
+# 72-78) → Gestão Contratual (Art. 117+). "Ciclo Completo" e "Conteúdos
+# Transversais" atravessam todas as fases → grupo à parte. Chaves = nome canônico
+# do seed (07-categories.sql).
+# ---------------------------------------------------------------------------
+_CAT_HOME_NUCLEO = (
+    "PLANO DE CONTRATAÇÕES ANUAL (PCA)",
+    "PLANEJAMENTO/FASE PREPARATÓRIA",
+    "SELEÇÃO DO FORNECEDOR",
+    "GESTÃO CONTRATUAL",
+)
+_CAT_HOME_TRANSVERSAL = (
+    "CICLO COMPLETO DA CONTRATAÇÃO",
+    "CONTEÚDOS TRANSVERSAIS",
+)
+_CAT_HOME_ICON = {
+    "PLANO DE CONTRATAÇÕES ANUAL (PCA)": "fi-calendar",
+    "PLANEJAMENTO/FASE PREPARATÓRIA": "fi-file-text",
+    "SELEÇÃO DO FORNECEDOR": "fi-scale",
+    "GESTÃO CONTRATUAL": "fi-shield",
+    "CICLO COMPLETO DA CONTRATAÇÃO": "fi-layers",
+    "CONTEÚDOS TRANSVERSAIS": "fi-bookmark",
+}
+_CAT_HOME_COLOR = {
+    "PLANO DE CONTRATAÇÕES ANUAL (PCA)": "c-blue",
+    "PLANEJAMENTO/FASE PREPARATÓRIA": "c-petrol",
+    "SELEÇÃO DO FORNECEDOR": "c-red",
+    "GESTÃO CONTRATUAL": "c-bluedark",
+    "CICLO COMPLETO DA CONTRATAÇÃO": "c-yellow",
+    "CONTEÚDOS TRANSVERSAIS": "c-green",
+}
+
+
+def categorias_overview():
+    """Categorias processuais (macroetapas) com contagem real, arranjadas p/ a
+    seção 'Comece pela etapa da contratação' da home. Espelha
+    colecao_v6_overview(): devolve `nucleo` (4 etapas sequenciais) e `transversal`
+    (2 visões), cada item com id, nome cru, descrição (do seed), contagem, ícone e
+    cor. A contagem é "documentos com aquele category_id" — mesmo critério da
+    faceta de Categoria. Categorias fora das listas acima entram no fim do núcleo,
+    para nada sumir se a taxonomia mudar.
+    """
+    counts = dict(
+        Document.objects.filter(status="a")
+        .exclude(category_id__isnull=True)
+        .values_list("category_id")
+        .annotate(c=Count("id"))
+        .values_list("category_id", "c")
+    )
+    by_name = {c.name: c for c in NrCategory.objects.all()}
+
+    def _row(cat):
+        return {
+            "id": cat.id,
+            "nome": cat.name,
+            "descricao": cat.description or "",
+            "count": counts.get(cat.id, 0),
+            "icon": _CAT_HOME_ICON.get(cat.name, "fi-layers"),
+            "color": _CAT_HOME_COLOR.get(cat.name, "c-blue"),
+        }
+
+    nucleo = [_row(by_name[n]) for n in _CAT_HOME_NUCLEO if n in by_name]
+    transversal = [_row(by_name[n]) for n in _CAT_HOME_TRANSVERSAL if n in by_name]
+    conhecidos = set(_CAT_HOME_NUCLEO) | set(_CAT_HOME_TRANSVERSAL)
+    extras = [_row(c) for name, c in by_name.items() if name not in conhecidos]
+    nucleo += sorted(extras, key=lambda r: r["id"])
+    return {"nucleo": nucleo, "transversal": transversal}
+
+
 def tema_busca(tema):
     """Filtro de busca de um tema em destaque: devolve (params_querystring, count).
 

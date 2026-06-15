@@ -7,10 +7,17 @@ from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from .facets import cards_tematicos_overview, colecao_v6_overview, compute_facets, tema_busca
+from .facets import (
+    cards_tematicos_overview,
+    categorias_overview,
+    colecao_v6_overview,
+    compute_facets,
+    tema_busca,
+)
 from .models import Document, NrCategory, Topic, TypeInformation
 from .search import filter_documents, search_documents
 from .taxonomy_v6 import TEMAS_DESTAQUE
+from .templatetags.catalog_tags import titulo_pt
 
 
 def _artigos_type_id():
@@ -47,6 +54,17 @@ def _card_tematico(t):
         "href": _search_url(**t["params"]),
         "color": t["color"], "icon": t["icon"], "label": t["label"],
         "desc": t["descricao"], "count": t["count"],
+    }
+
+
+def _card_categoria(cat):
+    """Normaliza uma categoria processual (categorias_overview) para o card
+    unificado. O rótulo recebe Title Case (titulo_pt), como na busca; o link usa
+    o filtro de Categoria por id (category_id) da página de Acervo."""
+    return {
+        "href": _search_url(category_id=cat["id"]),
+        "color": cat["color"], "icon": cat["icon"],
+        "label": titulo_pt(cat["nome"]), "desc": cat["descricao"], "count": cat["count"],
     }
 
 
@@ -95,6 +113,13 @@ def home(request):
     # cair para "mais recentes", que mostrava documentos fora do tema).
     temas_em_alta = [t for t in temas_em_alta if t["docs"]]
 
+    # "Comece pela etapa da contratação": categorias processuais (macroetapas da
+    # Lei 14.133/21) como porta de entrada por tarefa — núcleo sequencial + visões
+    # transversais. Reusa a rota de busca filtrada por Categoria (category_id).
+    categorias = categorias_overview()
+    cards_etapas = [_card_categoria(c) for c in categorias["nucleo"]]
+    cards_transversais = [_card_categoria(c) for c in categorias["transversal"]]
+
     # Stat 1: total de materiais
     total_docs = Document.objects.filter(status="a").count()
 
@@ -131,6 +156,8 @@ def home(request):
     return render(request, "home.html", {
         "colecoes_v6": colecoes_v6,
         "cards_explorar": cards_explorar,
+        "cards_etapas": cards_etapas,
+        "cards_transversais": cards_transversais,
         "temas_em_alta": temas_em_alta,
         "total_docs": total_docs,
         "tipos_top": tipos_top,
@@ -192,6 +219,11 @@ def search(request):
     page_number = request.GET.get("page", 1)
     sort = request.GET.get("sort", "")
     filters = _read_filters(request)
+    # Nº de filtros ATIVOS (conta valores, não dimensões): multi-select soma cada
+    # valor escolhido. Alimenta o "(N)" do botão de filtros no mobile.
+    filtros_count = sum(
+        len(v) if isinstance(v, (list, tuple)) else 1 for v in filters.values()
+    )
 
     if query:
         results = search_documents(query, filters if filters else None, sort=sort)
@@ -210,6 +242,7 @@ def search(request):
         "query": query,
         "page_obj": page_obj,
         "filters": filters,
+        "filtros_count": filtros_count,
         "facets": facets,
         "total_results": paginator.count,
         "sort": sort,

@@ -22,9 +22,17 @@
 {% endif %}
 
 <h2>Documentos ({{ total_docs }})</h2>
+{% if page_obj.object_list %}
 <div class="doc-grid">
-  {% for doc in page_obj %}{% include "_partials/_doc_card.html" %}{% empty %}<p>Nenhum documento nesta coleção.</p>{% endfor %}
+  {% for doc in page_obj %}{% include "_partials/_doc_card.html" %}{% endfor %}
 </div>
+{% else %}
+<div class="sp-panel empty-state">
+  <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
+  <strong>Ainda não há documentos nesta coleção</strong>
+  <p>Esta coleção faz parte da organização do acervo, mas ainda não recebeu materiais. Explore o <a href="{% url 'catalog:search' %}">acervo completo</a> ou veja outras <a href="{% url 'catalog:collection_list' %}">coleções</a>.</p>
+</div>
+{% endif %}
 
 {% if page_obj.has_other_pages %}
 <nav class="pagination" aria-label="Paginação dos documentos">

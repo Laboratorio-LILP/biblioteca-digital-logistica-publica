@@ -148,7 +148,7 @@ As duas telas divergem hoje: `search.html` usa `Paginação dos resultados`/`Pá
 **Categorias:**
 | Seed (CAIXA ALTA) | Exibir |
 |---|---|
-| PLANO ANUAL DE CONTRATAÇÕES (PCA) | Plano Anual de Contratações (PCA) |
+| PLANO DE CONTRATAÇÕES ANUAL (PCA) | Plano de Contratações Anual (PCA) |
 | CICLO COMPLETO DA CONTRATAÇÃO | Ciclo Completo da Contratação |
 | PLANEJAMENTO/FASE PREPARATÓRIA | Planejamento/Fase Preparatória |
 | SELEÇÃO DO FORNECEDOR | Seleção do Fornecedor |

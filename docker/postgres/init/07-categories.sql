@@ -15,7 +15,7 @@ DELETE FROM nr_category;
 SELECT setval('nr_category_seq', 0);
 
 INSERT INTO nr_category (name, description, max_size) VALUES
-    ('PLANO ANUAL DE CONTRATAÇÕES (PCA)', 'Planejamento anual das contratações do órgão (PCA)', 0),
+    ('PLANO DE CONTRATAÇÕES ANUAL (PCA)', 'Planejamento anual das contratações do órgão (PCA)', 0),
     ('CICLO COMPLETO DA CONTRATAÇÃO', 'Materiais que percorrem todo o ciclo da contratação pública', 0),
     ('PLANEJAMENTO/FASE PREPARATÓRIA', 'Fase preparatória: ETP, TR, gestão de riscos e pesquisa de preços', 0),
     ('SELEÇÃO DO FORNECEDOR', 'Seleção do fornecedor: licitação, contratação direta e procedimentos auxiliares', 0),

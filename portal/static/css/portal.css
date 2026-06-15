@@ -411,6 +411,11 @@ main { flex: 1 0 auto; }
 .c-bluedark { color: var(--sp-blue-dark); background: rgb(98 201 224 / 0.2); }
 .c-yellow { color: var(--sp-yellow-dark); background: rgb(var(--rgb-yellow) / 0.18); }
 
+/* Seção "Comece pela etapa" (home): rótulo do grupo de visões transversais,
+   abaixo das 4 etapas do ciclo. Reusa os cards e a grade das Coleções. */
+.etapas-trans-head { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: rgb(var(--rgb-black) / 0.66); margin: clamp(28px, 3vw, 36px) 0 0; }
+.etapas-trans-head + .collections-grid { margin-top: 16px; }
+
 /* ============================================================
    DocCard
    ============================================================ */
@@ -491,6 +496,12 @@ main { flex: 1 0 auto; }
 .breadcrumb a { color: var(--sp-blue); }
 .breadcrumb a:hover { text-decoration: underline; }
 .breadcrumb .sep { color: var(--sp-gray-dark); font-size: 14px; }
+/* Mobile: o último item do breadcrumb (página atual — ex.: título de documento)
+   trunca com reticências, em vez de empurrar a barra para rolagem horizontal. */
+@media (max-width: 767px) {
+  .breadcrumb a, .breadcrumb .sep { flex: 0 0 auto; }
+  .breadcrumb > :last-child { min-width: 2.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
 
 .catalog-hero { border-bottom: var(--border); background: var(--sp-white); }
 .catalog-hero__inner { padding-block: var(--space-page-top); }
@@ -663,6 +674,13 @@ main { flex: 1 0 auto; }
 .empty-state .fi { font-size: 42px; color: var(--sp-gray-dark); margin-bottom: 12px; }
 .empty-state strong { font-family: var(--font-subtitle); font-weight: 600; font-size: 15px; color: var(--sp-black); }
 .empty-state p { margin: 8px 0 0; max-width: 420px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.62); }
+
+/* Páginas de erro (404/500) — bloco central com a marca, dentro de .page. */
+.error-page { max-width: 560px; margin-inline: auto; padding-block: clamp(40px, 8vw, 80px); text-align: center; }
+.error-page__code { font-family: var(--font-heading); font-weight: 700; font-size: clamp(64px, 18vw, 120px); line-height: 1; color: var(--sp-red); margin: 0; }
+.error-page h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(24px, 4vw, 34px); margin: 8px 0 0; }
+.error-page p { margin: 12px 0 0; font-size: 15px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); }
+.error-page__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 28px; }
 
 /* Paginação */
 .pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; margin-top: 32px; }

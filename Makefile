@@ -110,7 +110,10 @@ collectstatic:
 	docker compose --env-file .env -f docker/docker-compose.yml exec portal python manage.py collectstatic --noinput
 
 # Verificação de acessibilidade WCAG 2.0 AA — requer Node 18+ no host (npx pa11y).
-# Executa pa11y contra a home, busca, detalhe (placeholder) e as 6 páginas legais.
+# Executa pa11y contra home, busca, coleções, sobre e as 6 páginas legais, MAIS
+# uma página de documento e uma de coleção descobertas dinamicamente no banco
+# (código/id variam por dados — URL chumbada quebraria no re-seed). Se o banco
+# estiver fora, essas duas são puladas com aviso.
 # Para usar com Docker em vez de npx local, troque a chamada por:
 #   docker run --rm --network host pa11y/pa11y-ci $(A11Y_URLS)
 A11Y_URLS = \
@@ -127,7 +130,15 @@ A11Y_URLS = \
 
 a11y-check:
 	@echo "Verificando acessibilidade WCAG 2.0 AA com pa11y..."
-	@for url in $(A11Y_URLS); do \
+	@urls="$(A11Y_URLS)"; \
+	dbq="docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psql -U php nourau -t -A -c"; \
+	code=$$($$dbq "SELECT code FROM nr_document WHERE status='a' AND code <> '' ORDER BY id LIMIT 1;" 2>/dev/null | tr -d '[:space:]'); \
+	if [ -n "$$code" ]; then urls="$$urls http://localhost:8000/documento/$$code/"; \
+	else echo "  (aviso: documento amostra não encontrado — /documento/ não testado)"; fi; \
+	topic=$$($$dbq "SELECT id FROM topic WHERE parent_id=0 ORDER BY id LIMIT 1;" 2>/dev/null | tr -d '[:space:]'); \
+	if [ -n "$$topic" ]; then urls="$$urls http://localhost:8000/colecao/$$topic/"; \
+	else echo "  (aviso: coleção amostra não encontrada — /colecao/ não testado)"; fi; \
+	for url in $$urls; do \
 		echo ""; echo "==> $$url"; \
 		npx --yes pa11y --standard WCAG2AA "$$url" || true; \
 	done
