@@ -12,22 +12,33 @@ LOG="${HOME}/Library/Logs/bdlp-tunnel-watchdog.log"
 
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 
-# Lê o nº de conexões de host. Só age com leitura DEFINITIVA de 0.
-# Saída vazia/erro (hiccup de API, rede) → não faz nada: reiniciar às cegas
-# por causa de uma leitura ambígua causaria flapping desnecessário.
-conns="$(devtunnel show "$TUNNEL_ID" 2>/dev/null \
-    | awk -F: '/Host connections/{gsub(/[^0-9]/,"",$2); print $2}')"
+# Nº de conexões de host. String vazia = leitura indefinida (API/rede).
+host_conns() {
+    devtunnel show "$TUNNEL_ID" 2>/dev/null \
+        | awk -F: '/Host connections/{gsub(/[^0-9]/,"",$2); print $2}'
+}
 
+conns="$(host_conns)"
+
+# Saudável: silencioso, para não poluir o log a cada ciclo.
+[ -n "$conns" ] && [ "$conns" -ge 1 ] 2>/dev/null && exit 0
+
+# Leitura ambígua (vazia): não age — reiniciar às cegas causaria flapping.
 if [ -z "$conns" ]; then
     echo "$(ts) leitura indefinida (API/rede?) — sem ação" >> "$LOG"
     exit 0
 fi
 
-if [ "$conns" -ge 1 ] 2>/dev/null; then
-    exit 0  # saudável — silencioso, para não poluir o log a cada ciclo
+# Conexões = 0. Antes de reiniciar, CONFIRMA após uma pausa: absorve a janela
+# de arranque (host recém-iniciado ainda no handshake, no login/reboot) e
+# blips em que o próprio host reconecta sozinho. Só reinicia se persistir.
+sleep 25
+conns2="$(host_conns)"
+if [ -z "$conns2" ] || { [ "$conns2" -ge 1 ] 2>/dev/null; }; then
+    exit 0  # recuperou sozinho ou leitura ambígua — não mexe
 fi
 
-echo "$(ts) Host connections=$conns — host zumbi; reiniciando $LABEL" >> "$LOG"
+echo "$(ts) Host connections=0 confirmado (2 leituras) — host zumbi; reiniciando $LABEL" >> "$LOG"
 launchctl kickstart -k "gui/$(id -u)/${LABEL}" >> "$LOG" 2>&1 \
     && echo "$(ts) kickstart enviado" >> "$LOG" \
     || echo "$(ts) FALHA no kickstart (serviço instalado? login válido?)" >> "$LOG"
