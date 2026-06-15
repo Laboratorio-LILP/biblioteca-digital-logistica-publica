@@ -83,7 +83,7 @@ def _docs_do_tema(tema):
         base = Document.objects.filter(status="a", assunto_id=params["assunto_id"]).order_by("-created", "-pk")
     else:
         base = search_documents(params["q"])  # ordenado por relevância (-rank)
-    return list(base[:3])
+    return list(base[:4])
 
 
 def home(request):
@@ -260,12 +260,12 @@ def document_detail(request, code):
     if doc.assunto_id:
         relacionados = list(
             Document.objects.filter(status="a", assunto_id=doc.assunto_id)
-            .exclude(pk=doc.pk).order_by("-created", "-pk")[:3]
+            .exclude(pk=doc.pk).order_by("-created", "-pk")[:4]
         )
     if not relacionados and doc.category_id:
         relacionados = list(
             Document.objects.filter(status="a", category_id=doc.category_id)
-            .exclude(pk=doc.pk).order_by("-created", "-pk")[:3]
+            .exclude(pk=doc.pk).order_by("-created", "-pk")[:4]
         )
 
     return render(request, "document_detail.html", {

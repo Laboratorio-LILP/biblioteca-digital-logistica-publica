@@ -29,7 +29,7 @@
       <a class="tag" href="{% url 'catalog:search' %}?q=Intelig%C3%AAncia+Artificial">Inteligência Artificial</a>
       <a class="tag" href="{% url 'catalog:search' %}?q=Log%C3%ADstica">Logística</a>
       <a class="tag" href="{% url 'catalog:search' %}?q=Auditoria">Auditoria</a>
-      <a class="tag" href="{% url 'catalog:search' %}?q=Gest%C3%A3o+de+Riscos">Gestão de Riscos</a>
+      <a class="tag" href="{% url 'catalog:search' %}?q=Registro+de+Pre%C3%A7os">Registro de Preços</a>
       <a class="tag" href="{% url 'catalog:search' %}?q=Compliance">Compliance</a>
     </div>
 
@@ -66,7 +66,7 @@
         <span class="eyebrow">Explorar o acervo</span>
         <h2>Coleções organizadas para a tomada de decisão pública</h2>
       </div>
-      <a class="sp-button-secondary" href="{% url 'catalog:collection_list' %}">Consultar Coleção <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+      <a class="sp-button-secondary" href="{% url 'catalog:collection_list' %}">Consultar Coleções <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
     <div class="collections-grid">
       {% for card in cards_explorar %}{% include "_partials/_collection_card.html" %}{% endfor %}
@@ -74,7 +74,7 @@
   </div>
 </section>
 
-<section class="sp-section">
+<section class="sp-section home-etapas">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -84,12 +84,32 @@
       <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Ver todo o acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
     <div class="collections-grid collections-grid--quatro">
-      {% for card in cards_etapas %}{% include "_partials/_collection_card.html" %}{% endfor %}
+      {% for card in cards_etapas %}
+      <a class="sp-card etapa-card" href="{{ card.href }}">
+        <span class="etapa-card__ibox" aria-hidden="true"><svg class="fi"><use href="#{{ card.icon }}"/></svg></span>
+        <span class="etapa-card__body">
+          <span class="etapa-card__label"><span class="etapa-card__num" aria-hidden="true">{{ forloop.counter }}</span><span>{{ card.label }}</span></span>
+          {% if card.desc %}<span class="etapa-card__desc">{{ card.desc }}</span>{% endif %}
+          <span class="etapa-card__count">{{ card.count }} {{ card.count|pluralize_pt:"documento" }}</span>
+        </span>
+        <svg class="fi etapa-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+      </a>
+      {% endfor %}
     </div>
     {% if cards_transversais %}
     <p class="etapas-trans-head">Visões transversais</p>
     <div class="collections-grid collections-grid--quatro">
-      {% for card in cards_transversais %}{% include "_partials/_collection_card.html" %}{% endfor %}
+      {% for card in cards_transversais %}
+      <a class="sp-card etapa-card etapa-card--trans" href="{{ card.href }}">
+        <span class="etapa-card__box" aria-hidden="true"><svg class="fi"><use href="#{{ card.icon }}"/></svg></span>
+        <span class="etapa-card__body">
+          <span class="etapa-card__label"><span>{{ card.label }}</span></span>
+          {% if card.desc %}<span class="etapa-card__desc">{{ card.desc }}</span>{% endif %}
+          <span class="etapa-card__count">{{ card.count }} {{ card.count|pluralize_pt:"documento" }}</span>
+        </span>
+        <svg class="fi etapa-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+      </a>
+      {% endfor %}
     </div>
     {% endif %}
   </div>
@@ -108,7 +128,7 @@
         <a class="sp-button-secondary" href="{{ tema.href }}">Ver tema no acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
       </div>
       <p class="tema-grupo__intro">{{ tema.intro }}</p>
-      <div class="doc-grid doc-grid--3">
+      <div class="doc-grid doc-grid--2">
         {% for doc in tema.docs %}{% include "_partials/_doc_card.html" %}{% endfor %}
       </div>
     </div>

@@ -415,6 +415,31 @@ main { flex: 1 0 auto; }
    abaixo das 4 etapas do ciclo. Reusa os cards e a grade das Coleções. */
 .etapas-trans-head { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: rgb(var(--rgb-black) / 0.66); margin: clamp(28px, 3vw, 36px) 0 0; }
 .etapas-trans-head + .collections-grid { margin-top: 16px; }
+/* Divisor sutil na fronteira branco-branco Coleções→Etapas (como o stats tem
+   border-bottom) — o espaçamento já é padrão (84px); falta só o divisor. */
+.home-etapas { border-top: var(--border); }
+/* Cards da seção Etapas: sequência numerada com um único acento (vermelho AA-safe),
+   ícone neutro — distingue-se das Coleções (cards coloridos por tipo). Transversais
+   sem número, ícone em tom petrol discreto. */
+.etapa-card { display: flex; align-items: flex-start; gap: 14px; min-height: 108px; padding: 18px; color: inherit; }
+.etapa-card__ibox { flex: none; width: 34px; height: 34px; border-radius: 8px; background: var(--gov-red-100); color: var(--sp-red-dark); display: grid; place-items: center; font-size: 17px; }
+.etapa-card__box { flex: none; width: 34px; height: 34px; border-radius: 8px; background: rgb(var(--rgb-petrol) / 0.1); color: var(--sp-petrol); display: grid; place-items: center; font-size: 17px; }
+.etapa-card__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.etapa-card__label { display: flex; align-items: flex-start; gap: 7px; font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; color: var(--sp-black); }
+.etapa-card__label > span { min-width: 0; }
+/* Número agora é marcador pequeno inline antes do título (ícone foi p/ a esquerda). */
+.etapa-card__num { flex: none; width: 18px; height: 18px; margin-top: 1px; border-radius: 50%; background: var(--sp-red-dark); color: var(--sp-white); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-subtitle); font-weight: 600; font-size: 11px; }
+.etapa-card__desc { margin-top: 5px; font-size: 12.5px; line-height: 1.45; color: rgb(var(--rgb-black) / 0.66); }
+.etapa-card__count { margin-top: 8px; font-size: 11.5px; color: rgb(var(--rgb-black) / 0.55); }
+.etapa-card__arrow { flex: none; margin-left: auto; margin-top: 2px; color: var(--sp-red); font-size: 16px; }
+/* Mobile: ícones sem fundo na home (Coleções e Etapas) — o ícone colorido sozinho
+   já basta e fica uniforme (no desktop os fundos permanecem). Seletor com 2 classes
+   para vencer o .c-red (#FEEDED sólido), que era o único visível no mobile. */
+@media (max-width: 767px) {
+  .collection-card .collection-card__icon,
+  .etapa-card .etapa-card__ibox,
+  .etapa-card .etapa-card__box { background: transparent; }
+}
 
 /* ============================================================
    DocCard
@@ -422,9 +447,12 @@ main { flex: 1 0 auto; }
 /* minmax(0, 1fr) (não 1fr = minmax(auto,1fr)) deixa o card encolher até a largura
    da coluna; sem isso, o conteúdo de min-content estoura a track no mobile. */
 .doc-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
-.doc-grid--3 { grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 768px) { .doc-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .doc-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Grid 2×2 (Temas em alta + Materiais relacionados): 1 col no mobile, 2 col a
+   partir de 640px. DEPOIS da base .doc-grid (mesma especificidade → ordem decide).
+   Sem reservas de min-height: o card fica idêntico ao do acervo (mesmo espaçamento
+   título→resumo); a igualdade de altura na linha vem do grid + height:100% no card. */
+.doc-grid--2 { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .doc-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .doc-card { display: flex; flex-direction: column; height: 100%; gap: 16px; padding: 20px; color: inherit; }
 .doc-card__top { display: flex; align-items: flex-start; gap: 12px; }
@@ -443,15 +471,6 @@ main { flex: 1 0 auto; }
 .doc-card__title { font-family: var(--font-subtitle); font-weight: 600; font-size: 15px; line-height: 1.35; color: var(--sp-black); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .doc-card:hover .doc-card__title { color: var(--sp-blue); }
 .doc-card__resumo { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-/* Reserva de 3 linhas SÓ na grade (Temas em alta), p/ alinhar os cards.
-   Na coluna única (busca/coleção) o card fica justo — sem gap título↔resumo. */
-/* Reservas de altura só fazem sentido em grade multi-coluna (alinhamento entre
-   cards). Em 1 coluna (mobile) o card acompanha o conteúdo, sem altura morta. */
-@media (min-width: 768px) {
-  .doc-grid--3 .doc-card__title { min-height: 4.05em; }
-  .doc-grid--3 .doc-card__resumo { min-height: 4.8em; }
-  .doc-grid--3 .doc-card { min-height: 23rem; }
-}
 .doc-card__foot { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; }
 .doc-card__author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
 .doc-card__author .fi { color: var(--sp-blue); }

@@ -158,6 +158,10 @@
       {% if query %}
       <p class="query-indicator">Pesquisa por <strong>“{{ query }}”</strong></p>
       {% endif %}
+      {% if filtros_count %}
+      {% applied_filters request.GET as chips %}
+      <p class="query-indicator">Filtrando por <strong>{% for c in chips %}{{ c.texto }}{% if not forloop.last %} · {% endif %}{% endfor %}</strong></p>
+      {% endif %}
 
       {% if page_obj.object_list %}
       <div class="doc-grid">
