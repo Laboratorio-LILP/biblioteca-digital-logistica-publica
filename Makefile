@@ -1,4 +1,4 @@
-.PHONY: up down logs tunnel tunnel-service tunnel-service-off tunnel-url shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
+.PHONY: up down logs tunnel tunnel-service tunnel-service-off tunnel-url tunnel-status shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
 
 # Ambiente de desenvolvimento
 up:
@@ -16,25 +16,42 @@ tunnel:
 	bash tools/tunnel.sh
 
 # Túnel como serviço do macOS (launchd): sobe no login e reinicia se cair.
-# Não precisa de terminal aberto. Logs: ~/Library/Logs/bdlp-tunnel.log
-# O script roda de uma cópia em ~/Library/Application Support (o launchd não
-# lê a pasta Desktop — TCC). Rode de novo após alterar tools/tunnel.sh.
+# Instala DOIS LaunchAgents: o host (processo longo) e um watchdog periódico
+# que reinicia o host se ele ficar vivo mas sem conexão (host zumbi).
+# Não precisa de terminal aberto. Logs: ~/Library/Logs/bdlp-tunnel*.log
+# Os scripts rodam de uma cópia em ~/Library/Application Support (o launchd
+# não lê a pasta Desktop — TCC). Rode de novo após alterar os scripts.
 TUNNEL_PLIST = $(HOME)/Library/LaunchAgents/br.gov.sp.lilp.bdlp-tunnel.plist
+WATCHDOG_PLIST = $(HOME)/Library/LaunchAgents/br.gov.sp.lilp.bdlp-tunnel-watchdog.plist
 TUNNEL_APPDIR = $(HOME)/Library/Application Support/lilp-bdlp
 tunnel-service:
 	@mkdir -p "$(TUNNEL_APPDIR)" $(HOME)/Library/LaunchAgents $(HOME)/Library/Logs
 	install -m 755 tools/tunnel.sh "$(TUNNEL_APPDIR)/tunnel.sh"
+	install -m 755 tools/tunnel-watchdog.sh "$(TUNNEL_APPDIR)/tunnel-watchdog.sh"
 	sed -e "s|@SCRIPT@|$(TUNNEL_APPDIR)/tunnel.sh|g" -e "s|@HOME@|$(HOME)|g" \
 	    -e "s|@PORT@|$$( (grep -E '^PORTAL_PORT=' .env 2>/dev/null | cut -d= -f2 | grep . ) || echo 8000)|g" \
 	    tools/bdlp-tunnel.plist.in > $(TUNNEL_PLIST)
+	sed -e "s|@SCRIPT@|$(TUNNEL_APPDIR)/tunnel-watchdog.sh|g" -e "s|@HOME@|$(HOME)|g" \
+	    tools/bdlp-tunnel-watchdog.plist.in > $(WATCHDOG_PLIST)
 	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel 2>/dev/null
+	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel-watchdog 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(TUNNEL_PLIST)
-	@echo "Serviço ativo. URL em alguns segundos via: make tunnel-url"
+	launchctl bootstrap gui/$$(id -u) $(WATCHDOG_PLIST)
+	@echo "Serviço + watchdog ativos. URL em alguns segundos via: make tunnel-url"
 
 tunnel-service-off:
 	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel 2>/dev/null
-	rm -f $(TUNNEL_PLIST) "$(TUNNEL_APPDIR)/tunnel.sh"
+	-launchctl bootout gui/$$(id -u)/br.gov.sp.lilp.bdlp-tunnel-watchdog 2>/dev/null
+	rm -f $(TUNNEL_PLIST) $(WATCHDOG_PLIST) \
+	      "$(TUNNEL_APPDIR)/tunnel.sh" "$(TUNNEL_APPDIR)/tunnel-watchdog.sh"
 	@echo "Serviço removido — o túnel está fora do ar."
+
+# Diagnóstico rápido do túnel (estado, conexões, saúde local e externa)
+tunnel-status:
+	@echo "— LaunchAgents —"; launchctl list 2>/dev/null | grep bdlp-tunnel || echo "  (nenhum serviço instalado)"
+	@echo "— Túnel —"; devtunnel show $${BDLP_TUNNEL_ID:-bdlp-homolog} 2>/dev/null | grep -iE "Host connections|expiration" || echo "  (túnel não encontrado)"
+	@echo "— Portal local —"; curl -s -o /dev/null -w '  HTTP %{http_code}\n' --max-time 5 http://127.0.0.1:$$( (grep -E '^PORTAL_PORT=' .env 2>/dev/null | cut -d= -f2 | grep .) || echo 8000)/ || echo "  fora do ar"
+	@echo "— URL —"; $(MAKE) -s tunnel-url
 
 # URL pública atual do túnel (muda se o túnel expirar e for recriado)
 tunnel-url:

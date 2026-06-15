@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  LaunchAgent do watchdog do túnel (instalado junto com `make tunnel-service`;
+  @SCRIPT@ e @HOME@ são substituídos). Diferente do serviço do túnel (que é
+  um processo longo com KeepAlive), este é um job PERIÓDICO (StartInterval):
+  acorda, checa a saúde do túnel, age se preciso e encerra. É o que reinicia
+  o túnel quando o processo está vivo mas sem conexão de host.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>br.gov.sp.lilp.bdlp-tunnel-watchdog</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>@SCRIPT@</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Checa a cada 5 minutos. -->
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>@HOME@/Library/Logs/bdlp-tunnel-watchdog.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>@HOME@/Library/Logs/bdlp-tunnel-watchdog.log</string>
+</dict>
+</plist>
