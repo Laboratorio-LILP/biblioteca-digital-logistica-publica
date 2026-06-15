@@ -31,7 +31,13 @@
     <div class="sp-container breadcrumb">
       <a href="{% url 'catalog:home' %}">Início</a>
       <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      {% if crumb %}
+      <a href="{% url 'catalog:search' %}">Acervo</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <span>{{ crumb }}</span>
+      {% else %}
       <span>Acervo</span>
+      {% endif %}
     </div>
   </nav>
 

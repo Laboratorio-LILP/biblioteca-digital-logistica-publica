@@ -16,7 +16,7 @@ from .facets import (
 )
 from .models import Document, NrCategory, Topic, TypeInformation
 from .search import filter_documents, search_documents
-from .taxonomy_v6 import TEMAS_DESTAQUE
+from .taxonomy_v6 import COLECOES_BY_SLUG, TEMAS_DESTAQUE
 from .templatetags.catalog_tags import titulo_pt
 
 
@@ -231,6 +231,19 @@ def search(request):
         len(v) if isinstance(v, (list, tuple)) else 1 for v in filters.values()
     )
 
+    # Breadcrumb contextual: quando se chega ao acervo filtrado por uma Coleção
+    # (Home/Coleções) ou por uma Categoria/etapa (seção "Comece pela etapa"),
+    # completa "Início > Acervo > {contexto}" em vez de parar em "Acervo".
+    crumb = None
+    if filters.get("colecao_v6"):
+        col = COLECOES_BY_SLUG.get(filters["colecao_v6"])
+        if col:
+            crumb = col["nome"]
+    elif filters.get("category_id"):
+        cat = NrCategory.objects.filter(id=filters["category_id"]).first()
+        if cat:
+            crumb = titulo_pt(cat.name)
+
     if query:
         results = search_documents(query, filters if filters else None, sort=sort)
     elif filters:
@@ -249,6 +262,7 @@ def search(request):
         "page_obj": page_obj,
         "filters": filters,
         "filtros_count": filtros_count,
+        "crumb": crumb,
         "facets": facets,
         "total_results": paginator.count,
         "sort": sort,
