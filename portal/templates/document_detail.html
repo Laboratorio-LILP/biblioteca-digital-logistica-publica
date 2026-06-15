@@ -65,7 +65,6 @@
       {% if document.metodo %}<div class="doc-callout"><h3 class="doc-section-title">Método</h3><p>{{ document.metodo }}</p></div>{% endif %}
       {% if document.resultado %}<div class="doc-callout"><h3 class="doc-section-title">Resultados</h3><p>{{ document.resultado }}</p></div>{% endif %}
       {% if document.referencias %}<div class="doc-callout"><h3 class="doc-section-title">Referências</h3><p>{{ document.referencias }}</p></div>{% endif %}
-      {% if document.abstract_en %}<div class="doc-callout" lang="en"><h3 class="doc-section-title">Abstract</h3><p>{{ document.abstract_en }}</p></div>{% endif %}
       {% if document.event_description %}<div class="doc-callout"><h3 class="doc-section-title">Apresentações do evento</h3><p>{{ document.event_description }}</p></div>{% endif %}
       {% if document.description %}<div class="doc-callout"><h3 class="doc-section-title">Informações adicionais</h3><p>{{ document.description }}</p></div>{% endif %}
 
@@ -123,7 +122,6 @@
       <div class="doc-ref">
         {% if document.edicao %}<div class="meta-item"><div class="label">Edição</div><div class="value">{{ document.edicao }}</div></div>{% endif %}
         {% if document.publicacao %}<div class="meta-item"><div class="label">Publicação</div><div class="value">{{ document.publicacao }}</div></div>{% endif %}
-        {% if document.descricao_fisica %}<div class="meta-item"><div class="label">Descrição física</div><div class="value">{{ document.descricao_fisica }}</div></div>{% endif %}
         {% if document.nota_versao_ori %}<div class="meta-item"><div class="label">Notas</div><div class="value">{{ document.nota_versao_ori }}</div></div>{% endif %}
         {% if document.doi %}<div class="meta-item"><div class="label">DOI</div><div class="value"><a href="https://doi.org/{{ document.doi }}" target="_blank" rel="noopener">{{ document.doi }}</a></div></div>{% endif %}
         {% if document.nlspi %}<div class="meta-item"><div class="label">ISSN/ISBN</div><div class="value">{{ document.nlspi }}</div></div>{% endif %}
