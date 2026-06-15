@@ -17,6 +17,19 @@
   </div>
 </nav>
 
+{% if nav.prev_url or nav.next_url or nav.back_url %}
+<nav class="doc-resultnav" aria-label="Navegação entre resultados da busca">
+  <div class="sp-container doc-resultnav__inner">
+    {% if nav.back_url %}<a class="doc-resultnav__back" href="{{ nav.back_url }}"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg> Voltar à busca</a>{% else %}<span></span>{% endif %}
+    <div class="doc-resultnav__nav">
+      {% if nav.pos %}<span class="doc-resultnav__pos">{{ nav.pos }} de {{ nav.total }}</span>{% endif %}
+      {% if nav.prev_url %}<a class="page-btn" href="{{ nav.prev_url }}" rel="prev"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg> Anterior</a>{% else %}<span class="page-btn is-disabled" aria-disabled="true"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg> Anterior</span>{% endif %}
+      {% if nav.next_url %}<a class="page-btn" href="{{ nav.next_url }}" rel="next">Próximo <svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>{% else %}<span class="page-btn is-disabled" aria-disabled="true">Próximo <svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></span>{% endif %}
+    </div>
+  </div>
+</nav>
+{% endif %}
+
 <section class="doc-detail-hero">
   <div class="sp-container">
     <div class="doc-badges">
@@ -92,8 +105,8 @@
     </div>
 
     <div class="sp-panel doc-panel doc-cite">
-      <h2 class="doc-section-title">Como citar</h2>
-      <p class="doc-cite__ref" id="doc-cite-ref">{{ document.author|default:document.autor_principal }}. <cite>{{ document.title }}</cite>.{% if document.source and not document.source|is_year_only %} {{ document.source }}.{% endif %}{% if document.ano and not document|ano_redundante %} {{ document.ano }}.{% endif %}{% if document.doi %} DOI: {{ document.doi }}.{% endif %}</p>
+      <h2 class="doc-section-title">Como citar (ABNT)</h2>
+      <p class="doc-cite__ref" id="doc-cite-ref">{% with abnt=document|autores_abnt %}{% if abnt %}{{ abnt }} {% endif %}{% endwith %}<cite>{{ document.title }}</cite>.{% if document.edicao %} {{ document.edicao }}.{% endif %}{% if document.source and not document.source|is_year_only %} {{ document.source }}.{% endif %}{% if document.ano and not document|ano_redundante %} {{ document.ano }}.{% endif %}{% if document.doi %} DOI: {{ document.doi }}.{% endif %}</p>
       <div class="doc-cite__actions">
         <button type="button" class="sp-button-secondary" data-copy="#doc-cite-ref">
           <svg class="fi" aria-hidden="true"><use href="#fi-file-text"/></svg> <span class="copy-label">Copiar referência</span>
@@ -109,6 +122,9 @@
       <h2 class="doc-section-title">Ficha técnica</h2>
       <div class="doc-ref">
         {% if document.edicao %}<div class="meta-item"><div class="label">Edição</div><div class="value">{{ document.edicao }}</div></div>{% endif %}
+        {% if document.publicacao %}<div class="meta-item"><div class="label">Publicação</div><div class="value">{{ document.publicacao }}</div></div>{% endif %}
+        {% if document.descricao_fisica %}<div class="meta-item"><div class="label">Descrição física</div><div class="value">{{ document.descricao_fisica }}</div></div>{% endif %}
+        {% if document.nota_versao_ori %}<div class="meta-item"><div class="label">Notas</div><div class="value">{{ document.nota_versao_ori }}</div></div>{% endif %}
         {% if document.doi %}<div class="meta-item"><div class="label">DOI</div><div class="value"><a href="https://doi.org/{{ document.doi }}" target="_blank" rel="noopener">{{ document.doi }}</a></div></div>{% endif %}
         {% if document.nlspi %}<div class="meta-item"><div class="label">ISSN/ISBN</div><div class="value">{{ document.nlspi }}</div></div>{% endif %}
         {% if document.format %}<div class="meta-item"><div class="label">Formato</div><div class="value">{{ document.format.name }}</div></div>{% endif %}

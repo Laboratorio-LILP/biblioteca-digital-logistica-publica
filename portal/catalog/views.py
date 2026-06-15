@@ -194,23 +194,29 @@ MULTI_PARAMS = frozenset({
 })
 
 
-def _read_filters(request):
-    """Extrai filtros válidos da query string, descartando vazios.
+def _read_filters_from(getparams):
+    """Extrai filtros válidos de um QueryDict, descartando vazios.
 
     Params em MULTI_PARAMS viram lista de valores (`getlist`); os demais,
-    valor único (`get`). Chaves sem valor são descartadas.
+    valor único (`get`). Usado tanto com request.GET quanto com um `ctx` de busca
+    reconstruído (para o anterior/próximo na página de documento).
     """
     filters = {}
     for p in FILTER_PARAMS:
         if p in MULTI_PARAMS:
-            vals = [v for v in request.GET.getlist(p) if v]
+            vals = [v for v in getparams.getlist(p) if v]
             if vals:
                 filters[p] = vals
         else:
-            value = request.GET.get(p)
+            value = getparams.get(p)
             if value:
                 filters[p] = value
     return filters
+
+
+def _read_filters(request):
+    """Filtros válidos da query string da requisição."""
+    return _read_filters_from(request.GET)
 
 
 def search(request):
@@ -250,6 +256,46 @@ def search(request):
     })
 
 
+def _resultado_navegacao(doc, ctx):
+    """Anterior/Próximo a partir do contexto de busca (`ctx` = querystring original).
+
+    Recalcula a busca/ordenação do ctx, acha a posição do documento na lista
+    ordenada de resultados e devolve URLs de anterior/próximo (carregando o ctx
+    adiante), 'voltar à busca' e a posição (X de Y). Degrada para tudo None se não
+    há ctx ou o documento não está nos resultados. O custo é uma consulta de códigos
+    (acervo pequeno); reavaliar se o acervo crescer muito.
+    """
+    from django.http import QueryDict
+
+    nav = {"prev_url": None, "next_url": None, "back_url": None, "pos": None, "total": None}
+    if not ctx:
+        return nav
+    cq = QueryDict(ctx)
+    query = cq.get("q", "").strip()
+    sort = cq.get("sort", "")
+    filters = _read_filters_from(cq)
+    if query:
+        results = search_documents(query, filters or None, sort=sort)
+    elif filters:
+        results = filter_documents(filters, sort=sort)
+    else:
+        results = filter_documents({}, sort=sort)
+
+    codes = list(results.values_list("code", flat=True))
+    if doc.code not in codes:
+        return nav
+    idx = codes.index(doc.code)
+    ctx_q = urlencode({"ctx": ctx})
+    if idx > 0:
+        nav["prev_url"] = reverse("catalog:document_detail", args=[codes[idx - 1]]) + "?" + ctx_q
+    if idx < len(codes) - 1:
+        nav["next_url"] = reverse("catalog:document_detail", args=[codes[idx + 1]]) + "?" + ctx_q
+    nav["back_url"] = reverse("catalog:search") + "?" + ctx
+    nav["pos"] = idx + 1
+    nav["total"] = len(codes)
+    return nav
+
+
 def document_detail(request, code):
     """Detalhes de um documento."""
     doc = get_object_or_404(Document, code=code, status="a")
@@ -268,9 +314,12 @@ def document_detail(request, code):
             .exclude(pk=doc.pk).order_by("-created", "-pk")[:4]
         )
 
+    nav = _resultado_navegacao(doc, request.GET.get("ctx", "").strip())
+
     return render(request, "document_detail.html", {
         "document": doc,
         "relacionados": relacionados,
+        "nav": nav,
     })
 
 

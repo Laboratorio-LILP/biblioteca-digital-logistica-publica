@@ -280,6 +280,27 @@ def extra_authors(doc):
     return max(0, len(parts) - 1)
 
 
+@register.filter
+def autores_abnt(doc):
+    """Autores em ABNT pragmático (NBR 6023): para cada autor de `display_authors`,
+    se vier 'Sobrenome, Nome' (com vírgula) coloca o sobrenome em CAIXA ALTA; se não
+    houver vírgula, mantém como está — NÃO inventa sobrenome a partir de
+    'Nome Sobrenome' (evita erro em sobrenomes compostos/partículas). Junta vários
+    com '; ' e termina em '.'. Vazio quando não há autor."""
+    autores = getattr(doc, "display_authors", None) or []
+    out = []
+    for a in autores:
+        a = (a or "").strip()
+        if not a:
+            continue
+        if "," in a:
+            sob, resto = a.split(",", 1)
+            out.append(sob.strip().upper() + ", " + resto.strip())
+        else:
+            out.append(a)
+    return "; ".join(out) + "." if out else ""
+
+
 # =====================================================================
 # Painel "Seus filtros" — chips de filtros ativos (T1).
 # Resolve cada par (param, valor) da query string num rótulo legível

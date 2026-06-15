@@ -165,7 +165,7 @@
 
       {% if page_obj.object_list %}
       <div class="doc-grid">
-        {% for doc in page_obj %}{% include "_partials/_doc_card.html" %}{% endfor %}
+        {% for doc in page_obj %}{% include "_partials/_doc_card.html" with doc_ctx=request.GET.urlencode %}{% endfor %}
       </div>
       {% else %}
       <div class="sp-panel empty-state">

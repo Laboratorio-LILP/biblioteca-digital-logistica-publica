@@ -4,7 +4,7 @@ Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de I
 {% endcomment %}
 {% load catalog_tags %}
 {% colecao_visual doc as cv %}
-<a class="sp-card doc-card" href="{% url 'catalog:document_detail' doc.code %}">
+<a class="sp-card doc-card" href="{% url 'catalog:document_detail' doc.code %}{% if doc_ctx %}?ctx={{ doc_ctx|urlencode }}{% endif %}">
   <div class="doc-card__top">
     <span class="doc-card__type {{ cv.color }}">
       <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
