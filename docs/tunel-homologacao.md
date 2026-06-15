@@ -56,17 +56,48 @@ Não precisa de terminal aberto. Para ver a URL atual:
 make tunnel-url
 ```
 
+Para um diagnóstico rápido (serviços, conexões, portal local e URL):
+
+```sh
+make tunnel-status
+```
+
+`make tunnel-service` instala **dois** serviços que trabalham juntos:
+
+- **O host** (`bdlp-tunnel`) — o processo que mantém o túnel aberto.
+- **O watchdog** (`bdlp-tunnel-watchdog`) — checa a saúde do túnel a cada
+  5 minutos e reinicia o host se ele ficar "vivo mas mudo" (ver abaixo).
+
 Condições para o serviço funcionar:
 
 - O Mac precisa estar **ligado e com o usuário logado** (Ajustes do Sistema →
   Tela de Bloqueio/Bateria: impedir suspensão se for servir por longos períodos).
 - O stack precisa estar no ar (`make up`). Se não estiver, o serviço tenta
   de novo a cada 60 segundos até o portal responder.
-- Logs do serviço: `~/Library/Logs/bdlp-tunnel.log`
+- Logs: `~/Library/Logs/bdlp-tunnel.log` (host) e
+  `~/Library/Logs/bdlp-tunnel-watchdog.log` (watchdog).
+
+### Por que existe um watchdog
+
+O launchd só reinicia o host quando o **processo morre**. Mas há uma falha
+mais traiçoeira: o processo continua vivo, porém perde a conexão com o
+servidor da Microsoft e não consegue se reautenticar (token expirado, queda
+de rede). O site fica fora do ar, mas o launchd acha que está tudo bem —
+porque o processo existe.
+
+O sinal de saúde correto não é "o processo existe", e sim "o túnel tem
+conexão de host". O watchdog verifica exatamente isso e, se as conexões
+caírem a zero, reinicia o host — que sobe limpo e se reautentica.
+
+> **Atenção a um falso positivo:** abrir a URL sem login devolve um
+> redirecionamento (HTTP 302) para a tela da Microsoft mesmo com o túnel
+> quebrado. Logo, "a URL respondeu" **não** significa "o site está no ar".
+> Use `make tunnel-status` para o veredito real.
 
 ## Como tirar do ar
 
-- **Serviço:** `make tunnel-service-off` — remove o serviço e derruba o acesso.
+- **Serviço:** `make tunnel-service-off` — remove o host e o watchdog e
+  derruba o acesso.
 - **Terminal (`make tunnel`):** pressione **Ctrl+C**.
 
 Nos dois casos o acesso externo morre na hora. O portal continua rodando
@@ -93,6 +124,8 @@ localmente em `http://localhost:8000`.
 | Erro 400 ao abrir a URL | `ALLOWED_HOSTS` sem `.devtunnels.ms` | Conferir o `.env` da raiz e rodar `make up` |
 | "portal não responde" ao rodar `make tunnel` | Stack Docker parado | Rodar `make up` antes |
 | Túnel sumiu depois de dias parado | O serviço apaga túneis após ~4 dias sem uso | Rodar `make tunnel` de novo — o script recria e gera **URL nova** (reenvie à equipe) |
+| Equipe sem acesso, mas `make tunnel-status` mostra `Host connections: 0` | Host zumbi (processo vivo, sem conexão) | O watchdog reinicia em até 5 min; para resolver na hora: `launchctl kickstart -k gui/$(id -u)/br.gov.sp.lilp.bdlp-tunnel` |
+| Watchdog reinicia em loop (log com "FALHA no kickstart" ou Unauthorized) | Login Microsoft expirou de vez | `devtunnel user login` (conta institucional) e depois `make tunnel-service` |
 | Site lento ou bloqueado no meio do dia | Limite de banda do plano gratuito | Usar para homologar páginas; evitar download em massa de PDFs |
 
 ## Quando voltar ao modo de desenvolvimento
