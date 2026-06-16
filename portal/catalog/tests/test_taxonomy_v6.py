@@ -2,6 +2,7 @@
 
 from catalog.taxonomy_v6 import (
     COLECOES_V6,
+    TEMAS_DESTAQUE,
     colecao_v6_for_tipo,
     tipos_de_colecao,
 )
@@ -37,3 +38,25 @@ def test_tipos_de_colecao_por_slug_e_nome():
     assert "Slides" in tipos_de_colecao("instrucao")
     assert "Teses" in tipos_de_colecao("Trabalhos Acadêmicos")
     assert tipos_de_colecao("inexistente") == []
+
+
+_TEMA_KEYS = {"slug", "label", "query", "icon", "color", "card_desc", "alta_intro"}
+
+
+def test_temas_destaque_ordem_e_novos():
+    slugs = [t["slug"] for t in TEMAS_DESTAQUE]
+    assert slugs == [
+        "lei-14133",
+        "sustentabilidade",
+        "compras-diretas",
+        "pregao",
+        "registro-precos",
+    ]
+
+
+def test_temas_destaque_entradas_completas():
+    for t in TEMAS_DESTAQUE:
+        assert _TEMA_KEYS <= set(t), f"faltam chaves em {t.get('slug')}"
+        assert t["icon"].startswith("fi-")
+        assert t["color"].startswith("c-")
+        assert t["query"].strip()

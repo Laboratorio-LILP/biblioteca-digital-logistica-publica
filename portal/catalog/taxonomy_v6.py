@@ -68,6 +68,42 @@ TEMAS_DESTAQUE = [
         "alta_intro": "Materiais indicados para apoiar compras públicas sustentáveis, "
                       "desenvolvimento responsável e inovação aplicada à cadeia de suprimentos.",
     },
+    {
+        "slug": "compras-diretas",
+        "label": "Compras Diretas",
+        "query": "Compras Diretas",
+        "icon": "fi-package",
+        "color": "c-red",
+        "card_desc": "Compras sem licitação — dispensa e inexigibilidade: "
+                     "quando cabem e quais os limites.",
+        "alta_intro": "Materiais para entender quando e como contratar sem "
+                      "licitação — por dispensa ou inexigibilidade — dentro dos "
+                      "limites e cuidados da Lei 14.133/21.",
+    },
+    {
+        "slug": "pregao",
+        "label": "Pregão",
+        "query": "Pregão",
+        "icon": "fi-trending-up",
+        "color": "c-blue",
+        "card_desc": "A modalidade para comprar bens e serviços comuns pelo "
+                     "menor preço.",
+        "alta_intro": "Materiais sobre o pregão: a modalidade usada para comprar "
+                      "bens e serviços comuns pelo menor preço, em geral na forma "
+                      "eletrônica.",
+    },
+    {
+        "slug": "registro-precos",
+        "label": "Registro de Preços",
+        "query": "Registro de Preços",
+        "icon": "fi-bookmark",
+        "color": "c-yellow",
+        "card_desc": "O Sistema de Registro de Preços (SRP): registrar preços "
+                     "para contratar quando precisar.",
+        "alta_intro": "Materiais sobre o Sistema de Registro de Preços (SRP) e a "
+                      "ata: registrar preços para contratar aos poucos, conforme "
+                      "a necessidade.",
+    },
 ]
 
 # Tipos de Informação EXATOS por coleção (planilha v6, aba "Coleção, Assunto e Natureza")
