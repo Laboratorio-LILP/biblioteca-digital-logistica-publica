@@ -1,0 +1,31 @@
+RewriteEngine On
+RewriteBase /
+
+# Proxy lê o corpo cru via php://input (corrige uploads multipart/form-data).
+# Só tem efeito sob mod_php (confirmado: libphp.so).
+<IfModule php_module>
+    php_flag enable_post_data_reading Off
+</IfModule>
+
+# Bloqueia acesso a arquivos/pastas ocultos em qualquer nível de path
+RewriteCond %{REQUEST_URI} !/\.vite
+RewriteRule "(^|/)\." - [F,L]
+
+# Bloqueia extensões sensíveis que não devem ser expostas
+RewriteRule "(^|/).*\.(?:env|ya?ml|ini|log|sql|bak|dist)$" - [F,NC,L]
+
+# Bloqueia acesso a arquivos ocultos (como .env, .htaccess)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Se o arquivo ou diretório solicitado existir, deixe o Apache servir normalmente.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Encaminha todo o resto para o roteador PHP.
+# SEM ?path= e SEM [QSA]: o index.php lê REQUEST_URI/QUERY_STRING diretamente,
+# o que preserva encoding, query repetida e impede o cliente de sobrepor a rota.
+# A query original é mantida automaticamente (substituição sem '?').
+RewriteRule ^ index.php [L]
