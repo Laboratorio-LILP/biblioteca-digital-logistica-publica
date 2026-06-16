@@ -145,13 +145,6 @@
       <div class="doc-grid doc-grid--2">
         {% for doc in tema.docs %}{% include "_partials/_doc_card.html" %}{% endfor %}
       </div>
-      {% if tema.docs|length > 2 %}
-      <div class="tema-grupo__more">
-        <button type="button" class="sp-button-secondary is-hidden" data-mais-docs aria-expanded="false">
-          <svg class="fi" aria-hidden="true"><use href="#fi-plus-circle"/></svg> Carregar mais documentos
-        </button>
-      </div>
-      {% endif %}
     </div>
     {% endfor %}
     {% if temas_em_alta|length > 2 %}

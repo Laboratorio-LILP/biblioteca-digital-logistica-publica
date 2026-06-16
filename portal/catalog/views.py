@@ -62,8 +62,8 @@ def _card_categoria(cat):
 def _docs_do_tema(tema):
     """Documentos de preview de um bloco de 'Temas em Alta'.
 
-    Os 3 cards são os documentos mais representativos do MESMO filtro que define
-    o tema (`tema_busca`: por Assunto curado ou busca textual) — exatamente o que
+    Os 2 cards (1 linha) são os documentos mais representativos do MESMO filtro
+    que define o tema (`tema_busca`: por Assunto curado ou busca textual) — o que
     alimenta o link "Ver tema no acervo" e a contagem do card. Assim o preview é
     sempre uma amostra do que o usuário vê ao clicar, nunca fora do tema. Lista
     vazia se o tema não tem documentos — a home oculta o bloco (antes caía para
@@ -74,7 +74,7 @@ def _docs_do_tema(tema):
         base = Document.objects.filter(status="a", assunto_id=params["assunto_id"]).order_by("-created", "-pk")
     else:
         base = search_documents(params["q"])  # ordenado por relevância (-rank)
-    return list(base[:4])
+    return list(base[:2])
 
 
 def home(request):

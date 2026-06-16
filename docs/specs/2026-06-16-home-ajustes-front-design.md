@@ -152,3 +152,17 @@ Contrato de dados/atributos:
 
 ## Fora de escopo (registrado)
 - **PCA com 0 documentos:** a etapa "Plano de Contratações Anual (PCA)" aparece com "0 documentos" (link levaria a busca vazia). Não faz parte destes 4 ajustes; fica registrado para decisão futura.
+
+---
+
+## Ajustes pós-implementação (2026-06-16)
+
+Dois refinamentos após verificação visual da entrega inicial:
+
+### A1 — Rolagem do chip parando no título do tema
+O `.site-header` é `position: sticky` (~85px). O `scrollIntoView({block:'start'})` do chip alinhava o topo do bloco ao topo da viewport, deixando o **título do tema coberto pelo header** (parecia rolar até os documentos). **Correção:** `scroll-margin-top: 100px` no `.tema-grupo` (alvo da âncora `#tema-<slug>`). Desloca o destino para abaixo do header, com o título visível. CSS puro; vale também para o salto de âncora nativo (sem JS). Sem mudança no JS.
+
+### A2 — Remoção do "Carregar mais documentos"
+O par "Carregar mais documentos" (por tema) + "Carregar mais temas" (seção) ficava visualmente poluído. **Decisão:** remover a expansão de documentos por tema. Cada tema passa a mostrar **sempre 2 documentos** (1 linha); o tema completo continua a um clique pelo "Ver tema no acervo" (já no cabeçalho). Mantém-se apenas o "Carregar mais temas". **Revisa o Item 4(a)** original (que previa 4 docs/tema com expansão).
+
+Mudanças: `_docs_do_tema` → `base[:2]`; remoção do botão `data-mais-docs` e do `{% if tema.docs|length > 2 %}` no template; remoção de `.tema-grupo__more` na CSS; remoção da função `initDocs` e da constante `DOCS_VISIVEIS` no `home.js` (que passa a tratar só revelação de temas e chips). Simplifica template, CSS e JS.
