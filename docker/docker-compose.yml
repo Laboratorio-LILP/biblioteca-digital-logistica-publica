@@ -7,7 +7,9 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nourau}
       POSTGRES_USER: ${POSTGRES_USER:-php}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abc123}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      # Consumido pelo init shell 09-portal-readonly-user.sh (cria a role read-only).
+      PORTAL_DB_PASSWORD: ${PORTAL_DB_PASSWORD:?defina PORTAL_DB_PASSWORD no .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d:ro
@@ -28,7 +30,7 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
       POSTGRES_USER: ${POSTGRES_USER:-php}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abc123}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
       NOURAU_SITE_URL: ${NOURAU_SITE_URL:-http://localhost:8080}
       NOURAU_WEBMASTER_EMAIL: ${NOURAU_WEBMASTER_EMAIL:-nourau@localhost}
       PORTAL_URL: ${PORTAL_URL:-http://localhost:8000}
@@ -56,9 +58,9 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
       PORTAL_DB_USER: ${PORTAL_DB_USER:-portal_reader}
-      PORTAL_DB_PASSWORD: ${PORTAL_DB_PASSWORD:-portal_reader_dev}
+      PORTAL_DB_PASSWORD: ${PORTAL_DB_PASSWORD:?defina PORTAL_DB_PASSWORD no .env}
       POSTGRES_USER: ${POSTGRES_USER:-php}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abc123}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
       NOURAU_SITE_URL: ${NOURAU_SITE_URL:-http://localhost:8080}
       NOURAU_ARCHIVE_DIR: /nourau/archive
     volumes:

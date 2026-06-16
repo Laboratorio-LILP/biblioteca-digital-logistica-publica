@@ -13,7 +13,7 @@ $cfg_port = '5432';
 
 // name of PostgreSQL user (and password, if needed)
 $cfg_user = 'php';
-$cfg_pass = 'abc123';
+$cfg_pass = 'OVERWRITTEN_AT_BOOT_BY_ENVSUBST';  // regenerado pelo entrypoint via envsubst (POSTGRES_PASSWORD)
 
 /*-------------- site --------------*/
 // site host address

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências (runtime fixado + ferramentas dev)
+        run: |
+          pip install -r requirements.lock
+          pip install ruff pytest pytest-django
+
+      - name: Lint (ruff)
+        run: ruff check portal/
+
+      - name: Testes (pytest)
+        working-directory: portal
+        env:
+          DJANGO_SECRET_KEY: ci-dummy-secret-key-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          PYTHONPATH: ${{ github.workspace }}/portal
+        run: python -m pytest -v
+
+      - name: Django deploy checks (postura de produção; recusa erros de config)
+        working-directory: portal
+        env:
+          DJANGO_SECRET_KEY: ci-dummy-secret-key-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          DJANGO_DEBUG: "false"
+          SECURE_SSL: "true"
+          ALLOWED_HOSTS: "ci.local"
+          PYTHONPATH: ${{ github.workspace }}/portal
+        run: python manage.py check --deploy --fail-level ERROR

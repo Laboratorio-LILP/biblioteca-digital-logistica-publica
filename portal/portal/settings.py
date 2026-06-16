@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import environ
@@ -20,7 +19,8 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 USE_X_FORWARDED_HOST = True  # confia no Host público repassado pelo front-controller
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # reconhece HTTPS no proxy
 FORCE_SCRIPT_NAME = env("FORCE_SCRIPT_NAME", default=None) or None  # ex.: "/Biblioteca"; "" (dev) → None
-CSRF_TRUSTED_ORIGINS = [o for o in env.list("CSRF_TRUSTED_ORIGINS", default=[]) if o.strip()]  # esquema+host públicos; ignora vazios
+# CSRF_TRUSTED_ORIGINS: esquema+host públicos; ignora entradas vazias.
+CSRF_TRUSTED_ORIGINS = [o for o in env.list("CSRF_TRUSTED_ORIGINS", default=[]) if o.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
@@ -60,7 +60,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": env("POSTGRES_DB", default="nourau"),
         "USER": env("PORTAL_DB_USER", default="portal_reader"),
-        "PASSWORD": env("PORTAL_DB_PASSWORD", default="portal_reader_dev"),
+        "PASSWORD": env("PORTAL_DB_PASSWORD", default="placeholder-set-PORTAL_DB_PASSWORD"),
         "HOST": env("POSTGRES_HOST", default="localhost"),
         "PORT": env("POSTGRES_PORT", default="5432"),
     }

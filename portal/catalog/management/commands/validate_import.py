@@ -24,11 +24,15 @@ class Command(BaseCommand):
             ("Assuntos", "SELECT COUNT(*) FROM nr_assunto"),
             ("Subcategorias", "SELECT COUNT(*) FROM nr_subcategoria"),
             ("Microcategorias", "SELECT COUNT(*) FROM nr_microcategoria"),
-            ("Documentos com assunto", "SELECT COUNT(*) FROM nr_document WHERE assunto_id IS NOT NULL AND status = 'a'"),
-            ("Documentos com subcategoria", "SELECT COUNT(*) FROM nr_document WHERE subcategoria_id IS NOT NULL AND status = 'a'"),
-            ("Documentos com microcategoria", "SELECT COUNT(*) FROM nr_document WHERE microcategoria_id IS NOT NULL AND status = 'a'"),
+            ("Documentos com assunto",
+             "SELECT COUNT(*) FROM nr_document WHERE assunto_id IS NOT NULL AND status = 'a'"),
+            ("Documentos com subcategoria",
+             "SELECT COUNT(*) FROM nr_document WHERE subcategoria_id IS NOT NULL AND status = 'a'"),
+            ("Documentos com microcategoria",
+             "SELECT COUNT(*) FROM nr_document WHERE microcategoria_id IS NOT NULL AND status = 'a'"),
             ("Documentos com ano", "SELECT COUNT(*) FROM nr_document WHERE ano IS NOT NULL AND status = 'a'"),
-            ("Documentos com permissão", "SELECT COUNT(*) FROM nr_document WHERE permissao IS NOT NULL AND permissao != '' AND status = 'a'"),
+            ("Documentos com permissão",
+             "SELECT COUNT(*) FROM nr_document WHERE permissao IS NOT NULL AND permissao != '' AND status = 'a'"),
         ]
 
         self.stdout.write(self.style.SUCCESS("=== Validação de Importação ===\n"))

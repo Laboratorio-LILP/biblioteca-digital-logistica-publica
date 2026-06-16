@@ -11,16 +11,9 @@ RUN apt-get update && apt-get install -y \
         gcc \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalar dependências Python (extraídas do pyproject.toml)
-COPY pyproject.toml /app/
-RUN pip install --no-cache-dir \
-    "django>=5.1,<6.0" \
-    "psycopg2-binary>=2.9" \
-    "gunicorn>=22.0" \
-    "django-environ>=0.11" \
-    "openpyxl>=3.1" \
-    "whitenoise>=6.7" \
-    "django-csp>=3.8,<4.0"
+# Instalar dependências Python do lockfile (fonte única; sem lista duplicada)
+COPY pyproject.toml requirements.lock /app/
+RUN pip install --no-cache-dir -r requirements.lock
 
 # Copiar código do portal
 COPY portal/ /app/

@@ -6,11 +6,14 @@
 #     -f docker/docker-compose.prod.yml \
 #     up -d --build
 #
-# Adiciona um Caddy como reverse proxy com HTTPS automático (Let's Encrypt)
-# e ajusta o portal para modo de produção (DEBUG=false, ALLOWED_HOSTS).
-# Os containers postgres/nourau/portal continuam mapeando suas portas no
-# host — a segurança fica a cargo do firewall externo (Oracle VCN security
-# list libera apenas 80/443 ao internet).
+# Adiciona um Caddy (HTTPS Let's Encrypt) como ÚNICA superfície pública (80/443)
+# e coloca o portal em modo de produção (DEBUG=false, SECURE_SSL=true) sob o
+# sub-path {$APP_PATH}. Os serviços internos (postgres/nourau/portal) herdam do
+# compose base o bind em 127.0.0.1 (loopback) — NÃO são publicados em 0.0.0.0;
+# o Caddy os alcança pela rede interna do Compose. Defesa em profundidade: a
+# exposição pública não depende só do firewall de borda.
+# (Para remover totalmente o publish no host em runtimes com Compose recente:
+#  `ports: !reset []` em cada serviço interno.)
 
 services:
   caddy:
@@ -26,6 +29,7 @@ services:
       - caddy_logs:/var/log/caddy
     environment:
       DOMAIN: ${DOMAIN:?DOMAIN obrigatório no .env (ex.: 140.238.202.105.sslip.io)}
+      APP_PATH: ${APP_PATH:-Biblioteca}
     depends_on:
       - portal
       - nourau
@@ -34,7 +38,10 @@ services:
     restart: unless-stopped
     environment:
       DJANGO_DEBUG: "false"
+      SECURE_SSL: "true"
+      FORCE_SCRIPT_NAME: /${APP_PATH:-Biblioteca}
       ALLOWED_HOSTS: ${DOMAIN},localhost,127.0.0.1
+      CSRF_TRUSTED_ORIGINS: https://${DOMAIN}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY obrigatório no .env em produção}
 
   nourau:

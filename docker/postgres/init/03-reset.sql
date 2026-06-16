@@ -1,6 +1,10 @@
 --
 -- Dados iniciais comuns do Nou-Rau
 --
+-- ⚠️ SEED DE DESENVOLVIMENTO. Cria admin/colab com senha default ('admin').
+-- ANTES de expor /manager em homologação/produção é OBRIGATÓRIO trocar a senha
+-- (ver docs/DEPLOY.md › Hardening). Em produção, /manager NÃO deve ser público.
+--
 
 SELECT SETVAL('notice_seq','0');
 SELECT SETVAL('topic_seq', '0');
