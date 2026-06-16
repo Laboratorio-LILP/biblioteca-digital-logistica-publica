@@ -1,29 +1,38 @@
-# Caddy v2 — reverse proxy + HTTPS automático via Let's Encrypt
-# Lê {$DOMAIN} de variável de ambiente (definida em .env e propagada pelo
-# docker-compose.prod.yml). Use sslip.io quando ainda não houver domínio
-# próprio: ex.: 140.238.202.105.sslip.io aponta para 140.238.202.105.
+# Caddy v2 — reverse proxy + HTTPS automático (Let's Encrypt).
+# Domínio único: cada sistema do LILP é um sub-path ({$APP_PATH}). O portal roda
+# sob /{$APP_PATH}/ e recompõe as URLs via FORCE_SCRIPT_NAME (handle_path remove
+# o prefixo antes de repassar). {$DOMAIN} e {$APP_PATH} vêm do ambiente
+# (docker-compose.prod.yml). sslip.io serve enquanto não houver domínio próprio
+# (ex.: 140.238.202.105.sslip.io aponta para 140.238.202.105).
 
 {$DOMAIN} {
     encode zstd gzip
 
-    # Painel administrativo do Nou-Rau (PHP/Apache).
-    # /manager/* → container nourau, porta 80 da rede interna do Compose.
+    # Painel de curadoria do Nou-Rau (PHP/Apache) — RESTRITO, não público.
+    # Por padrão libera só loopback; ajuste a allowlist para as faixas da
+    # VPN/SGGD antes de habilitar em produção (ver docs/DEPLOY.md › Hardening).
     handle /manager* {
-        reverse_proxy nourau:80
+        @allowed remote_ip 127.0.0.1/32 ::1
+        handle @allowed {
+            reverse_proxy nourau:80
+        }
+        respond "Acesso restrito ao painel de curadoria." 403
     }
 
-    # Tudo o mais → portal Django (Gunicorn).
-    # Inclui /static/* (servido via WhiteNoise dentro do próprio Django).
-    handle {
+    # Portal Django sob o sub-path do sistema. Inclui /static/* (WhiteNoise).
+    handle_path /{$APP_PATH:Biblioteca}/* {
         reverse_proxy portal:8000
     }
 
-    # Headers de segurança básicos
+    # Raiz → sub-path do sistema.
+    redir / /{$APP_PATH:Biblioteca}/ 302
+
+    # Headers de segurança básicos (os do app via django-csp continuam valendo).
     header {
         X-Content-Type-Options "nosniff"
         X-Frame-Options "SAMEORIGIN"
         Referrer-Policy "strict-origin-when-cross-origin"
-        # Strict-Transport-Security só após confirmar que tudo funciona via HTTPS
+        # Habilitar HSTS só após validar tudo via HTTPS:
         # Strict-Transport-Security "max-age=31536000; includeSubDomains"
     }
 
