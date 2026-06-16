@@ -5,6 +5,14 @@
 {% block meta_description %}As quatro coleções da Biblioteca Digital de Logística Pública e como o acervo é organizado: as dimensões de classificação (assunto, categoria e natureza) e como encontrar o que você precisa.{% endblock %}
 
 {% block content_raw %}
+<nav class="breadcrumb-bar" aria-label="Você está em">
+  <div class="sp-container breadcrumb">
+    <a href="{% url 'catalog:home' %}">Início</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <span>Coleções</span>
+  </div>
+</nav>
+
 <section class="sp-section colecoes-hero">
   <div class="sp-container">
     <span class="eyebrow">Acervo</span>

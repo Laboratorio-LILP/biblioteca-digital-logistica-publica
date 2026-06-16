@@ -83,31 +83,28 @@
       </div>
       <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Ver todo o acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
-    <div class="collections-grid collections-grid--quatro">
+    <ol class="etapas-stepper">
       {% for card in cards_etapas %}
-      <a class="sp-card etapa-card" href="{{ card.href }}">
-        <span class="etapa-card__ibox" aria-hidden="true"><svg class="fi"><use href="#{{ card.icon }}"/></svg></span>
-        <span class="etapa-card__body">
-          <span class="etapa-card__label"><span class="etapa-card__num" aria-hidden="true">{{ forloop.counter }}</span><span>{{ card.label }}</span></span>
-          {% if card.desc %}<span class="etapa-card__desc">{{ card.desc }}</span>{% endif %}
-          <span class="etapa-card__count">{{ card.count }} {{ card.count|pluralize_pt:"documento" }}</span>
-        </span>
-        <svg class="fi etapa-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
-      </a>
+      <li class="etapa-step">
+        <a class="etapa-step__link" href="{{ card.href }}">
+          <span class="etapa-step__node" aria-hidden="true"><svg class="fi"><use href="#{{ card.icon }}"/></svg></span>
+          <span class="etapa-step__txt">
+            <span class="etapa-step__lab">{{ card.label }}</span>
+            {% if card.desc %}<span class="etapa-step__desc">{{ card.desc }}</span>{% endif %}
+            <span class="etapa-step__count">{{ card.count }} {{ card.count|pluralize_pt:"documento" }}</span>
+          </span>
+        </a>
+      </li>
       {% endfor %}
-    </div>
+    </ol>
     {% if cards_transversais %}
     <p class="etapas-trans-head">Visões transversais</p>
-    <div class="collections-grid collections-grid--quatro">
+    <div class="etapas-trans">
       {% for card in cards_transversais %}
-      <a class="sp-card etapa-card etapa-card--trans" href="{{ card.href }}">
-        <span class="etapa-card__box" aria-hidden="true"><svg class="fi"><use href="#{{ card.icon }}"/></svg></span>
-        <span class="etapa-card__body">
-          <span class="etapa-card__label"><span>{{ card.label }}</span></span>
-          {% if card.desc %}<span class="etapa-card__desc">{{ card.desc }}</span>{% endif %}
-          <span class="etapa-card__count">{{ card.count }} {{ card.count|pluralize_pt:"documento" }}</span>
-        </span>
-        <svg class="fi etapa-card__arrow" aria-hidden="true"><use href="#fi-arrow-right"/></svg>
+      <a class="etapa-chip" href="{{ card.href }}">
+        <svg class="fi etapa-chip__ic" aria-hidden="true"><use href="#{{ card.icon }}"/></svg>
+        <span class="etapa-chip__lab">{{ card.label }}</span>
+        <span class="etapa-chip__count">{{ card.count }}</span>
       </a>
       {% endfor %}
     </div>
