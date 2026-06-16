@@ -60,7 +60,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": env("POSTGRES_DB", default="nourau"),
         "USER": env("PORTAL_DB_USER", default="portal_reader"),
-        "PASSWORD": env("PORTAL_DB_PASSWORD", default="portal_reader_dev"),
+        "PASSWORD": env("PORTAL_DB_PASSWORD", default="placeholder-set-PORTAL_DB_PASSWORD"),
         "HOST": env("POSTGRES_HOST", default="localhost"),
         "PORT": env("POSTGRES_PORT", default="5432"),
     }

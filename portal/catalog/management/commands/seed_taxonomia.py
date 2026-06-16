@@ -44,7 +44,7 @@ class Command(BaseCommand):
         return psycopg2.connect(
             dbname=os.environ.get("POSTGRES_DB", "nourau"),
             user=os.environ.get("POSTGRES_USER", "php"),
-            password=os.environ.get("POSTGRES_PASSWORD", "abc123"),
+            password=os.environ["POSTGRES_PASSWORD"],  # sem fallback: falha claro se ausente
             host=os.environ.get("POSTGRES_HOST", "postgres"),
             port=os.environ.get("POSTGRES_PORT", "5432"),
         )
