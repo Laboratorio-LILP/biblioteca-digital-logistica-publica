@@ -41,7 +41,7 @@ curl -s http://127.0.0.1:8010/__nao_existe__/ | grep -c "Using the URLconf" # 0 
 # .env com DOMAIN, DJANGO_DEBUG=false, SECURE_SSL=true, ALLOWED_HOSTS=<domínio>
 docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d --build
 ```
-A borda canônica é o Caddy (ver [adr/0006-borda-canonica.md](adr/0006-borda-canonica.md)). Em domínio único, cada sistema é um sub-path (`handle_path /Biblioteca/*`) com `FORCE_SCRIPT_NAME` coerente.
+A borda de produção **depende do ambiente** (ver [adr/0006-borda-canonica.md](adr/0006-borda-canonica.md)): na Prodesp será definida com eles. O `Caddyfile`/`prod.yml` aqui é uma **referência opcional** para um host próprio exposto à internet (HTTPS automático), não um requisito. Em domínio único, cada sistema é um sub-path (`handle_path /Biblioteca/*`) com `FORCE_SCRIPT_NAME` coerente. A homologação usa o `index.php` da VM interna (ver `deploy/edge/`).
 
 ## 4. Dados / acervo
 

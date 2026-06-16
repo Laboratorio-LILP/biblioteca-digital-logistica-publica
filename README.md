@@ -9,7 +9,7 @@ Três serviços orquestrados por Docker Compose (nome de projeto `lilp-bdlp`):
 - **portal** — Django 5 + gunicorn. Acervo público; conecta ao banco como usuário **read-only** (`portal_reader`).
 - **nourau** — PHP/Apache (Nou-Rau). Backend de curadoria, servido em `/manager`.
 - **postgres** — Postgres 15. Banco do acervo.
-- **borda** — Caddy (produção) ou `index.php` (homologação) — ver [docs/DEPLOY.md](docs/DEPLOY.md).
+- **borda** — `index.php` em homologação (VM interna SGGD, só porta 80); em produção, a definir com a Prodesp. O `Caddyfile` incluído é uma referência opcional para host próprio. Ver [docs/DEPLOY.md](docs/DEPLOY.md).
 
 O portal é **sub-path-agnóstico** (`FORCE_SCRIPT_NAME`): roda na raiz em dev e sob `/Biblioteca` atrás do proxy.
 

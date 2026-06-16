@@ -1,16 +1,20 @@
-# ADR 0006 — Borda canônica da esteira (Caddy sub-path; index.php em transição)
+# ADR 0006 — Borda por estágio (index.php em homologação; Caddy como referência opcional)
 
-- **Status:** Aceito (2026-06-16)
-- **Contexto:** Existiam três bordas divergentes: dev (sem borda), homologação (um `index.php` PHP multi-projeto, fora do git, servindo sub-path `/Biblioteca`) e o `docker/Caddyfile` versionado (nunca implantado, montando o portal na raiz `/`). A borda que de fato resolve o cenário "domínio único / sub-path" da Prodesp (o `index.php`) não estava versionada; a versionada não resolvia sub-path nem multi-sistema. Isso quebra a paridade homolog↔prod e impede replicar a esteira em novos sistemas.
+- **Status:** Aceito (2026-06-16). Revisado no mesmo dia após esclarecimento: a borda é **diferente por estágio, por design** — não é acidente a corrigir.
+- **Contexto:**
+  - **Homologação** roda numa VM interna da SGGD, **não exposta à internet**, com **apenas a porta 80 aberta** (precaução de segurança do servidor). O front-controller `index.php` (autor `faoportela`) recebe tudo na `:80` e roteia cada sistema do LILP para sua porta loopback (`/Biblioteca` → portal em `127.0.0.1:8010`). É uma **característica fixa desse servidor**, compartilhado por vários sistemas do laboratório.
+  - **Produção (Prodesp)** será um ambiente distinto, ainda **a definir com a Prodesp** — não necessariamente igual à homologação.
+  - Antes desta decisão, o `index.php` não estava versionado (infra manual) e o `docker/Caddyfile` versionado dava a entender, erroneamente, ser "a borda de produção".
 
 ## Decisão
 
-1. A borda **canônica do modelo é o Caddy**, configurado para **sub-path** (`handle_path /<Sistema>/*` → portal), passando `FORCE_SCRIPT_NAME=/<Sistema>` ao app. Cada sistema do LILP entra como um sub-path do domínio único.
-2. O `index.php` de homologação é **versionado** em `deploy/edge/` como borda de transição até a migração para Caddy; deixa de ser infra manual não rastreada.
-3. **`/manager` (admin Nou-Rau) não é público**: restrito por IP/VPN/Basic-Auth na borda (ver ADR relacionado ao hardening em `docs/DEPLOY.md`).
+1. **`index.php` é a borda canônica de homologação.** Passa a ser **versionado** em `deploy/edge/` (antes era editado à mão no servidor, sem rastreio).
+2. **`docker/Caddyfile` + `docker-compose.prod.yml` são uma referência OPCIONAL** — um modelo de borda para um deploy próprio **exposto à internet** com HTTPS automático (ex.: VM em nuvem). **Não** são a borda de homologação nem obrigatórios para a Prodesp.
+3. **A borda de produção na Prodesp será definida quando o ambiente for conhecido.** O portal é **sub-path-agnóstico** (`FORCE_SCRIPT_NAME`), então se adapta a `index.php`, Caddy, nginx ou ao que a Prodesp oferecer — o que importa é o **contrato da borda**: repassar `Host`/`X-Forwarded-*`, servir sob o sub-path e não redirecionar.
+4. **`/manager` (curadoria) não é público** — restringir na borda em uso.
 
 ## Consequências
 
-- Homologação e produção passam a exercitar o mesmo modelo de roteamento (sub-path), reduzindo surpresas na promoção.
-- A peça mais crítica da borda passa a ter versão, review e origem reproduzível.
-- Migração do `index.php`→Caddy na VM exige janela de manutenção (fora do escopo automatizado).
+- Homologação e produção podem ter bordas distintas sem quebrar o app, desde que o contrato acima seja respeitado.
+- A peça crítica de homologação (`index.php`) passa a ter versão e origem reproduzível.
+- O Caddy fica documentado como opção, sem prometer ser o caminho da Prodesp.
