@@ -6,7 +6,7 @@ que o usuário troque um valor de filtro sem ficar com lista vazia.
 
 import unicodedata
 
-from django.db.models import Count, Min, Max
+from django.db.models import Count, Max, Min
 
 from .models import (
     Assunto,

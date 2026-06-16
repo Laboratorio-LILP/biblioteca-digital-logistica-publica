@@ -15,7 +15,6 @@ import openpyxl
 import psycopg2
 from django.core.management.base import BaseCommand, CommandError
 
-
 # Abas de dados na planilha v3.1 (ordem de processamento)
 DATA_SHEETS = ["Eventos", "Livros Digitais", "Trabalhos Acadêmicos", "Materiais Pedagógicos"]
 
@@ -284,7 +283,10 @@ class Command(BaseCommand):
                         if len(sheet_errors) <= 5:
                             self.stdout.write(self.style.ERROR(f"  ERRO {sheet}/L{row_num}: {e}"))
 
-                self.stdout.write(f"  [{sheet}] Inseridos: {sheet_inserted}, Ignorados: {sheet_skipped}, Erros: {len(sheet_errors)}")
+                self.stdout.write(
+                    f"  [{sheet}] Inseridos: {sheet_inserted}, "
+                    f"Ignorados: {sheet_skipped}, Erros: {len(sheet_errors)}"
+                )
                 total_inserted += sheet_inserted
                 total_skipped += sheet_skipped
                 total_errors.extend(sheet_errors)
@@ -297,7 +299,7 @@ class Command(BaseCommand):
 
         wb.close()
 
-        self.stdout.write(self.style.SUCCESS(f"\n=== Resultado Final ==="))
+        self.stdout.write(self.style.SUCCESS("\n=== Resultado Final ==="))
         self.stdout.write(f"  Total inseridos: {total_inserted}")
         self.stdout.write(f"  Total ignorados: {total_skipped}")
         self.stdout.write(f"  Total erros: {len(total_errors)}")
