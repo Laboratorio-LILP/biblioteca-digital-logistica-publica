@@ -48,15 +48,6 @@ def _card_colecao(c):
     }
 
 
-def _card_tematico(t):
-    """Normaliza um card temático (cards_tematicos_overview) para o card unificado."""
-    return {
-        "href": _search_url(**t["params"]),
-        "color": t["color"], "icon": t["icon"], "label": t["label"],
-        "desc": t["descricao"], "count": t["count"],
-    }
-
-
 def _card_categoria(cat):
     """Normaliza uma categoria processual (categorias_overview) para o card
     unificado. O rótulo recebe Title Case (titulo_pt), como na busca; o link usa
@@ -91,15 +82,17 @@ def home(request):
     colecoes_v6 = colecao_v6_overview()
     tematicos = cards_tematicos_overview()
 
-    # "Explorar o acervo": 4 coleções formais + cards temáticos que têm resultados
-    # (oculta o card temático cuja busca não retorna documentos — sem beco sem saída).
+    # "Explorar o acervo" (Item 1): apenas as 4 Coleções formais como cards.
     cards_explorar = [_card_colecao(c) for c in colecoes_v6]
-    cards_explorar += [_card_tematico(t) for t in tematicos if t["count"] > 0]
+    # Os temas viram chips-âncora p/ a seção "Temas em alta" (mesma fonte:
+    # cards_tematicos_overview, já em `tematicos`), com slug p/ a âncora.
+    chips_temas = tematicos
 
     # "Temas em Alta": um bloco por tema, com até 3 documentos em destaque. O link
     # "Ver tema" usa o mesmo filtro do card (Assunto curado ou texto).
     temas_em_alta = [
         {
+            "slug": t["slug"],
             "label": t["label"],
             "intro": t["alta_intro"],
             "icon": t["icon"],
@@ -156,6 +149,7 @@ def home(request):
     return render(request, "home.html", {
         "colecoes_v6": colecoes_v6,
         "cards_explorar": cards_explorar,
+        "chips_temas": chips_temas,
         "cards_etapas": cards_etapas,
         "cards_transversais": cards_transversais,
         "temas_em_alta": temas_em_alta,
