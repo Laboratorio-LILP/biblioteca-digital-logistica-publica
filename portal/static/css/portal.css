@@ -413,7 +413,29 @@ main { flex: 1 0 auto; }
 
 /* Seção "Comece pela etapa" (home): stepper conectado das etapas + chips das
    visões transversais. */
-.etapas-trans-head { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: rgb(var(--rgb-black) / 0.66); margin: clamp(28px, 3vw, 36px) 0 0; }
+/* Utilitário de ocultação controlado por JS (vence display próprio de .doc-card,
+   .sp-button-secondary etc.). Sem JS, nada recebe esta classe. */
+.is-hidden { display: none !important; }
+
+/* Rótulo de sub-bloco compartilhado (Explorar: Coleções/Temas em alta; Etapas:
+   Visões transversais). Zera a margem do grid imediatamente seguinte. */
+.subsection-label { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: rgb(var(--rgb-black) / 0.66); margin: clamp(28px, 3vw, 36px) 0 14px; }
+.subsection-label + .collections-grid,
+.subsection-label + .temas-chips,
+.subsection-label + .etapas-trans { margin-top: 0; }
+
+/* Temas em alta (Explorar): chips-âncora — 5 colunas no desktop, responsivo. */
+.temas-chips { display: grid; gap: 10px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .temas-chips { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 768px) { .temas-chips { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .temas-chips { grid-template-columns: repeat(5, 1fr); } }
+.tema-chip { display: flex; align-items: center; gap: 10px; border: 1px solid rgb(var(--rgb-gray-medium) / 0.6); border-radius: 8px; padding: 11px 13px; color: inherit; transition: border-color 150ms ease; }
+.tema-chip:hover { border-color: var(--sp-blue); }
+.tema-chip__ic { height: 30px; width: 30px; flex: none; display: grid; place-items: center; border-radius: 6px; font-size: 15px; }
+.tema-chip__txt { display: flex; flex-direction: column; min-width: 0; }
+.tema-chip__lab { font-family: var(--font-subtitle); font-weight: 600; font-size: 12.5px; line-height: 1.25; color: var(--sp-black); }
+.tema-chip__count { font-size: 11px; color: rgb(var(--rgb-black) / 0.55); margin-top: 2px; }
+
 /* Divisor sutil na fronteira branco-branco Coleções→Etapas (como o stats tem
    border-bottom) — o espaçamento já é padrão (84px); falta só o divisor. */
 .home-etapas { border-top: var(--border); }
@@ -442,13 +464,24 @@ main { flex: 1 0 auto; }
   .etapa-step__txt { align-items: center; padding-top: 10px; }
 }
 
+/* Item 3: alinhar contagens das etapas. Rótulo com 2 linhas reservadas
+   (descrições começam na mesma altura) + contagem empurrada ao rodapé numa
+   linha-base comum. Só no layout horizontal (≥768px). */
+@media (min-width: 768px) {
+  .etapa-step__link { height: 100%; }
+  .etapa-step__txt { flex: 1 1 auto; }
+  .etapa-step__lab { min-height: 2.5em; display: flex; align-items: center; justify-content: center; }
+  .etapa-step__count { margin-top: auto; }
+}
+
 /* Visões transversais: chips (não são etapas) — secundárias ao stepper. */
-.etapas-trans { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-.etapa-chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgb(var(--rgb-gray-medium) / 0.6); border-radius: 8px; padding: 9px 13px; color: inherit; transition: border-color 150ms ease; }
+.etapas-trans { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
+@media (min-width: 640px) { .etapas-trans { grid-template-columns: repeat(2, 1fr); } }
+.etapa-chip { display: flex; align-items: center; gap: 8px; border: 1px solid rgb(var(--rgb-gray-medium) / 0.6); border-radius: 8px; padding: 11px 14px; color: inherit; transition: border-color 150ms ease; }
 .etapa-chip:hover { border-color: var(--sp-blue); }
 .etapa-chip__ic { color: var(--sp-petrol); font-size: 16px; }
 .etapa-chip__lab { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: var(--sp-black); }
-.etapa-chip__count { font-size: 11px; color: rgb(var(--rgb-black) / 0.55); }
+.etapa-chip__count { font-size: 11px; color: rgb(var(--rgb-black) / 0.55); margin-left: auto; }
 
 /* Mobile: ícones das Coleções sem fundo (o ícone colorido basta; vence o .c-red
    sólido). O nó do stepper mantém o círculo (é o elemento do fluxo). */
@@ -512,6 +545,11 @@ main { flex: 1 0 auto; }
 .tema-grupo__titulo { margin: 0; display: flex; align-items: center; gap: 12px; font-family: var(--font-heading); font-weight: 700; font-size: clamp(22px, 2.4vw, 30px); line-height: 1.18; color: var(--sp-black); }
 .tema-grupo__icone { height: 40px; width: 40px; flex-shrink: 0; display: grid; place-items: center; border-radius: 8px; font-size: 20px; }
 .tema-grupo__intro { max-width: 760px; margin: 14px 0 28px; font-size: 14px; line-height: 1.65; color: rgb(var(--rgb-black) / 0.66); }
+
+/* Item 4: botões “Carregar mais” (docs por tema e temas). Ocultos por padrão
+   (.is-hidden), revelados pelo JS; usam o estilo .sp-button-secondary. */
+.tema-grupo__more, .temas-em-alta__more { display: flex; justify-content: center; margin-top: 18px; }
+.temas-em-alta__more { margin-top: 24px; }
 
 /* ============================================================
    Faixa “Contribua”
