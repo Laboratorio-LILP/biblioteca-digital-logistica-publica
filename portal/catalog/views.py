@@ -48,15 +48,6 @@ def _card_colecao(c):
     }
 
 
-def _card_tematico(t):
-    """Normaliza um card temático (cards_tematicos_overview) para o card unificado."""
-    return {
-        "href": _search_url(**t["params"]),
-        "color": t["color"], "icon": t["icon"], "label": t["label"],
-        "desc": t["descricao"], "count": t["count"],
-    }
-
-
 def _card_categoria(cat):
     """Normaliza uma categoria processual (categorias_overview) para o card
     unificado. O rótulo recebe Title Case (titulo_pt), como na busca; o link usa
@@ -71,8 +62,8 @@ def _card_categoria(cat):
 def _docs_do_tema(tema):
     """Documentos de preview de um bloco de 'Temas em Alta'.
 
-    Os 3 cards são os documentos mais representativos do MESMO filtro que define
-    o tema (`tema_busca`: por Assunto curado ou busca textual) — exatamente o que
+    Os 2 cards (1 linha) são os documentos mais representativos do MESMO filtro
+    que define o tema (`tema_busca`: por Assunto curado ou busca textual) — o que
     alimenta o link "Ver tema no acervo" e a contagem do card. Assim o preview é
     sempre uma amostra do que o usuário vê ao clicar, nunca fora do tema. Lista
     vazia se o tema não tem documentos — a home oculta o bloco (antes caía para
@@ -83,7 +74,7 @@ def _docs_do_tema(tema):
         base = Document.objects.filter(status="a", assunto_id=params["assunto_id"]).order_by("-created", "-pk")
     else:
         base = search_documents(params["q"])  # ordenado por relevância (-rank)
-    return list(base[:4])
+    return list(base[:2])
 
 
 def home(request):
@@ -91,15 +82,19 @@ def home(request):
     colecoes_v6 = colecao_v6_overview()
     tematicos = cards_tematicos_overview()
 
-    # "Explorar o acervo": 4 coleções formais + cards temáticos que têm resultados
-    # (oculta o card temático cuja busca não retorna documentos — sem beco sem saída).
+    # "Explorar o acervo" (Item 1): apenas as 4 Coleções formais como cards.
     cards_explorar = [_card_colecao(c) for c in colecoes_v6]
-    cards_explorar += [_card_tematico(t) for t in tematicos if t["count"] > 0]
+    # Os temas viram chips-âncora p/ a seção "Temas em alta" (mesma fonte:
+    # cards_tematicos_overview, já em `tematicos`), com slug p/ a âncora.
+    # Só os com resultados (count > 0): alinha com `temas_em_alta` (filtrado por
+    # docs abaixo) e evita chip-âncora para um bloco que não foi renderizado.
+    chips_temas = [t for t in tematicos if t["count"] > 0]
 
     # "Temas em Alta": um bloco por tema, com até 3 documentos em destaque. O link
     # "Ver tema" usa o mesmo filtro do card (Assunto curado ou texto).
     temas_em_alta = [
         {
+            "slug": t["slug"],
             "label": t["label"],
             "intro": t["alta_intro"],
             "icon": t["icon"],
@@ -156,6 +151,7 @@ def home(request):
     return render(request, "home.html", {
         "colecoes_v6": colecoes_v6,
         "cards_explorar": cards_explorar,
+        "chips_temas": chips_temas,
         "cards_etapas": cards_etapas,
         "cards_transversais": cards_transversais,
         "temas_em_alta": temas_em_alta,

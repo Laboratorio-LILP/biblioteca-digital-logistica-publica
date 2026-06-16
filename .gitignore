@@ -227,6 +227,9 @@ migration/*.log
 .claude/settings.local.json
 .claude/worktrees/
 
+# Superpowers — mockups/brainstorm local (não versionar)
+.superpowers/
+
 # Backups locais de manutenção (não versionar)
 *.bak-*
 *preflip*

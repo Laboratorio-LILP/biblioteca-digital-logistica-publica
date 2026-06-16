@@ -68,9 +68,26 @@
       </div>
       <a class="sp-button-secondary" href="{% url 'catalog:collection_list' %}">Consultar Coleções <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
-    <div class="collections-grid">
+
+    <p class="subsection-label">Coleções</p>
+    <div class="collections-grid collections-grid--quatro">
       {% for card in cards_explorar %}{% include "_partials/_collection_card.html" %}{% endfor %}
     </div>
+
+    {% if chips_temas %}
+    <p class="subsection-label">Temas em alta</p>
+    <div class="temas-chips">
+      {% for chip in chips_temas %}
+      <a class="tema-chip" href="#tema-{{ chip.slug }}" data-tema-target="{{ chip.slug }}">
+        <span class="tema-chip__ic {{ chip.color }}" aria-hidden="true"><svg class="fi"><use href="#{{ chip.icon }}"/></svg></span>
+        <span class="tema-chip__txt">
+          <span class="tema-chip__lab">{{ chip.label }}</span>
+          <span class="tema-chip__count">{{ chip.count }} {{ chip.count|pluralize_pt:"documento" }}</span>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
 </section>
 
@@ -98,7 +115,7 @@
       {% endfor %}
     </ol>
     {% if cards_transversais %}
-    <p class="etapas-trans-head">Visões transversais</p>
+    <p class="subsection-label">Visões transversais</p>
     <div class="etapas-trans">
       {% for card in cards_transversais %}
       <a class="etapa-chip" href="{{ card.href }}">
@@ -116,7 +133,7 @@
   <div class="sp-container temas-em-alta">
     <span class="eyebrow">Temas em alta</span>
     {% for tema in temas_em_alta %}
-    <div class="tema-grupo">
+    <div class="tema-grupo" id="tema-{{ tema.slug }}" data-tema="{{ tema.slug }}">
       <div class="tema-grupo__cab">
         <h2 class="tema-grupo__titulo">
           <span class="tema-grupo__icone {{ tema.color }}" aria-hidden="true"><svg class="fi"><use href="#{{ tema.icon }}"/></svg></span>
@@ -130,6 +147,17 @@
       </div>
     </div>
     {% endfor %}
+    {% if temas_em_alta|length > 2 %}
+    <div class="temas-em-alta__more">
+      <button type="button" class="sp-button-secondary is-hidden" data-mais-temas>
+        <svg class="fi" aria-hidden="true"><use href="#fi-plus-circle"/></svg> Carregar mais temas
+      </button>
+    </div>
+    {% endif %}
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/home.js' %}" defer></script>
 {% endblock %}
