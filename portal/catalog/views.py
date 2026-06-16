@@ -86,7 +86,9 @@ def home(request):
     cards_explorar = [_card_colecao(c) for c in colecoes_v6]
     # Os temas viram chips-âncora p/ a seção "Temas em alta" (mesma fonte:
     # cards_tematicos_overview, já em `tematicos`), com slug p/ a âncora.
-    chips_temas = tematicos
+    # Só os com resultados (count > 0): alinha com `temas_em_alta` (filtrado por
+    # docs abaixo) e evita chip-âncora para um bloco que não foi renderizado.
+    chips_temas = [t for t in tematicos if t["count"] > 0]
 
     # "Temas em Alta": um bloco por tema, com até 3 documentos em destaque. O link
     # "Ver tema" usa o mesmo filtro do card (Assunto curado ou texto).
