@@ -16,7 +16,7 @@ O portal é **sub-path-agnóstico** (`FORCE_SCRIPT_NAME`): roda na raiz em dev e
 ## Pré-requisitos
 
 - Docker + Docker Compose.
-- `make` + `bash` — no Windows, via **WSL** ou **Git Bash**. (Os alvos `tunnel-*` do Makefile são exclusivos de macOS.)
+- `make` + `bash` — no Windows, via **WSL** ou **Git Bash**.
 
 ## Quickstart (dev local)
 

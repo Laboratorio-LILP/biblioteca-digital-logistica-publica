@@ -2,18 +2,28 @@
 
 Biblioteca Digital de Logística Pública (BDLP), frente prioritária do LILP e **repo-modelo** do laboratório. Este arquivo é a camada de **Instruções da frente** para o Claude Code; viaja com o repositório.
 
+## Limites de segurança — inegociáveis
+
+Valem integralmente os limites do `LILP/CLAUDE.md` transversal e do ADR-006 da vault (reunião
+CTI de 30/06/2026): sem túneis, sem alterações de firewall, sem PowerShell em host corporativo,
+sem acesso a servidores — acesso é restrito a TI/PRODESP e a VPN é a via única de acesso remoto.
+O mecanismo de homologação sem VPN desta frente (túnel como serviço + watchdog) está **proscrito
+e em desmonte**: não reativar, não recriar, não "consertar". A subida dev→homologação passa a
+ser por esteira GitHub Actions sobre o Git corporativo (em validação). Se algo estiver
+inacessível, a resposta correta é parar e registrar solicitação à equipe de TI (Felipe/Diego).
+
 ## Rito de sessão
-O **rito transversal** (abertura/durante/fechamento, regra de ouro, precedência) vive em `LILP/CLAUDE.md` na árvore OneDrive e carrega sozinho quando se trabalha lá. **Este clone canônico fica FORA do OneDrive** (`C:\Projetos\Governo\…`, ADR-002), onde o arquivo transversal não é ancestral — então leia o rito e o estado direto na vault:
-- Vault: `C:\Users\bcgsantos\OneDrive - PRODESP\LILP\SGGD - SEGES - LILP\`
-- Rito + teoria: `…\Padrões\Arquitetura de Contexto.md` (+ `LILP\CLAUDE.md`)
-- Estado vivo do laboratório: `…\Mapa de Contexto Operacional.md`
-- **Estado desta frente (leia sempre):** `…\Portfólio\Mapa-Semente — Biblioteca Digital (BDLP).md`
+O **rito transversal** (abertura/durante/fechamento, regra de ouro, precedência) vive em `LILP/CLAUDE.md` na árvore OneDrive e carrega sozinho quando se trabalha lá. **Este clone canônico fica FORA do OneDrive** (ADR-002; Mac é a máquina principal desde 23/06/2026: `~/Desktop/Projetos/Governo/…`; Windows legado: `C:\Projetos\Governo\…`), onde o arquivo transversal não é ancestral — então leia o rito e o estado direto na vault:
+- Vault (Mac): `~/Library/CloudStorage/OneDrive-PRODESP/LILP/SGGD - SEGES - LILP/` (Windows legado: `C:\Users\bcgsantos\OneDrive - PRODESP\LILP\SGGD - SEGES - LILP\`)
+- Rito + teoria: `…/Padrões/Arquitetura de Contexto.md` (+ `LILP/CLAUDE.md`)
+- Estado vivo do laboratório: `…/Mapa de Contexto Operacional.md`
+- **Estado desta frente (leia sempre):** `…/Portfólio/Mapa-Semente — Biblioteca Digital (BDLP).md`
 
 ## O que é
 Portal Django (busca/facetas) + Nou-Rau (catálogo/curadoria) + Postgres, em três contêineres Docker (compose `lilp-bdlp`). Acervo v8 (**406 docs** canônicos desde 16/06/2026). Homologação no ar e endurecida na VM da SGGD, atrás da borda `index.php` (proxy reverso, subcaminho `/Biblioteca/`).
 
 ## Onde isto roda
-- **Clone canônico:** este repo, em `C:\Projetos\Governo\biblioteca-digital-logistica-publica` (fora do OneDrive, ADR-002).
+- **Clone canônico:** este repo, em `~/Desktop/Projetos/Governo/biblioteca-digital-logistica-publica` no Mac (máquina principal; no Windows legado: `C:\Projetos\Governo\…`) — fora do OneDrive, ADR-002.
 - **Remoto:** `github.com/Laboratorio-LILP/biblioteca-digital-logistica-publica`. CI (ruff + pytest + `manage.py check --deploy`) roda nos PRs.
 - **VM de homologação:** SSH alias `bdlp-vm` (key-based; usuário `bernardosantos:webdev`). Tudo em loopback (portal 8010, nourau 8082, postgres 5433; ADR-0008); só `:80` pública; `DEBUG=false` em HTTP, CSP ligada.
 

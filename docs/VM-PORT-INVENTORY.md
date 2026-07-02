@@ -1,6 +1,6 @@
 # Inventário de portas da VM de homologação
 
-Mapa de portas da VM de homologação on-premise da SGGD (hostname `vademecumlicitacoes`), referenciado pelo [ADR 0008](adr/0008-portas-loopback.md).
+Mapa de portas da VM de homologação on-premise da SGGD, referenciado pelo [ADR 0008](adr/0008-portas-loopback.md).
 
 **Postura de segurança:** todos os serviços do BDLP escutam em **loopback** (`127.0.0.1`); a **única porta pública é a `:80`** (a borda `index.php`/Apache, ver `deploy/edge/`). O `ufw` está inativo — a proteção depende do perímetro da SGGD (o firewall externo libera só a `:80`).
 
