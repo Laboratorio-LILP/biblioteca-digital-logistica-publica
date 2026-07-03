@@ -29,7 +29,7 @@ A VM é compartilhada. Estes serviços **não** são do BDLP; ficam aqui só par
 |---|---|---|
 | `3306` | MySQL/MariaDB (XAMPP) | o BDLP usa Postgres, não isto |
 | `21` | FTP/ProFTPD (XAMPP) | texto puro; provável default ligado à toa |
-| `8080` | vademecum_node | projeto separado |
+| `8080` | app Node de outro projeto | fora de escopo |
 | `10050` | Zabbix agent | monitoramento |
 | `22` | SSH | acesso à VM (necessário) |
 | `443` | Apache-SSL | não alcançável pelo perímetro (só a `:80` é liberada) |

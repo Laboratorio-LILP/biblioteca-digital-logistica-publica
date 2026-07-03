@@ -28,7 +28,7 @@ services:
       - caddy_config:/config
       - caddy_logs:/var/log/caddy
     environment:
-      DOMAIN: ${DOMAIN:?DOMAIN obrigatório no .env (ex.: 140.238.202.105.sslip.io)}
+      DOMAIN: ${DOMAIN:?DOMAIN obrigatório no .env (ex.: <IP>.sslip.io)}
       APP_PATH: ${APP_PATH:-Biblioteca}
     depends_on:
       - portal

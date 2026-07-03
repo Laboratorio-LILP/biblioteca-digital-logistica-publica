@@ -55,7 +55,7 @@ Deve mostrar: 504 documentos arquivados, distribuição 3/12/151/338.
 
 ## Passo 7 — Demonstrar o Nou-Rau (http://localhost:8080/manager)
 
-1. Login: usuário `admin`, senha `admin`.
+1. Login: usuário `admin`, senha `admin` (seed de demonstração — **trocar no deploy**; nunca manter em homologação/produção, ver `docs/DEPLOY.md`).
 2. Mostrar a lista de documentos catalogados (504 registros).
 3. Abrir um documento para mostrar os metadados.
 
@@ -92,7 +92,7 @@ docker compose --env-file .env -f docker/docker-compose.yml exec postgres psql -
 ```
 
 ### Esqueceu a senha do Nou-Rau
-Login: `admin` / Senha: `admin`
+Login: `admin` / Senha: `admin` (seed local de demo — em homologação/produção a credencial deve estar rotacionada, ver `docs/DEPLOY.md`)
 
 ---
 

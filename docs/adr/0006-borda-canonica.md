@@ -2,7 +2,7 @@
 
 - **Status:** Aceito (2026-06-16). Revisado no mesmo dia após esclarecimento: a borda é **diferente por estágio, por design** — não é acidente a corrigir.
 - **Contexto:**
-  - **Homologação** roda numa VM interna da SGGD, **não exposta à internet**, com **apenas a porta 80 aberta** (precaução de segurança do servidor). O front-controller `index.php` (autor `faoportela`) recebe tudo na `:80` e roteia cada sistema do LILP para sua porta loopback (`/Biblioteca` → portal em `127.0.0.1:8010`). É uma **característica fixa desse servidor**, compartilhado por vários sistemas do laboratório.
+  - **Homologação** roda numa VM interna da SGGD, **não exposta à internet**, com **apenas a porta 80 aberta** (precaução de segurança do servidor). O front-controller `index.php` (autoria da TI — Felipe) recebe tudo na `:80` e roteia cada sistema do LILP para sua porta loopback (`/Biblioteca` → portal em `127.0.0.1:8010`). É uma **característica fixa desse servidor**, compartilhado por vários sistemas do laboratório.
   - **Produção (Prodesp)** será um ambiente distinto, ainda **a definir com a Prodesp** — não necessariamente igual à homologação.
   - Antes desta decisão, o `index.php` não estava versionado (infra manual) e o `docker/Caddyfile` versionado dava a entender, erroneamente, ser "a borda de produção".
 

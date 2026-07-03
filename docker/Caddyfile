@@ -3,7 +3,7 @@
 # sob /{$APP_PATH}/ e recompõe as URLs via FORCE_SCRIPT_NAME (handle_path remove
 # o prefixo antes de repassar). {$DOMAIN} e {$APP_PATH} vêm do ambiente
 # (docker-compose.prod.yml). sslip.io serve enquanto não houver domínio próprio
-# (ex.: 140.238.202.105.sslip.io aponta para 140.238.202.105).
+# (ex.: <IP>.sslip.io aponta para <IP>).
 
 {$DOMAIN} {
     encode zstd gzip

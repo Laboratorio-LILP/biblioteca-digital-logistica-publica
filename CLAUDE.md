@@ -14,33 +14,35 @@ inacessível, a resposta correta é parar e registrar solicitação à equipe de
 
 ## Rito de sessão
 O **rito transversal** (abertura/durante/fechamento, regra de ouro, precedência) vive em `LILP/CLAUDE.md` na árvore OneDrive e carrega sozinho quando se trabalha lá. **Este clone canônico fica FORA do OneDrive** (ADR-002; Mac é a máquina principal desde 23/06/2026: `~/Desktop/Projetos/Governo/…`; Windows legado: `C:\Projetos\Governo\…`), onde o arquivo transversal não é ancestral — então leia o rito e o estado direto na vault:
-- Vault (Mac): `~/Library/CloudStorage/OneDrive-PRODESP/LILP/SGGD - SEGES - LILP/` (Windows legado: `C:\Users\bcgsantos\OneDrive - PRODESP\LILP\SGGD - SEGES - LILP\`)
+- Vault (Mac): `~/Library/CloudStorage/OneDrive-PRODESP/LILP/SGGD - SEGES - LILP/` (Windows legado: `C:\Users\<usuario>\OneDrive - PRODESP\LILP\SGGD - SEGES - LILP\`)
 - Rito + teoria: `…/Padrões/Arquitetura de Contexto.md` (+ `LILP/CLAUDE.md`)
 - Estado vivo do laboratório: `…/Mapa de Contexto Operacional.md`
 - **Estado desta frente (leia sempre):** `…/Portfólio/Mapa-Semente — Biblioteca Digital (BDLP).md`
 
 ## O que é
-Portal Django (busca/facetas) + Nou-Rau (catálogo/curadoria) + Postgres, em três contêineres Docker (compose `lilp-bdlp`). Acervo v8 (**406 docs** canônicos desde 16/06/2026). Homologação no ar e endurecida na VM da SGGD, atrás da borda `index.php` (proxy reverso, subcaminho `/Biblioteca/`).
+Portal Django (busca/facetas) + Nou-Rau (catálogo/curadoria) + Postgres, em três contêineres Docker (compose `lilp-bdlp`). Acervo v8 (**507 docs** canônicos — lote 4, 16/06/2026; o número vivo está no Mapa-Semente da frente). Homologação no ar e endurecida na VM da SGGD, atrás da borda `index.php` (proxy reverso, subcaminho `/Biblioteca/`).
 
 ## Onde isto roda
 - **Clone canônico:** este repo, em `~/Desktop/Projetos/Governo/biblioteca-digital-logistica-publica` no Mac (máquina principal; no Windows legado: `C:\Projetos\Governo\…`) — fora do OneDrive, ADR-002.
 - **Remoto:** `github.com/Laboratorio-LILP/biblioteca-digital-logistica-publica`. CI (ruff + pytest + `manage.py check --deploy`) roda nos PRs.
-- **VM de homologação:** SSH alias `bdlp-vm` (key-based; usuário `bernardosantos:webdev`). Tudo em loopback (portal 8010, nourau 8082, postgres 5433; ADR-0008); só `:80` pública; `DEBUG=false` em HTTP, CSP ligada.
+- **VM de homologação** (operada por TI/PRODESP; acesso direto do desenvolvedor descontinuado — ADR-006): stack em loopback (portal 8010, nourau 8082, postgres 5433; ADR-0008); só `:80` pública; `DEBUG=false` em HTTP, CSP ligada. Subida dev→homolog: esteira GitHub Actions (em validação).
 
 ## Decisões de arquitetura (ADRs do repo, em `docs/adr/`)
 - **0006** — borda por estágio: a `index.php` é a borda de homologação (servidor interno SGGD); Caddy = referência opcional; borda de produção na Prodesp a definir.
-- **0007** — canal de homologação.
+- **0007** — canal de homologação (parte Dev Tunnels **revogada** em 02/07/2026 — ver nota de status no próprio ADR; canal canônico: VM via VPN + esteira GitHub Actions).
 - **0008** — portas em loopback (**substitui** a orientação do ADR-004 da vault de expor à web).
 
 A borda de homologação (`index.php`/`.htaccess`) agora é **versionada** em `deploy/edge/` (não é mais só infra do Felipe na VM). Os ADRs transversais do laboratório (numerados `ADR-NNN`) vivem na vault; estes (`000N`) são específicos do repo.
 
 ## Gotchas (não tropece)
-- **Segredos por env, sem fallback** (endurecimento do PR #16): o compose **falha** se as senhas não estiverem no `.env` (sem `abc123`/`portal_reader_dev`). `PORTAL_DB_PASSWORD` é obrigatória — a role `portal_reader` é criada por env no init; sem ela o portal dá 500.
+- **Segredos por env, sem fallback** (endurecimento do PR #16): o compose **falha** se as senhas não estiverem no `.env` (sem os defaults fracos de dev). `PORTAL_DB_PASSWORD` é obrigatória — a role `portal_reader` é criada por env no init; sem ela o portal dá 500.
 - O volume `lilp-bdlp_pgdata` **persiste por nome de projeto**, não por pasta — base limpa exige `docker volume rm lilp-bdlp_pgdata`.
 - A **taxonomia (coleções) vem dos init scripts do clone** — clone defasado semeia coleções BDU velhas; precisa estar na `main` para a v8.
-- Carregar acervo: `docker exec lilp-bdlp-portal-1 python manage.py migrate_spreadsheet <xlsx> --sheet "Inserir Material"` **sem `--skip-red`**. Planilha-fonte v8 FINAL (406): `Enriquecimento 499 v8 2026-06-11/BDLP_406_v8_FINAL.xlsx` (na pasta de docs da frente). Runbook: `tools/db-refresh.md`.
+- Carregar acervo: `docker exec lilp-bdlp-portal-1 python manage.py migrate_spreadsheet <xlsx> --sheet "Inserir Material"` **sem `--skip-red`**. Planilha-fonte vigente: **`BDLP_507_v8_FINAL.xlsx`** (raiz da pasta da frente + pasta de enriquecimento). Antes de carregar, confirme a planilha canônica no Mapa-Semente — a `BDLP_406_v8_FINAL.xlsx` está superada desde 16/06. Runbook: `tools/db-refresh.md`.
 - Build: **`requirements.lock`** (versões travadas); o Dockerfile instala do lock.
-- Portas por ambiente: **local Windows** `PORTAL_PORT=8001` (8000 reservada pelo kernel); **VM** 8010/8082/5433.
+- Portas por ambiente: **local Mac (principal)** — defaults do compose (portal 8000, nourau 8080, postgres 5432); **Windows legado** `PORTAL_PORT=8001` (8000 reservada pelo kernel); **VM** 8010/8082/5433.
+- **Worktrees em `.claude/worktrees/` são gitignorados** — invisíveis ao `git status`, mas são cópias completas do repo em disco. Em varreduras de segurança/limpeza, confira `git worktree list`.
+- Após mudanças de segurança no repo, **reconcilie o `.env` local com o `.env.example`** — o `.env` não versionado pode reter configuração antiga (ex.: hosts extras em `ALLOWED_HOSTS`).
 
 ## Subir local
 `make up` → carregar acervo (`migrate_spreadsheet --sheet "Inserir Material"`) → `make validate`. Ver `docs/DEPLOY.md`, `docs/CHECKLIST-MODELO.md` e `README.md`.
