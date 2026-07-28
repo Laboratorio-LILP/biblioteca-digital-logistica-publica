@@ -8,6 +8,8 @@ Uso:
 from django.core.management.base import BaseCommand
 from django.db import connection
 
+from catalog.taxonomy_v6 import COLECOES_V6, colecao_v6_for_tipo
+
 
 class Command(BaseCommand):
     help = "Valida integridade dos dados importados no Nou-Rau"
@@ -68,20 +70,30 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(self.style.SUCCESS("\n  Sem códigos duplicados."))
 
-            # Documentos por coleção
+            # Documentos por coleção v6 — derivada do Tipo de Informação com o
+            # MESMO mapeamento do portal (colecao_v6_for_tipo); a árvore de
+            # tópicos do Nou-Rau (topic) não reflete a coleção exibida.
             cursor.execute(
                 """
-                SELECT t.name, COUNT(d.id)
-                FROM topic t
-                LEFT JOIN nr_document d ON d.topic_id = t.id AND d.status = 'a'
-                WHERE t.parent_id = 0
-                GROUP BY t.name
-                ORDER BY t.name
+                SELECT ti.name, COUNT(d.id)
+                FROM nr_document d
+                JOIN type_information ti ON ti.id = d.typeinform_id
+                WHERE d.status = 'a'
+                GROUP BY ti.name
                 """
             )
+            por_colecao = {c["nome"]: 0 for c in COLECOES_V6}
+            for tipo_nome, count in cursor.fetchall():
+                por_colecao[colecao_v6_for_tipo(tipo_nome)["nome"]] += count
             self.stdout.write("\n  Documentos por coleção:")
-            for name, count in cursor.fetchall():
-                self.stdout.write(f"    {name}: {count}")
+            for nome, count in por_colecao.items():
+                self.stdout.write(f"    {nome}: {count}")
+            cursor.execute(
+                "SELECT COUNT(*) FROM nr_document WHERE typeinform_id IS NULL AND status = 'a'"
+            )
+            sem_tipo = cursor.fetchone()[0]
+            if sem_tipo:
+                self.stdout.write(self.style.WARNING(f"    (sem tipo de informação: {sem_tipo})"))
 
             # Documentos por categoria
             cursor.execute(
