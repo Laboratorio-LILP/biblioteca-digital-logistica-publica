@@ -41,7 +41,7 @@
 | C | `Filtros ativos ({N})` | Neutro, de estado | Meio-termo; "ativo" descreve o estado visível |
 
 ### Justificativa
-O painel é o **principal sinal de continuidade** da T3: após o refresh, a Laís vê em destaque o que escolheu. Prefixar o chip com a **dimensão que ela clicou** remove ambiguidade — um mesmo rótulo pode existir em dimensões diferentes (ex.: `Assunto: Governança` vs `Subcategoria: Governança e Logística`). Um prefixo por origem: tudo que sai da seção **Coleção** (tipos via `typeinform_id` + o "Toda a coleção" via `colecao_v6`) usa **`Coleção:`** — nunca `Tipo:` — porque é o nome do cabeçalho que ela clicou. O cabeçalho da seção é "Categorias" (plural, rotula o grupo); o chip nomeia **um** valor, então usa o singular `Categoria:`/`Subcategoria:` — escolha deliberada, não inconsistência. "Seus filtros" foi a escolha do time (10/06): atende a continuidade e o tratamento direto da LS, mesmo introduzindo o possessivo que a voz atual evitava.
+O painel é o **principal sinal de continuidade** da T3: após o refresh, a Laís vê em destaque o que escolheu. Prefixar o chip com a **dimensão que ela clicou** remove ambiguidade — rótulos iguais ou muito parecidos podem existir em dimensões diferentes (ex.: `Categoria: Gestão Contratual` vs `Subcategoria: Gestão de Contratos`). Um prefixo por origem: tudo que sai da seção **Coleção** (tipos via `typeinform_id` + o "Toda a coleção" via `colecao_v6`) usa **`Coleção:`** — nunca `Tipo:` — porque é o nome do cabeçalho que ela clicou. O cabeçalho da seção é "Categorias" (plural, rotula o grupo); o chip nomeia **um** valor, então usa o singular `Categoria:`/`Subcategoria:` — escolha deliberada, não inconsistência. "Seus filtros" foi a escolha do time (10/06): atende a continuidade e o tratamento direto da LS, mesmo introduzindo o possessivo que a voz atual evitava.
 
 ### A11y (WCAG2AA)
 - O `×` é **`<button type="button">`** focável (2.1.1 Teclado / 4.1.2 Nome-Papel-Valor); o glifo `#fi-x` leva `aria-hidden="true"` — o nome acessível vem só do `aria-label`.
@@ -167,17 +167,14 @@ As duas telas divergem hoje: `search.html` usa `Paginação dos resultados`/`Pá
 | PROCEDIMENTOS AUXILIARES | Procedimentos Auxiliares |
 | GESTÃO DE CONTRATOS | Gestão de Contratos |
 | FISCALIZAÇÃO DE CONTRATOS | Fiscalização de Contratos |
-| Governança e Logística | Governança e Logística *(idempotente — já ok)* |
-| Integridade e Controle | Integridade e Controle *(idempotente)* |
-| Políticas Públicas e Sustentabilidade | Políticas Públicas e Sustentabilidade *(idempotente)* |
-| Sistemas e Inovação | Sistemas e Inovação *(idempotente)* |
-| Direito e Regulação | Direito e Regulação *(idempotente)* |
+
+> **Taxonomia v9 (28/07/2026):** CONTEÚDOS TRANSVERSAIS não tem mais subcategorias — é nó folha, como PCA e Ciclo Completo. A dimensão temática desses documentos é o **Assunto**.
 
 ### Regras do filtro `titulo_pt`
 - **Conectores minúsculos** (exceto 1ª palavra): de, da, do, das, dos, e, em, na, no, a, o, para, por, com.
 - **Siglas preservadas** (allowlist): PCA, ETP, TR, TIC, RP, PMI, ODS, MPE.
 - **1ª letra maiúscula** nas palavras significativas; tratar separadores `/` e `-` (cada parte recebe Title Case; manter o espaçamento " - ").
-- **Idempotência:** rodar 2× não altera o resultado (as subcategorias de CONTEÚDOS TRANSVERSAIS já estão corretas — não podem ser quebradas).
+- **Idempotência:** rodar 2× não altera o resultado (rótulos já em caixa mista saem intactos).
 - **Microcategorias ficam como estão** *(decidido: aplicar a Categoria + Subcategoria; micros não)* — já vêm em caixa mista no seed ("Emergência - Inciso VIII", "Registro de Preços (RP)") com romanos/incisos que o filtro não deve mexer.
 
 ---

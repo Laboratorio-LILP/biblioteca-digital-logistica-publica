@@ -117,8 +117,8 @@ def titulo_pt(value):
       "Planejamento/Fase Preparatória"; "FASE PREPARATÓRIA - ETP" →
       "Fase Preparatória - ETP".
 
-    Idempotente: as subcategorias de "Conteúdos Transversais" já vêm em caixa
-    mista no seed e devem sair intactas (rodar 2x não muda nada).
+    Idempotente: aplicar o filtro 2x não muda o resultado — rótulos que já
+    estão em caixa mista saem intactos.
     """
     if not value:
         return value

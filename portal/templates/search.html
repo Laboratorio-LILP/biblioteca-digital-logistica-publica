@@ -73,7 +73,7 @@
       <details class="side-section"{% if filters.category_id or filters.subcategoria_id or filters.microcategoria_id %} open{% endif %}>
         <summary><h3>Categorias</h3></summary>
         <p class="side-section__hint">Cada categoria é uma etapa do processo de contratação pública.</p>
-        {# Toda categoria é um <details> expansível (mesmo sem subcategorias ainda, ex.: PCA, Ciclo Completo) — coesão visual entre os cabeçalhos. #}
+        {# Toda categoria é um <details> expansível (mesmo sem subcategorias, ex.: PCA, Ciclo Completo, Conteúdos Transversais) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
           <summary><span class="filter-group__label">{{ cat.nome|titulo_pt }}</span></summary>
