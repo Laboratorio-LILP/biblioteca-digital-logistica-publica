@@ -34,4 +34,5 @@ make validate
 ## Notas
 - O aviso `Colunas não encontradas: {'description'}` é a coluna "Nota" (removida no v8) — esperado.
 - Scripts de init (`docker/postgres/init/*`) só rodam em **volume novo**; mudanças neles (ex.: rename de categoria) exigem `UPDATE` manual num banco existente.
-- Acervo canônico atual: **406 docs** (v8 FINAL). Distribuição esperada por coleção: Doutrina 217 · Trabalhos Acadêmicos 152 · Instrução 31 · Jurisprudência 6.
+- **Taxonomia v9 (28/07/2026) é seed-only — sem SQL de migração.** A v9 removeu as 5 subcategorias de CONTEÚDOS TRANSVERSAIS do seed (a categoria virou nó folha; a dimensão temática é o Assunto). Caminho suportado: base inicializada com o seed v9 — em dev, recrie o volume (`docker volume rm lilp-bdlp_pgdata`; ele persiste por **nome de projeto**, não por pasta) e rode `make up` antes do full-refresh. Em homologação, a reimplantação formalizada à TI em 14/07 parte de clone novo + carga inicial, já com o seed v9. Uma base **antiga** que rode só o full-refresh mantém as 5 subcategorias órfãs na árvore (aparecem zeradas no front).
+- Acervo canônico atual: **507 docs** (planilha **`BDLP_507_v9_FINAL.xlsx`**, taxonomia v9). Distribuição esperada por coleção: Doutrina e Conteúdo Técnico 294 · Trabalhos Acadêmicos 153 · Instrução e Capacitação 49 · Jurisprudência 11.

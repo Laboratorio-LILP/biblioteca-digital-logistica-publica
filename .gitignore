@@ -226,6 +226,9 @@ migration/*.log
 # Claude Code — estado local da máquina (não versionar)
 .claude/settings.local.json
 .claude/worktrees/
+.claude/launch.json
+# Rascunhos locais de sessão na raiz (scripts temporários)
+.tmp_*
 
 # Superpowers — mockups/brainstorm local (não versionar)
 .superpowers/

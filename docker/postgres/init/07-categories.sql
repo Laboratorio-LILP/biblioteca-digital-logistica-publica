@@ -1,9 +1,12 @@
 --
--- Categorias PROCESSUAIS da contratação pública — taxonomia v8 (canônica, §7).
+-- Categorias PROCESSUAIS da contratação pública — taxonomia v9 (canônica, §7).
 -- 6 macroetapas da Lei 14.133/2021, fonte: aba "Árvore de Classificação" de
--- BDLP_Template_Insercao_v8.xlsx. Substituem as categorias temáticas v5
--- (que na v8 viraram ASSUNTO — ver 06-taxonomia.sql).
+-- BDLP_Template_Insercao_v9.xlsx. Substituem as categorias temáticas v5
+-- (que desde a v8 viraram ASSUNTO — ver 06-taxonomia.sql).
 -- Substituem também as categorias padrão do Nou-Rau (04-reset-nr.sql).
+-- v9 (decisão de 28/07/2026): CONTEÚDOS TRANSVERSAIS deixou de ter as 5
+-- subcategorias derivadas do Assunto e virou nó folha; a dimensão temática
+-- segue no campo Assunto, que não mudou.
 --
 
 -- Remover categorias padrão e dependências
@@ -37,12 +40,13 @@ FROM nr_category c, nr_format f
 WHERE f.extension IN ('pdf', 'doc', 'docx', 'html', 'htm', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'odt', 'ods', 'odp', 'epub');
 
 -- =====================================================================
--- Subcategorias e Microcategorias v8 (cascata sob a Categoria)
--- Fonte: aba "Árvore de Classificação" de BDLP_Template_Insercao_v8.xlsx.
+-- Subcategorias e Microcategorias v9 (cascata sob a Categoria)
+-- Fonte: aba "Árvore de Classificação" de BDLP_Template_Insercao_v9.xlsx.
 -- Semeadas aqui (e não em 06-taxonomia.sql) porque dependem de nr_category,
 -- que é populada acima neste mesmo arquivo. As tabelas já existem (criadas
 -- em 06-taxonomia.sql, que roda antes).
--- PCA e CICLO COMPLETO DA CONTRATAÇÃO não têm subcategoria.
+-- PCA, CICLO COMPLETO DA CONTRATAÇÃO e CONTEÚDOS TRANSVERSAIS não têm
+-- subcategoria (CONTEÚDOS TRANSVERSAIS desde a v9 — 28/07/2026).
 -- =====================================================================
 
 INSERT INTO nr_subcategoria (nome, slug, category_id, ordem)
@@ -56,12 +60,7 @@ FROM (VALUES
     ('CONTRATAÇÃO DIRETA', 'contratacao-direta', 'SELEÇÃO DO FORNECEDOR', 2),
     ('PROCEDIMENTOS AUXILIARES', 'procedimentos-auxiliares', 'SELEÇÃO DO FORNECEDOR', 3),
     ('GESTÃO DE CONTRATOS', 'gestao-de-contratos', 'GESTÃO CONTRATUAL', 1),
-    ('FISCALIZAÇÃO DE CONTRATOS', 'fiscalizacao-de-contratos', 'GESTÃO CONTRATUAL', 2),
-    ('Governança e Logística', 'governanca-e-logistica', 'CONTEÚDOS TRANSVERSAIS', 1),
-    ('Integridade e Controle', 'integridade-e-controle', 'CONTEÚDOS TRANSVERSAIS', 2),
-    ('Políticas Públicas e Sustentabilidade', 'politicas-publicas-e-sustentabilidade', 'CONTEÚDOS TRANSVERSAIS', 3),
-    ('Sistemas e Inovação', 'sistemas-e-inovacao', 'CONTEÚDOS TRANSVERSAIS', 4),
-    ('Direito e Regulação', 'direito-e-regulacao', 'CONTEÚDOS TRANSVERSAIS', 5)
+    ('FISCALIZAÇÃO DE CONTRATOS', 'fiscalizacao-de-contratos', 'GESTÃO CONTRATUAL', 2)
 ) AS v(nome, slug, cat, ordem)
 JOIN nr_category c ON c.name = v.cat
 ON CONFLICT (slug, category_id) DO NOTHING;

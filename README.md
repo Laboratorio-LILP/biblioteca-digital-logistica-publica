@@ -23,7 +23,7 @@ O portal é **sub-path-agnóstico** (`FORCE_SCRIPT_NAME`): roda na raiz em dev e
 ```bash
 cp .env.example .env        # ajuste os segredos (DJANGO_SECRET_KEY, senhas)
 make up                     # sobe postgres + nourau + portal
-make migrate FILE=/caminho/acervo.xlsx   # importa o acervo (usa --sheet "Inserir Material")
+make migrate FILE=/caminho/acervo.xlsx   # importa o acervo (só repassa FILE; a planilha vigente exige --sheet "Inserir Material" — ver tools/db-refresh.md)
 make validate               # valida a importação
 ```
 

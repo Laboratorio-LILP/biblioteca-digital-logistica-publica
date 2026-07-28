@@ -117,8 +117,8 @@ def titulo_pt(value):
       "Planejamento/Fase Preparatória"; "FASE PREPARATÓRIA - ETP" →
       "Fase Preparatória - ETP".
 
-    Idempotente: as subcategorias de "Conteúdos Transversais" já vêm em caixa
-    mista no seed e devem sair intactas (rodar 2x não muda nada).
+    Idempotente: aplicar o filtro 2x não muda o resultado — rótulos que já
+    estão em caixa mista saem intactos.
     """
     if not value:
         return value
@@ -343,8 +343,8 @@ def _chip_dimensao_valor(param, value):
     """(Dimensão legível, valor legível) para um filtro ativo.
 
     Tipos e coleção compartilham o prefixo "Coleção" (a seção da barra se chama
-    Coleção); Categoria/Subcategoria recebem Title Case (titulo_pt), coerente
-    com a T6; microcategoria fica como está.
+    Coleção); Categoria, Subcategoria e Microcategoria recebem o mesmo rótulo
+    das demais telas (titulo_pt/rotulo_sub — siglas e romanos preservados).
     """
     sid = _safe_int(value)
     if param == "colecao_v6":

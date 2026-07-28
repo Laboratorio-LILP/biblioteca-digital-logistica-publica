@@ -20,7 +20,7 @@ O **rito transversal** (abertura/durante/fechamento, regra de ouro, precedência
 - **Estado desta frente (leia sempre):** `…/Portfólio/Mapa-Semente — Biblioteca Digital (BDLP).md`
 
 ## O que é
-Portal Django (busca/facetas) + Nou-Rau (catálogo/curadoria) + Postgres, em três contêineres Docker (compose `lilp-bdlp`). Acervo v8 (**507 docs** canônicos — lote 4, 16/06/2026; o número vivo está no Mapa-Semente da frente). Homologação no ar e endurecida na VM da SGGD, atrás da borda `index.php` (proxy reverso, subcaminho `/Biblioteca/`).
+Portal Django (busca/facetas) + Nou-Rau (catálogo/curadoria) + Postgres, em três contêineres Docker (compose `lilp-bdlp`). Acervo com **507 docs** canônicos (lote 4, 16/06/2026; o número vivo está no Mapa-Semente da frente), taxonomia **v9** (28/07/2026 — CONTEÚDOS TRANSVERSAIS sem subcategorias; a dimensão temática é o Assunto). Homologação no ar e endurecida na VM da SGGD, atrás da borda `index.php` (proxy reverso, subcaminho `/Biblioteca/`).
 
 ## Onde isto roda
 - **Clone canônico:** este repo, em `~/Desktop/Projetos/Governo/biblioteca-digital-logistica-publica` no Mac (máquina principal; no Windows legado: `C:\Projetos\Governo\…`) — fora do OneDrive, ADR-002.
@@ -38,7 +38,7 @@ A borda de homologação (`index.php`/`.htaccess`) agora é **versionada** em `d
 - **Segredos por env, sem fallback** (endurecimento do PR #16): o compose **falha** se as senhas não estiverem no `.env` (sem os defaults fracos de dev). `PORTAL_DB_PASSWORD` é obrigatória — a role `portal_reader` é criada por env no init; sem ela o portal dá 500.
 - O volume `lilp-bdlp_pgdata` **persiste por nome de projeto**, não por pasta — base limpa exige `docker volume rm lilp-bdlp_pgdata`.
 - A **taxonomia (coleções) vem dos init scripts do clone** — clone defasado semeia coleções BDU velhas; precisa estar na `main` para a v8.
-- Carregar acervo: `docker exec lilp-bdlp-portal-1 python manage.py migrate_spreadsheet <xlsx> --sheet "Inserir Material"` **sem `--skip-red`**. Planilha-fonte vigente: **`BDLP_507_v8_FINAL.xlsx`** (raiz da pasta da frente + pasta de enriquecimento). Antes de carregar, confirme a planilha canônica no Mapa-Semente — a `BDLP_406_v8_FINAL.xlsx` está superada desde 16/06. Runbook: `tools/db-refresh.md`.
+- Carregar acervo: `docker exec lilp-bdlp-portal-1 python manage.py migrate_spreadsheet <xlsx> --sheet "Inserir Material"` **sem `--skip-red`**. Planilha-fonte vigente: **`BDLP_507_v9_FINAL.xlsx`** (raiz da pasta da frente). Antes de carregar, confirme a planilha canônica no Mapa-Semente — `BDLP_507_v8_FINAL.xlsx` e `BDLP_406_v8_FINAL.xlsx` estão superadas (taxonomia v9 desde 28/07/2026). Runbook: `tools/db-refresh.md`.
 - Build: **`requirements.lock`** (versões travadas); o Dockerfile instala do lock.
 - Portas por ambiente: **local Mac (principal)** — defaults do compose (portal 8000, nourau 8080, postgres 5432); **Windows legado** `PORTAL_PORT=8001` (8000 reservada pelo kernel); **VM** 8010/8082/5433.
 - **Worktrees em `.claude/worktrees/` são gitignorados** — invisíveis ao `git status`, mas são cópias completas do repo em disco. Em varreduras de segurança/limpeza, confira `git worktree list`.
