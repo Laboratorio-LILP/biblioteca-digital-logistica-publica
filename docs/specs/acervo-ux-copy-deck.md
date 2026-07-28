@@ -175,7 +175,7 @@ As duas telas divergem hoje: `search.html` usa `Paginação dos resultados`/`Pá
 - **Siglas preservadas** (allowlist): PCA, ETP, TR, TIC, RP, PMI, ODS, MPE.
 - **1ª letra maiúscula** nas palavras significativas; tratar separadores `/` e `-` (cada parte recebe Title Case; manter o espaçamento " - ").
 - **Idempotência:** rodar 2× não altera o resultado (rótulos já em caixa mista saem intactos).
-- **Microcategorias ficam como estão** *(decidido: aplicar a Categoria + Subcategoria; micros não)* — já vêm em caixa mista no seed ("Emergência - Inciso VIII", "Registro de Preços (RP)") com romanos/incisos que o filtro não deve mexer.
+- **Microcategorias também recebem `titulo_pt`** em todas as telas (cascata da busca, chips "Seus filtros" e página de detalhe) — o filtro preserva siglas e numerais romanos ("Emergência - Inciso VIII", "Registro de Preços (RP)"), então a caixa mista do seed sai correta. *(Atualizado 28/07/2026 — o texto anterior dizia "micros ficam como estão", mas a busca e os chips já aplicavam o filtro; o detalhe foi alinhado.)*
 
 ---
 
