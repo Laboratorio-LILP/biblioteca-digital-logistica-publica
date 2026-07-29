@@ -4,7 +4,7 @@
 {% block title %}Início — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 
 {% block content_raw %}
-<section class="hero">
+<section class="hero" data-sec="Busca no acervo">
   <div class="hero__pattern sp-pattern" aria-hidden="true"></div>
   <div class="sp-container hero__inner">
     <div class="hero__badge"><svg class="fi" aria-hidden="true"><use href="#fi-award"/></svg> Plataforma oficial de conhecimento e inovação pública</div>
@@ -42,7 +42,7 @@
   </div>
 </section>
 
-<section class="stats" aria-label="Indicadores do acervo">
+<section class="stats" data-sec="Acervo em números" aria-label="Indicadores do acervo">
   <div class="sp-container">
     <div class="section-heading stats__heading">
       <div>
@@ -59,7 +59,7 @@
   </div>
 </section>
 
-<section class="sp-section">
+<section class="sp-section" data-sec="Coleções e temas">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -91,7 +91,7 @@
   </div>
 </section>
 
-<section class="sp-section home-etapas">
+<section class="sp-section home-etapas" data-sec="Etapas da contratação">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -129,7 +129,7 @@
   </div>
 </section>
 
-<section class="sp-section sp-section--alt">
+<section class="sp-section sp-section--alt" data-sec="Temas em alta">
   <div class="sp-container temas-em-alta">
     <span class="eyebrow">Temas em alta</span>
     {% for tema in temas_em_alta %}
@@ -156,8 +156,10 @@
     {% endif %}
   </div>
 </section>
+{% include "_partials/_seta_secoes.html" %}
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/home.js' %}" defer></script>
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}

@@ -31,3 +31,17 @@ def test_parcial_da_seta_e_melhoria_progressiva():
     assert "aria-label" in parcial
     assert 'type="button"' in parcial
     assert "fi-chevron-down" in parcial
+
+
+def test_home_tem_5_ancoras_e_a_seta():
+    home = _template("home.html")
+    assert home.count("data-sec=") == 5
+    assert "_partials/_seta_secoes.html" in home
+    assert "js/seta-secoes.js" in home
+
+
+def test_colecoes_tem_3_ancoras_e_a_seta():
+    colecoes = _template("collection_list.html")
+    assert colecoes.count("data-sec=") == 3
+    assert "_partials/_seta_secoes.html" in colecoes
+    assert "js/seta-secoes.js" in colecoes
