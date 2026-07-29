@@ -6,6 +6,7 @@ duas páginas, ícones no sprite e blocos CSS/JS presentes.
 Spec: docs/superpowers/specs/2026-07-29-seta-secoes-design.md
 """
 
+import re
 from pathlib import Path
 
 PORTAL = Path(__file__).resolve().parents[2]
@@ -26,7 +27,7 @@ def test_sprite_tem_chevron_down_e_up():
 def test_parcial_da_seta_e_melhoria_progressiva():
     parcial = _template("_partials/_seta_secoes.html")
     assert "data-seta-secoes" in parcial
-    assert "hidden" in parcial  # sem JS, a seta não aparece
+    assert re.search(r"<button[^>]*\shidden[\s>]", parcial)  # sem JS, a seta não aparece
     assert "aria-label" in parcial
     assert 'type="button"' in parcial
     assert "fi-chevron-down" in parcial
