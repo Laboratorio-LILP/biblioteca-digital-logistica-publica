@@ -251,7 +251,7 @@ def search(request):
     paginator = Paginator(results, settings.SEARCH_RESULTS_PER_PAGE)
     page_obj = paginator.get_page(page_number)
 
-    facets = compute_facets(filters)
+    facets = compute_facets(filters, query=query or None)
 
     return render(request, "search.html", {
         "query": query,

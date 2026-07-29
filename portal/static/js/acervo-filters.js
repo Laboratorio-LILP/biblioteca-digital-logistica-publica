@@ -20,6 +20,17 @@
   // Grupos single-select (rádio); os demais (Assunto, Natureza, Tipo) são multi.
   var SINGLE_SELECT = new Set(["colecao_v6", "category_id", "subcategoria_id", "microcategoria_id"]);
 
+  // Dimensões da barra (espelham DIM_COLECAO/DIM_HIERARQUIA de facets.py): a
+  // contagem de cada nó exclui a dimensão inteira, então marcar um nó precisa
+  // LIMPAR os outros params da mesma dimensão — senão o servidor aplica AND
+  // (ex.: colecao_v6=A & typeinform_id=T de outra coleção) e a lista devolve 0
+  // contra o número prometido na barra. Dentro do próprio param, multi continua
+  // multi (Tipo) e single continua rádio (SINGLE_SELECT).
+  var DIMENSOES = [
+    ["colecao_v6", "typeinform_id"],
+    ["category_id", "subcategoria_id", "microcategoria_id"],
+  ];
+
   function clearGroup(name) {
     form.querySelectorAll('input[name="' + name + '"]').forEach(function (el) { el.checked = false; });
   }
@@ -87,8 +98,10 @@
       if (SINGLE_SELECT.has(param)) {
         form.querySelectorAll('input[name="' + param + '"]').forEach(function (el) { if (el !== t) el.checked = false; });
       }
-      if (param === "category_id") { clearGroup("subcategoria_id"); clearGroup("microcategoria_id"); }
-      else if (param === "subcategoria_id") { clearGroup("microcategoria_id"); }
+      DIMENSOES.forEach(function (dim) {
+        if (dim.indexOf(param) === -1) return;
+        dim.forEach(function (name) { if (name !== param) clearGroup(name); });
+      });
       submitSoon(40);
       return;
     }
