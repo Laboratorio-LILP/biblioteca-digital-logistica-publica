@@ -21,3 +21,12 @@ def test_sprite_tem_chevron_down_e_up():
     sprite = _template("_partials/_feather.html")
     assert 'id="fi-chevron-down"' in sprite
     assert 'id="fi-chevron-up"' in sprite
+
+
+def test_parcial_da_seta_e_melhoria_progressiva():
+    parcial = _template("_partials/_seta_secoes.html")
+    assert "data-seta-secoes" in parcial
+    assert "hidden" in parcial  # sem JS, a seta não aparece
+    assert "aria-label" in parcial
+    assert 'type="button"' in parcial
+    assert "fi-chevron-down" in parcial
