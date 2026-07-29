@@ -23,6 +23,8 @@
 
             this.uso = this.btn.querySelector('use');
             this.visiveis = [];
+            this.idx = 0;   // última seção corrente conhecida (retida quando nada intersecta)
+            this._renderizado = -1;
 
             this.btn.addEventListener('click', this.onClick.bind(this));
             this.observarSecoes();
@@ -41,6 +43,10 @@
                     var idx = self.secoes.indexOf(entries[i].target);
                     if (idx >= 0) self.visiveis[idx] = entries[i].isIntersecting;
                 }
+                for (var j = self.secoes.length - 1; j >= 0; j--) {
+                    if (self.visiveis[j]) { self.idx = j; break; }
+                }
+                // sem nenhuma visível (ex.: rodapé mais alto que o viewport), retém o último índice
                 self.atualizar();
             }, { rootMargin: '0px 0px -50% 0px', threshold: 0 });
             for (var i = 0; i < this.secoes.length; i++) {
@@ -49,10 +55,7 @@
         },
 
         correnteIdx: function () {
-            for (var i = this.secoes.length - 1; i >= 0; i--) {
-                if (this.visiveis[i]) return i;
-            }
-            return 0;
+            return this.idx;
         },
 
         naUltima: function () {
@@ -60,11 +63,15 @@
         },
 
         atualizar: function () {
+            var idx = this.correnteIdx();
+            if (idx === this._renderizado) return;
+            this._renderizado = idx;
+
             if (this.naUltima()) {
                 this.uso.setAttribute('href', '#fi-chevron-up');
                 this.btn.setAttribute('aria-label', 'Voltar ao topo');
             } else {
-                var proxima = this.secoes[this.correnteIdx() + 1];
+                var proxima = this.secoes[idx + 1];
                 this.uso.setAttribute('href', '#fi-chevron-down');
                 this.btn.setAttribute('aria-label', 'Ir para: ' + proxima.getAttribute('data-sec'));
             }
@@ -72,6 +79,7 @@
 
         onClick: function () {
             var alvo;
+            /* 'auto' delega ao scroll-behavior do CSS — o modo instantâneo em reduced-motion depende do override html { scroll-behavior: auto } no portal.css */
             if (this.naUltima()) {
                 alvo = this.secoes[0];
                 window.scrollTo({ top: 0, behavior: reduzMovimento() ? 'auto' : 'smooth' });
