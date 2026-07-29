@@ -54,3 +54,11 @@ def test_css_tem_componente_ancoras_e_offset_do_banner():
     assert "--sp-seta-offset" in css  # desvio do banner LGPD
     assert css.index(".sp-seta-secoes") > css.index(".sp-banner-cookies")  # bloco novo no fim
     assert ".sp-seta-secoes[hidden]" in css  # sem JS, o botão não pode virar tab stop fantasma
+
+
+def test_js_da_seta_existe_e_e_csp_safe():
+    js = (STATIC / "js" / "seta-secoes.js").read_text(encoding="utf-8")
+    assert "data-seta-secoes" in js
+    assert "data-sec" in js
+    assert "addEventListener" in js  # CSP-safe: sem handlers inline
+    assert "prefers-reduced-motion" in js
