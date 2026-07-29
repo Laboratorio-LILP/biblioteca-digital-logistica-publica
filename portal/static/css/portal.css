@@ -978,6 +978,7 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   transition: background-color 180ms ease, border-color 180ms ease,
               color 180ms ease, opacity 260ms ease, bottom 180ms ease;
 }
+.sp-seta-secoes[hidden] { display: none; }   /* [hidden] precisa vencer o display do componente (mesmo padrão do banner de cookies) */
 .sp-seta-secoes.is-on { opacity: 1; }
 /* Vermelho AA-safe no hover/foco (mesma regra do .sp-button-primary) */
 .sp-seta-secoes:hover, .sp-seta-secoes:focus-visible {

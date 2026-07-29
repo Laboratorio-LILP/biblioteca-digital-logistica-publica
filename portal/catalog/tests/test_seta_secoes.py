@@ -53,3 +53,4 @@ def test_css_tem_componente_ancoras_e_offset_do_banner():
     assert "[data-sec]" in css  # scroll-margin-top das âncoras
     assert "--sp-seta-offset" in css  # desvio do banner LGPD
     assert css.index(".sp-seta-secoes") > css.index(".sp-banner-cookies")  # bloco novo no fim
+    assert ".sp-seta-secoes[hidden]" in css  # sem JS, o botão não pode virar tab stop fantasma
