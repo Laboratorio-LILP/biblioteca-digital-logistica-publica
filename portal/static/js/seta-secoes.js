@@ -79,7 +79,9 @@
 
         onClick: function () {
             var alvo;
-            /* 'auto' delega ao scroll-behavior do CSS — o modo instantâneo em reduced-motion depende do override html { scroll-behavior: auto } no portal.css */
+            /* Em reduced-motion o ramo 'auto' rola instantâneo; o override
+               html { scroll-behavior: auto } no portal.css cobre o mesmo caso
+               para rolagens fora deste arquivo (cinto e suspensórios). */
             if (this.naUltima()) {
                 alvo = this.secoes[0];
                 window.scrollTo({ top: 0, behavior: reduzMovimento() ? 'auto' : 'smooth' });

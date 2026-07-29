@@ -992,9 +992,10 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   }
 }
 
-/* Anti-falso-fundo (Home): em telas baixas o hero encolhe para o título
-   "Acervo em números" espiar na dobra. Este bloco fica no fim do arquivo
-   de propósito: vence, pela ordem, o padding de 56px do media
+/* Anti-falso-fundo (Home): em telas baixas (inclusive mobile em retrato,
+   onde a redução é de só 4px) o hero encolhe para a seção "Acervo em
+   números" espiar na dobra. Este bloco fica no fim do arquivo de
+   propósito: vence, pela ordem, o padding de 56px do media
    (min-width: 1024px) da seção do hero. */
 @media (max-height: 900px) {
   .hero__inner { padding-block: 36px; }

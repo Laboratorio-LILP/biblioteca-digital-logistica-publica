@@ -117,6 +117,20 @@ Adicionar `fi-chevron-down` e `fi-chevron-up` ao sprite
   com ~800 px de altura para o peek do hero; `prefers-reduced-motion`.
 - CI (ruff + pytest puro + `check --deploy`) segue verde — a feature é só front.
 
+## Notas de execução (estado final difere em 4 detalhes)
+
+A execução (plano + revisões) refinou este design; o código vale sobre o texto acima:
+
+1. `tabindex="-1"` das âncoras é colocado pelo **JS no momento do foco**
+   (padrão `focar()` do `home.js`), não no template.
+2. Hover/foco da seta usa **`--sp-red-dark`** (#BD0E15, AA-safe com conteúdo
+   branco — mesma regra do `.sp-button-primary`), não `--sp-red`.
+3. O banner LGPD é observado por **MutationObserver (atributo `hidden`) +
+   listener de resize**, não ResizeObserver.
+4. Rótulos finais das âncoras: Home — "Busca no acervo", "Acervo em números",
+   "Coleções e temas", "Etapas da contratação", "Temas em alta"; Coleções —
+   "Coleções", "Como o acervo se organiza", "Como encontrar o que você procura".
+
 ## Rejeitado (e por quê)
 
 - **Scroll-snap/fullpage:** falso fundo em toda tela + barreiras de

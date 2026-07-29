@@ -12,6 +12,12 @@
 
 **Branch:** `feat/seta-secoes` (já criada, contém o spec).
 
+> **Nota de status (pós-execução):** o código inline abaixo é o da execução
+> original; o estado final difere em dois pontos corrigidos em revisão —
+> `.sp-seta-secoes[hidden] { display: none; }` no CSS (commit `4793f15`) e o
+> índice corrente retido no JS, no lugar do fallback 0 de `correnteIdx()`
+> (commit `a66efeb`). O código nos arquivos vale sobre o plano.
+
 ---
 
 ## Estrutura de arquivos
