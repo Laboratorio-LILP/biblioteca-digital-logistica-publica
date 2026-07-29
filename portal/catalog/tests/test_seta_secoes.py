@@ -45,3 +45,11 @@ def test_colecoes_tem_3_ancoras_e_a_seta():
     assert colecoes.count("data-sec=") == 3
     assert "_partials/_seta_secoes.html" in colecoes
     assert "js/seta-secoes.js" in colecoes
+
+
+def test_css_tem_componente_ancoras_e_offset_do_banner():
+    css = (STATIC / "css" / "portal.css").read_text(encoding="utf-8")
+    assert ".sp-seta-secoes" in css
+    assert "[data-sec]" in css  # scroll-margin-top das âncoras
+    assert "--sp-seta-offset" in css  # desvio do banner LGPD
+    assert css.index(".sp-seta-secoes") > css.index(".sp-banner-cookies")  # bloco novo no fim
