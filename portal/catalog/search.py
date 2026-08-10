@@ -110,8 +110,12 @@ def _apply_sort(qs, sort, default):
     return qs.order_by(default, "-pk")
 
 
-def search_documents(query, filters=None, sort=None):
-    """Busca full-text em português + filtros estruturados nos documentos arquivados.
+def apply_fulltext(qs, query):
+    """Restringe `qs` aos documentos que casam a busca textual, anotando `rank`.
+
+    É o critério ÚNICO de "casa a busca": compartilhado pela lista de
+    resultados (search_documents) e pela base das facetas (compute_facets).
+    Se divergirem, a contagem da barra lateral não bate com a lista exibida.
 
     O vetor inclui campos LILP (complexidade, uso_futuro, metodo, resultado)
     além dos clássicos title/keywords/author/abstract.
@@ -128,11 +132,12 @@ def search_documents(query, filters=None, sort=None):
         + SearchVector("complexidade", weight="D", config="portuguese")
     )
     search_query = SearchQuery(query, config="portuguese")
+    return qs.annotate(rank=SearchRank(vector, search_query)).filter(rank__gte=0.01)
 
-    qs = Document.objects.filter(status="a")
-    qs = qs.annotate(rank=SearchRank(vector, search_query))
-    qs = qs.filter(rank__gte=0.01)
 
+def search_documents(query, filters=None, sort=None):
+    """Busca full-text em português + filtros estruturados nos documentos arquivados."""
+    qs = apply_fulltext(Document.objects.filter(status="a"), query)
     qs = _apply_filters(qs, filters)
     return _apply_sort(qs, sort, default="-rank")
 

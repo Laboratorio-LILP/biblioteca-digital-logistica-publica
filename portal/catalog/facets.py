@@ -1,7 +1,9 @@
 """
 Faceted aggregation: para cada filtro disponível, calcula a contagem de documentos
-que satisfazem TODOS os outros filtros aplicados — exceto ele mesmo. Isso permite
-que o usuário troque um valor de filtro sem ficar com lista vazia.
+que satisfazem a busca textual (q) e TODOS os filtros das OUTRAS dimensões —
+excluindo a própria dimensão. Isso permite que o usuário troque ou some valores
+dentro de uma faceta sem zerar os irmãos, e garante que cada número da barra é
+"quantos documentos da busca atual têm este valor" (barra == lista ao clicar).
 """
 
 import unicodedata
@@ -16,8 +18,32 @@ from .models import (
     Subcategoria,
     TypeInformation,
 )
-from .search import _apply_filters, search_documents
+from .search import _apply_filters, apply_fulltext, search_documents
 from .taxonomy_v6 import COLECOES_V6, TEMAS_DESTAQUE, colecao_v6_for_tipo
+
+# Dimensões da barra lateral: cada faceta conta EXCLUINDO as chaves da própria
+# dimensão. Coleção e Tipo formam UMA dimensão (a coleção deriva do tipo) —
+# excluir só o tipo zeraria e travaria as outras coleções ao selecionar uma.
+DIM_COLECAO = ("colecao_v6", "typeinform_id")
+DIM_HIERARQUIA = ("category_id", "subcategoria_id", "microcategoria_id")
+
+
+def _sans(filters, keys):
+    """Filtros menos as chaves de uma dimensão (None-safe)."""
+    return {k: v for k, v in (filters or {}).items() if k not in keys}
+
+
+def _base_qs(query=None):
+    """Base comum das contagens: acervo ativo, restrito à busca textual quando há q.
+
+    Materializa UMA vez os ids que casam o full-text e reusa em todas as
+    facetas — evita repetir o ts_rank em cada agregação (acervo pequeno) e usa
+    o mesmo critério da lista de resultados (apply_fulltext)."""
+    qs = Document.objects.filter(status="a")
+    if query:
+        ids = list(apply_fulltext(qs, query).values_list("pk", flat=True))
+        qs = Document.objects.filter(status="a", pk__in=ids)
+    return qs
 
 
 def _sort_key(nome):
@@ -27,11 +53,9 @@ def _sort_key(nome):
     return "".join(c for c in decomp if not unicodedata.combining(c)).casefold()
 
 
-def _facet_counts(filters, exclude_key, group_by):
-    """Conta documentos agrupados por `group_by`, aplicando filters menos `exclude_key`."""
-    f = {k: v for k, v in (filters or {}).items() if k != exclude_key}
-    qs = Document.objects.filter(status="a")
-    qs = _apply_filters(qs, f)
+def _facet_counts(base, filters, exclude, group_by):
+    """Conta documentos de `base` agrupados por `group_by`, aplicando filters menos `exclude`."""
+    qs = _apply_filters(base, _sans(filters, exclude))
     return (
         qs.exclude(**{f"{group_by}__isnull": True})
         .values(group_by)
@@ -54,11 +78,9 @@ def _attach_names(rows, key, model, label_field="nome"):
     return out
 
 
-def _string_facet(filters, exclude_key, field):
+def _string_facet(base, filters, exclude, field):
     """Faceta para campo string. Retorna [{value, nome, count}] com chaves uniformes."""
-    f = {k: v for k, v in (filters or {}).items() if k != exclude_key}
-    qs = Document.objects.filter(status="a")
-    qs = _apply_filters(qs, f)
+    qs = _apply_filters(base, _sans(filters, exclude))
     rows = (
         qs.exclude(**{f"{field}__isnull": True})
         .exclude(**{field: ""})
@@ -75,9 +97,8 @@ def _string_facet(filters, exclude_key, field):
 
 def _colecao_v6_facet(filters):
     """Contagem por Coleção v6 (derivada do Tipo de Informação), faceta-aware."""
-    f = {k: v for k, v in (filters or {}).items() if k != "colecao_v6"}
     qs = Document.objects.filter(status="a")
-    qs = _apply_filters(qs, f)
+    qs = _apply_filters(qs, _sans(filters, DIM_COLECAO))
     rows = (
         qs.exclude(typeinform_id__isnull=True)
         .values("typeinform_id")
@@ -210,16 +231,17 @@ def cards_tematicos_overview():
     return out
 
 
-def _tipos_por_colecao_facet(filters):
+def _tipos_por_colecao_facet(base, filters):
     """Tipos de Informação agrupados por Coleção v6, em cascata. A seção é
     exibida na interface como 'Coleção' (substitui a faceta simples antiga).
 
     Cada grupo traz `slug` (para 'Toda a coleção' = colecao_v6), `total`
     (soma dos tipos = contagem da coleção, pois cada doc tem 1 tipo), `active`
     (abrir o <details> quando a coleção ou um de seus tipos está selecionado)
-    e os `tipos`. As 4 coleções aparecem sempre, como na faceta antiga."""
+    e os `tipos`. As 4 coleções aparecem sempre, como na faceta antiga.
+    Exclui a dimensão inteira (DIM_COLECAO): coleção e tipo são o mesmo eixo."""
     flat = _attach_names(
-        list(_facet_counts(filters, "typeinform_id", "typeinform_id")),
+        list(_facet_counts(base, filters, DIM_COLECAO, "typeinform_id")),
         "typeinform_id", TypeInformation, label_field="name",
     )
     by_col = {c["nome"]: [] for c in COLECOES_V6}
@@ -248,7 +270,7 @@ def _tipos_por_colecao_facet(filters):
     return out
 
 
-def _categorias_hierarquia_facet(filters):
+def _categorias_hierarquia_facet(base, filters):
     """Categoria → Subcategoria → Microcategoria — taxonomia COMPLETA sempre.
 
     Mostra todos os nós da árvore (mesmo com 0 documentos, exibidos `disabled`/
@@ -265,11 +287,11 @@ def _categorias_hierarquia_facet(filters):
     selecionado — o template usa para abrir os <details>.
     """
     f = filters or {}
-    # Base comum a todos os níveis: remove a hierarquia → contagens estáveis.
-    base = {k: v for k, v in f.items() if k not in ("category_id", "subcategoria_id", "microcategoria_id")}
+    # Filtros comuns a todos os níveis: sem a hierarquia → contagens estáveis.
+    outras_dim = _sans(f, DIM_HIERARQUIA)
 
     def counts_by(group_by):
-        qs = _apply_filters(Document.objects.filter(status="a"), base)
+        qs = _apply_filters(base, outras_dim)
         rows = qs.exclude(**{f"{group_by}__isnull": True}).values(group_by).annotate(count=Count("id"))
         return {r[group_by]: r["count"] for r in rows}
 
@@ -315,29 +337,33 @@ def _categorias_hierarquia_facet(filters):
     return out
 
 
-def compute_facets(filters):
-    """Devolve as facetas que a página de busca renderiza, dado o conjunto de filtros.
+def compute_facets(filters, query=None):
+    """Devolve as facetas que a página de busca renderiza, dados os filtros e a
+    busca textual (q). Com `query`, TODAS as contagens são calculadas dentro do
+    resultado do full-text — cada número da barra vira "quantos documentos da
+    sua busca atual têm este valor" (barra == lista ao clicar).
 
     Calcula só o que o `search.html` consome (Coleção, Categorias, Assunto,
     Natureza e os limites de Ano). As demais facetas planas (categorias/sub/
     micro/coleções/tipos/complexidade/permissão) eram servidas pelo antigo
     endpoint /api/facets/ — removido por não ter consumidor.
     """
+    base = _base_qs(query)
     facets = {}
 
     # Coleção (Tipos de Informação agrupados por Coleção v6, em cascata)
-    facets["tipos_por_colecao"] = _tipos_por_colecao_facet(filters)
+    facets["tipos_por_colecao"] = _tipos_por_colecao_facet(base, filters)
     # Categorias em cascata (accordion <details>): Categoria → Sub → Micro
-    facets["categorias_hierarquia"] = _categorias_hierarquia_facet(filters)
+    facets["categorias_hierarquia"] = _categorias_hierarquia_facet(base, filters)
     # Assunto (eixo transversal, multi-select)
     facets["assuntos"] = sorted(
         _attach_names(
-            list(_facet_counts(filters, "assunto_id", "assunto_id")), "assunto_id", Assunto
+            list(_facet_counts(base, filters, ("assunto_id",), "assunto_id")), "assunto_id", Assunto
         ),
         key=lambda a: _sort_key(a["nome"]),
     )
     # Natureza (objeto da contratação, v6)
-    facets["naturezas"] = _string_facet(filters, "natureza", "natureza")
+    facets["naturezas"] = _string_facet(base, filters, ("natureza",), "natureza")
 
     # Ano: limites ESTÁVEIS sobre o acervo inteiro (NÃO o conjunto filtrado), para
     # os campos De/Até não "pularem" ao aplicar outros filtros (evita o salto).
