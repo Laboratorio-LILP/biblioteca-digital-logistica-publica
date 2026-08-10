@@ -26,6 +26,16 @@
             this.idx = 0;   // última seção corrente conhecida (retida quando nada intersecta)
             this._renderizado = -1;
 
+            /* Estado de chegada (pílula "Veja mais"): só se a página abriu no
+               topo — o falso fundo não existe em página já rolada. Assenta no
+               primeiro gesto (aoRolar/onClick → assentar). */
+            this.chegada = window.scrollY <= 24;
+            if (this.chegada) {
+                this.btn.classList.add('is-chegada');
+                this._aoRolar = this.aoRolar.bind(this);
+                window.addEventListener('scroll', this._aoRolar, { passive: true });
+            }
+
             this.btn.addEventListener('click', this.onClick.bind(this));
             this.observarSecoes();
             this.observarBanner();
@@ -73,11 +83,13 @@
             } else {
                 var proxima = this.secoes[idx + 1];
                 this.uso.setAttribute('href', '#fi-chevron-down');
-                this.btn.setAttribute('aria-label', 'Ir para: ' + proxima.getAttribute('data-sec'));
+                var rotulo = this.chegada ? 'Veja mais: ' : 'Ir para: ';
+                this.btn.setAttribute('aria-label', rotulo + proxima.getAttribute('data-sec'));
             }
         },
 
         onClick: function () {
+            this.assentar();
             var alvo;
             /* Em reduced-motion o ramo 'auto' rola instantâneo; o override
                html { scroll-behavior: auto } no portal.css cobre o mesmo caso
@@ -90,6 +102,21 @@
                 alvo.scrollIntoView({ behavior: reduzMovimento() ? 'auto' : 'smooth', block: 'start' });
             }
             this.focar(alvo);   // teclado/leitor de tela acompanham a navegação
+        },
+
+        aoRolar: function () {
+            if (window.scrollY > 24) this.assentar();
+        },
+
+        /* Primeiro gesto: a pílula colapsa para o quadrado discreto e o
+           aria-label volta ao padrão "Ir para: …". Idempotente. */
+        assentar: function () {
+            if (!this.chegada) return;
+            this.chegada = false;
+            this.btn.classList.remove('is-chegada');
+            window.removeEventListener('scroll', this._aoRolar);
+            this._renderizado = -1;   // força re-render do aria-label
+            this.atualizar();
         },
 
         focar: function (el) {
