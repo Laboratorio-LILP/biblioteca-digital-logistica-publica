@@ -69,3 +69,10 @@ def test_parcial_tem_rotulo_de_chegada():
     assert "sp-seta-secoes__rotulo" in parcial
     assert "Veja mais" in parcial
     assert re.search(r"<button[^>]*\shidden[\s>]", parcial)  # melhoria progressiva intacta
+
+
+def test_css_tem_estado_de_chegada():
+    css = (STATIC / "css" / "portal.css").read_text(encoding="utf-8")
+    assert ".sp-seta-secoes.is-chegada" in css
+    assert ".sp-seta-secoes__rotulo" in css
+    assert "--sp-red-dark" in css[css.index(".sp-seta-secoes.is-chegada"):]  # pílula AA-safe

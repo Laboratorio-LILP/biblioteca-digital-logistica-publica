@@ -971,7 +971,8 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   /* --sp-seta-offset sobe a seta enquanto o banner LGPD está visível */
   bottom: calc(24px + var(--sp-seta-offset, 0px));
   z-index: 900;                            /* sob o banner de cookies (1000) */
-  width: 48px; height: 48px;
+  width: auto; min-width: 48px; height: 48px;
+  padding: 0;                              /* sem gap aqui: com o rótulo em max-width 0, um gap na base descentralizaria o chevron */
   display: inline-flex; align-items: center; justify-content: center;
   border: var(--border); border-radius: 6px;
   background: var(--sp-white); color: var(--sp-black);
@@ -979,7 +980,8 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   font-size: 20px;
   opacity: 0;                              /* revelado com fade via .is-on */
   transition: background-color 180ms ease, border-color 180ms ease,
-              color 180ms ease, opacity 260ms ease, bottom 180ms ease;
+              color 180ms ease, opacity 260ms ease, bottom 180ms ease,
+              padding 220ms ease, gap 220ms ease;
 }
 .sp-seta-secoes[hidden] { display: none; }   /* [hidden] precisa vencer o display do componente (mesmo padrão do banner de cookies) */
 .sp-seta-secoes.is-on { opacity: 1; }
@@ -988,9 +990,27 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   background: var(--sp-red-dark); border-color: var(--sp-red-dark); color: var(--sp-white);
 }
 
+/* Estado de chegada: pílula "Veja mais" até o primeiro gesto (scroll >24px
+   ou clique na seta) — depois assenta para o quadrado discreto acima.
+   Colapso anima por max-width/opacity do rótulo + padding do botão.
+   Spec: docs/superpowers/specs/2026-08-10-seta-enfase-chegada-design.md */
+.sp-seta-secoes__rotulo {
+  display: inline-block;
+  max-width: 0; overflow: hidden; white-space: nowrap;
+  opacity: 0;
+  font-family: var(--font-subtitle); font-weight: 600; font-size: 15px;
+  transition: max-width 220ms ease, opacity 180ms ease;
+}
+.sp-seta-secoes.is-chegada {
+  padding: 0 18px; gap: 8px;
+  background: var(--sp-red-dark); border-color: var(--sp-red-dark);
+  color: var(--sp-white);
+}
+.sp-seta-secoes.is-chegada .sp-seta-secoes__rotulo { max-width: 120px; opacity: 1; }
+
 @media (max-width: 767px) {
   .sp-seta-secoes {
-    width: 44px; height: 44px; right: 16px;
+    min-width: 44px; height: 44px; right: 16px;
     bottom: calc(16px + var(--sp-seta-offset, 0px)); font-size: 18px;
   }
 }
@@ -1009,5 +1029,5 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }          /* rolagem instantânea */
-  .sp-seta-secoes { transition: none; }
+  .sp-seta-secoes, .sp-seta-secoes__rotulo { transition: none; }
 }
