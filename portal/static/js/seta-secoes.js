@@ -78,6 +78,7 @@
             this._renderizado = idx;
 
             if (this.naUltima()) {
+                if (this.chegada) { this.assentar(); return; }   // pílula nunca coexiste com "Voltar ao topo" (WCAG 2.5.3)
                 this.uso.setAttribute('href', '#fi-chevron-up');
                 this.btn.setAttribute('aria-label', 'Voltar ao topo');
             } else {

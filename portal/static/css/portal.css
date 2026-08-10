@@ -972,7 +972,7 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   bottom: calc(24px + var(--sp-seta-offset, 0px));
   z-index: 900;                            /* sob o banner de cookies (1000) */
   width: auto; min-width: 48px; height: 48px;
-  padding: 0;                              /* sem gap aqui: com o rótulo em max-width 0, um gap na base descentralizaria o chevron */
+  padding: 0; gap: 0;                      /* gap explícito: 'normal' não interpola na transição; 0 mantém o chevron centrado com o rótulo em max-width 0 */
   display: inline-flex; align-items: center; justify-content: center;
   border: var(--border); border-radius: 6px;
   background: var(--sp-white); color: var(--sp-black);
@@ -992,7 +992,7 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
 
 /* Estado de chegada: pílula "Veja mais" até o primeiro gesto (scroll >24px
    ou clique na seta) — depois assenta para o quadrado discreto acima.
-   Colapso anima por max-width/opacity do rótulo + padding do botão.
+   Colapso anima por max-width/opacity do rótulo + padding/gap do botão.
    Spec: docs/superpowers/specs/2026-08-10-seta-enfase-chegada-design.md */
 .sp-seta-secoes__rotulo {
   display: inline-block;
