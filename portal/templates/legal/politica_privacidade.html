@@ -26,11 +26,11 @@
       </address>
       <h3 id="dpo">1.1 Encarregado de Proteção de Dados (DPO)</h3>
       <p>
-        A designação do Encarregado de Proteção de Dados (DPO) da SGGD,
-        conforme o art. 41 da LGPD, está em processo de formalização. Até a
-        publicação do contato direto, utilize o canal
+        A SGGD ainda está formalizando a designação do seu Encarregado de
+        Proteção de Dados (DPO), prevista no art. 41 da LGPD. Enquanto o
+        contato direto não é publicado, use o canal
         <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a> para
-        tratar de assuntos de proteção de dados pessoais.
+        tratar de proteção de dados pessoais.
       </p>
     </div>
   </div>
@@ -51,20 +51,22 @@
         funcionamento técnico e à medição agregada de uso:
       </p>
       <ul>
-        <li><strong>Logs técnicos de acesso</strong> — endereço IP (truncado),
+        <li><strong>Logs técnicos de acesso</strong> — endereço IP,
           data/hora, página solicitada, navegador (User-Agent) e código de
           resposta HTTP. Finalidade: segurança operacional, prevenção a
           ataques e estatísticas agregadas. Retenção: período conforme
           políticas de segurança da SGGD.</li>
-        <li><strong>Cookies estritamente necessários</strong> — utilizados
-          para sessões e proteção CSRF do Django. Não dependem de
+        <li><strong>Cookies estritamente necessários</strong> —
+          <code>csrftoken</code>, para proteção contra CSRF em formulários
+          (Django), e <code>sp-lgpd-consent</code>, que registra sua escolha
+          sobre cookies (em <em>localStorage</em>). Não dependem de
           consentimento.</li>
         <li><strong>Cookies opcionais</strong> — apenas se você aceitar no
           banner de cookies. Caso aceite, podem ser registradas estatísticas
           anônimas de navegação. Você pode revogar o consentimento a qualquer
           momento (veja a <a href="{% url 'catalog:politica_cookies' %}">Política
           de Cookies</a>).</li>
-        <li><strong>Dados informados em formulário Fale Conosco</strong> —
+        <li><strong>Dados enviados pelo canal Fale Conosco (e-mail)</strong> —
           nome, e-mail e mensagem que você nos enviar. Finalidade exclusiva:
           responder à sua solicitação. Base legal: art. 7º, V (execução de
           contrato) e art. 7º, II (cumprimento de obrigação legal) da LGPD.</li>
@@ -90,7 +92,7 @@
         <li><strong>Art. 7º, II</strong> — cumprimento de obrigação legal
           ou regulatória pelo controlador.</li>
         <li><strong>Art. 7º, III</strong> — execução de políticas públicas
-          previstas em lei (Lei nº 14.133/2021, Decreto Estadual 67.799/2023).</li>
+          previstas em lei (Lei nº 14.133/2021, Decreto Estadual nº 67.799/2023).</li>
         <li><strong>Art. 7º, V</strong> — execução de contrato ou
           procedimentos preliminares.</li>
         <li><strong>Art. 7º, IX</strong> — atendimento de interesses
@@ -136,8 +138,8 @@
     </div>
     <div class="sp-section__body sp-section__body--prosa">
       <p>
-        Conforme art. 18 da LGPD, você pode requerer ao controlador, a
-        qualquer momento e mediante requisição:
+        Conforme o art. 18 da LGPD, você pode pedir ao controlador, a
+        qualquer momento:
       </p>
       <ul>
         <li>Confirmação da existência de tratamento dos seus dados;</li>
@@ -153,7 +155,7 @@
       </ul>
       <p>
         Para exercer qualquer desses direitos, entre em contato com o DPO
-        através do canal indicado no item 2 desta política, ou por
+        por meio do canal indicado no item 1.1 desta política, ou por
         <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a>.
       </p>
     </div>
@@ -173,9 +175,9 @@
         O portal adota medidas técnicas e administrativas para proteger os
         dados pessoais contra acessos não autorizados, perda acidental,
         destruição ou difusão indevida. Entre as medidas: comunicação
-        criptografada (HTTPS), <em>headers</em> de segurança HTTP, política
-        de senhas para acesso administrativo, segregação de redes e backups
-        periódicos.
+        criptografada quando servido sob HTTPS, <em>headers</em> de
+        segurança HTTP, política de senhas para acesso administrativo,
+        segregação de redes e backups periódicos.
       </p>
     </div>
   </div>
@@ -193,9 +195,10 @@
       <p>
         Esta política pode ser atualizada para refletir mudanças legais,
         tecnológicas ou de processo. Sempre que houver alteração relevante,
-        a data de revisão será atualizada no rodapé desta página e
+        a data de revisão indicada nesta página será atualizada e
         eventualmente comunicada por aviso visual.
       </p>
+      <p><em>Última revisão: agosto de 2026.</em></p>
       <p><em>Esta política está em processo de validação jurídica e poderá ser atualizada.</em></p>
     </div>
   </div>

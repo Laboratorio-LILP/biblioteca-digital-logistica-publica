@@ -20,10 +20,10 @@
     <div class="sp-section__body sp-section__body--prosa">
       <p>
         O portal observa as recomendações do <strong>Modelo de Acessibilidade
-        em Governo Eletrônico (eMAG) versão 3.1</strong>, instituído pela
-        Portaria nº 3 de 7 de maio de 2007 do SISP, alinhado às
-        <strong>Web Content Accessibility Guidelines (WCAG) 2.0, nível AA</strong>
-        do W3C/WAI.
+        em Governo Eletrônico (eMAG)</strong>, institucionalizado no âmbito
+        do SISP pela Portaria nº 3, de 7 de maio de 2007 (SLTI/MP), na sua
+        versão 3.1 (2014), alinhado às <strong>Web Content Accessibility
+        Guidelines (WCAG) 2.0, nível AA</strong> do W3C/WAI.
       </p>
     </div>
   </div>
@@ -42,13 +42,13 @@
       <ul>
         <li><strong>A+</strong> — aumenta o tamanho da fonte da página, em incrementos.</li>
         <li><strong>A−</strong> — diminui o tamanho da fonte da página.</li>
-        <li><strong>Alto contraste</strong> — alterna paleta amarelo sobre preto (WCAG AAA).</li>
+        <li><strong>Alto contraste</strong> — ativa ou desativa o modo de alto contraste — texto amarelo sobre fundo preto (contraste no nível máximo, AAA, das diretrizes WCAG).</li>
         <li><strong>Comunicar erros</strong> — link para o canal oficial do Governo SP.</li>
       </ul>
       <p>
         As preferências de fonte e contraste são preservadas entre páginas
-        e visitas (via <em>localStorage</em> do seu navegador), enquanto você
-        não as alterar.
+        e visitas (gravadas no armazenamento local — <em>localStorage</em> —
+        do seu navegador), enquanto você não as alterar.
       </p>
     </div>
   </div>
@@ -64,11 +64,10 @@
     </div>
     <div class="sp-section__body sp-section__body--prosa">
       <p>
-        Em sistemas operacionais e navegadores que respeitam a tecla
-        <kbd>Alt</kbd> (ou combinação equivalente do seu sistema —
-        <kbd>Alt+Shift</kbd> em Firefox para Linux/Windows,
-        <kbd>Control+Option</kbd> em macOS), os seguintes atalhos saltam
-        diretamente para os blocos principais da página:
+        Os atalhos abaixo levam você direto aos blocos principais da
+        página. Use a tecla <kbd>Alt</kbd> junto com o número indicado.
+        Em alguns ambientes a combinação muda: <kbd>Alt+Shift</kbd> no
+        Firefox (Linux/Windows) e <kbd>Control+Option</kbd> no macOS.
       </p>
       <ul>
         <li><kbd>Alt</kbd> + <kbd>1</kbd> — ir para o conteúdo principal</li>
@@ -77,8 +76,9 @@
         <li><kbd>Alt</kbd> + <kbd>4</kbd> — ir para o rodapé</li>
       </ul>
       <p>
-        Estes atalhos também aparecem como links visíveis ao primeiro
-        <kbd>Tab</kbd> da página (skip-links), no canto superior esquerdo.
+        Estes atalhos também aparecem como links visíveis quando você
+        pressiona <kbd>Tab</kbd> pela primeira vez na página (os chamados
+        <em>skip-links</em>, links de salto), no canto superior esquerdo.
       </p>
     </div>
   </div>
@@ -97,12 +97,12 @@
         O portal foi estruturado com elementos semânticos HTML5
         (<code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>,
         <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>,
-        <code>&lt;footer&gt;</code>) e atributos ARIA quando necessário,
-        sendo testado com NVDA, JAWS e VoiceOver. Imagens decorativas
-        possuem <code>alt=""</code>; imagens informativas trazem texto
-        alternativo descritivo. A navegação por teclado segue ordem lógica
-        e cada elemento focável apresenta indicador visível com contraste
-        mínimo de 4.5:1.
+        <code>&lt;footer&gt;</code>) e atributos ARIA quando necessário. O
+        portal é testado com os leitores de tela NVDA, JAWS e VoiceOver.
+        Imagens decorativas possuem <code>alt=""</code>; imagens
+        informativas trazem texto alternativo descritivo. A navegação por
+        teclado segue ordem lógica e cada elemento focável apresenta
+        indicador visível com contraste mínimo de 4,5:1.
       </p>
     </div>
   </div>
@@ -119,14 +119,14 @@
     <div class="sp-section__body sp-section__body--prosa">
       <p>
         Caso você encontre alguma dificuldade para acessar conteúdo ou
-        utilizar funcionalidades deste portal, por favor avise nossa equipe.
+        utilizar funcionalidades deste portal, por favor, avise nossa equipe.
         Sua mensagem nos ajuda a corrigir problemas e melhorar
         continuamente.
       </p>
       <ul>
         <li>E-mail: <a href="mailto:lab.sggd@sp.gov.br?subject=Acessibilidade%20BDLP">lab.sggd@sp.gov.br</a></li>
-        <li>Canal central do Governo SP: <a href="https://www.saopaulo.sp.gov.br/fale-conosco/comunicar-erros/" target="_blank" rel="noopener noreferrer">Comunicar erros</a></li>
-        <li>Formulário interno: <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a></li>
+        <li>Fala.SP (manifestações e comunicações ao Governo de SP): <a href="https://fala.sp.gov.br/" target="_blank" rel="noopener noreferrer">fala.sp.gov.br</a></li>
+        <li>Página de contato: <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a></li>
       </ul>
     </div>
   </div>
