@@ -116,12 +116,29 @@ h1, h2, h3 { margin: 0; }
 .sp-container { width: min(1180px, calc(100% - 32px)); margin-inline: auto; }
 .sp-section { padding-block: var(--space-section); background: var(--sp-white); }
 .sp-section--alt { background: var(--sp-gray-light); }
+/* Banda de abertura do padrão de fundos (spec 2026-08-11): cinza-claro com o
+   quadriculado da home direto no background — alfa 0.03 ≈ 0.045 × opacity 0.7
+   do overlay .hero__pattern do hero. O breadcrumb vive DENTRO da banda; o
+   padding-top menor encosta a banda no header, como na home. */
+.sp-section--pattern {
+  padding-top: var(--space-4);
+  background-color: var(--sp-gray-light);
+  background-image:
+    linear-gradient(90deg, rgb(0 0 0 / 0.03) 1px, transparent 1px),
+    linear-gradient(180deg, rgb(0 0 0 / 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  border-bottom: var(--border);
+}
+.sp-section--pattern .breadcrumb { margin-bottom: var(--space-6); }
 /* O ritmo entre seções é dado só pelo padding da .sp-section — a margem residual
    do último filho (p, ul) somaria ao padding e alargaria o respiro daquela seção. */
 .sp-section .sp-container > :last-child { margin-bottom: 0; }
-/* Respiro generoso entre a última seção da Home e o rodapé (mesma medida das
-   páginas internas .page), convenção de sites consolidados. */
-main > .sp-section:last-child { padding-bottom: var(--space-page-bottom); }
+/* Respiro generoso entre a última seção e o rodapé (mesma medida das páginas
+   internas .page). :last-of-type, não :last-child — a seta-guia é incluída
+   depois da última seção em home/colecoes; a variante form > cobre a /busca/
+   (seções dentro do <form id="acervo-form">). */
+main > .sp-section:last-of-type,
+main > form > .sp-section:last-of-type { padding-bottom: var(--space-page-bottom); }
 .sp-title { font-family: var(--font-heading); font-weight: 700; letter-spacing: 0; }
 .sp-subtitle { font-family: var(--font-subtitle); font-weight: 600; letter-spacing: 0; }
 main { flex: 1 0 auto; }
@@ -773,6 +790,9 @@ main { flex: 1 0 auto; }
 
 /* Paginação */
 .pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; margin-top: 24px; }
+/* Paginação como primeiro conteúdo da banda de fechamento (busca/coleção):
+   o respiro vem do padding da banda, não da margem do componente. */
+.sp-section .pagination { margin-top: 0; }
 .page-btn { height: 40px; min-width: 40px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--sp-gray-medium); border-radius: 6px; background: var(--sp-white); color: rgb(var(--rgb-black) / 0.72); font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; transition: border-color 150ms ease, color 150ms ease; }
 .page-btn:hover { border-color: var(--sp-blue); color: var(--sp-blue); }
 @media (max-width: 767px) { .page-btn { height: 44px; min-width: 44px; } }
