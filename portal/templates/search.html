@@ -5,22 +5,19 @@
 
 {% block content_raw %}
 <form id="acervo-form" action="{% url 'catalog:search' %}" method="get">
-  <nav class="breadcrumb-bar" aria-label="Você está em">
-    <div class="sp-container breadcrumb">
-      <a href="{% url 'catalog:home' %}">Início</a>
-      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-      {% if crumb %}
-      <a href="{% url 'catalog:search' %}">Acervo</a>
-      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-      <span>{{ crumb }}</span>
-      {% else %}
-      <span>Acervo</span>
-      {% endif %}
-    </div>
-  </nav>
-
-  <section class="catalog-hero">
-    <div class="sp-container catalog-hero__inner">
+  <section class="sp-section sp-section--pattern catalog-hero">
+    <div class="sp-container">
+      <nav class="breadcrumb" aria-label="Você está em">
+        <a href="{% url 'catalog:home' %}">Início</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        {% if crumb %}
+        <a href="{% url 'catalog:search' %}">Acervo</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        <span>{{ crumb }}</span>
+        {% else %}
+        <span>Acervo</span>
+        {% endif %}
+      </nav>
       <div class="catalog-hero__grid">
         <div>
           <span class="eyebrow">Acervo</span>
@@ -40,7 +37,8 @@
     </div>
   </section>
 
-  <div class="sp-container acervo-layout">
+  <section class="sp-section">
+    <div class="sp-container acervo-layout">
     <aside id="acervo-sidebar" class="sp-panel filter-panel" aria-label="Filtros do acervo">
       <div class="filter-panel__head">
         <span class="filter-panel__head-title">
@@ -187,8 +185,13 @@
         {% endif %}
       </div>
       {% endif %}
+    </div>
+  </div>
+  </section>
 
-      {% if page_obj.has_other_pages %}
+  {% if page_obj.has_other_pages %}
+  <section class="sp-section sp-section--alt">
+    <div class="sp-container">
       <nav class="pagination" aria-label="Paginação dos resultados">
         {% if page_obj.has_previous %}
         <a class="page-btn" href="?{% querystring_replace request.GET 'page' 1 %}" aria-label="Primeira página">Primeira</a>
@@ -211,9 +214,9 @@
         {% endif %}
       </nav>
       <p class="pagination__status">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
-      {% endif %}
     </div>
-  </div>
+  </section>
+  {% endif %}
 </form>
 {% endblock %}
 

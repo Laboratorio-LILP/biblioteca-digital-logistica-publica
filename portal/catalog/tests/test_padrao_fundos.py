@@ -50,3 +50,25 @@ def test_sobre_segue_o_trio():
     # miolo alterna branco/cinza a partir do branco; contato fecha cinza
     assert t.count("sp-section--alt") == 2
     assert t.rindex("sp-section--alt") > t.index("Fale com o LILP") - 400
+
+
+def test_busca_segue_o_trio_dentro_do_form():
+    t = _template("search.html")
+    assert "breadcrumb-bar" not in t
+    form = t.index('id="acervo-form"')
+    abertura = t.index("sp-section sp-section--pattern catalog-hero")
+    assert abertura > form                                     # tudo dentro do form
+    assert t.index('class="breadcrumb"', abertura) > abertura
+    miolo = t.index('sp-section">', abertura)                  # banda branca do miolo
+    assert t.index("acervo-layout") > miolo
+    fecho = t.index("sp-section sp-section--alt")
+    assert fecho > t.index("acervo-layout")                    # paginacao na banda cinza
+    assert t.index('class="pagination"') > fecho
+    assert t.rindex("</form>") > fecho                         # fechamento ainda no form
+
+
+def test_css_catalog_hero_nao_pinta_banda_propria():
+    # A banda vem do .sp-section--pattern; o .catalog-hero nao pode sobrepor
+    # fundo branco por ordem de arquivo.
+    assert ".catalog-hero { border-bottom" not in CSS
+    assert ".catalog-hero__inner" not in CSS

@@ -605,11 +605,6 @@ main { flex: 1 0 auto; }
 .doc-resultnav__pos { font-size: 12px; color: rgb(var(--rgb-black) / 0.6); margin-right: 4px; }
 .doc-resultnav .page-btn { min-height: 36px; }
 
-.catalog-hero { border-bottom: var(--border); background: var(--sp-white); }
-.catalog-hero__inner { padding-block: var(--space-page-top); }
-/* Breadcrumb no topo: a 1ª seção não precisa do padding-top cheio (o breadcrumb já
-   separa). Reduz só o topo no Acervo e nas Coleções; padding-bottom e ritmo ficam. */
-.breadcrumb-bar + .catalog-hero .catalog-hero__inner { padding-top: var(--space-4); }
 .breadcrumb-bar + .colecoes-hero, .breadcrumb-bar + .sobre-hero { padding-top: var(--space-5); }
 .catalog-hero__crumb { font-size: 12px; color: rgb(var(--rgb-black) / 0.55); }
 .catalog-hero__grid { display: grid; gap: 24px; grid-template-columns: 1fr; align-items: end; }
@@ -617,7 +612,7 @@ main { flex: 1 0 auto; }
 .catalog-hero p { margin: 12px 0 0; max-width: 620px; font-size: 14px; line-height: 1.65; color: rgb(var(--rgb-black) / 0.66); }
 @media (min-width: 1024px) { .catalog-hero__grid { grid-template-columns: 0.82fr 1.18fr; } }
 
-.acervo-layout { display: grid; gap: var(--space-6); padding-block: var(--space-page-top) var(--space-page-bottom); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.acervo-layout { display: grid; gap: var(--space-6); grid-template-columns: minmax(0, 1fr); align-items: start; }
 @media (min-width: 1024px) { .acervo-layout { grid-template-columns: 300px minmax(0, 1fr); } }
 
 .filter-panel { padding: 20px; }
