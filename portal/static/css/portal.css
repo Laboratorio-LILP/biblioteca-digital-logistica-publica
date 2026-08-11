@@ -1078,3 +1078,8 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
   html { scroll-behavior: auto; }          /* rolagem instantânea */
   .sp-seta-secoes, .sp-seta-secoes__rotulo, .sp-seta-secoes::before { transition: none; }
 }
+
+/* Pseudo-elementos escapam do reset acima (* casa só elementos): o véu e a
+   pele da pílula da seta-guia não podem pintar sobre o modo alto contraste. */
+body.sp-alto-contraste .sp-seta-secoes::before,
+body.sp-alto-contraste .sp-seta-secoes.is-chegada::after { content: none !important; }
