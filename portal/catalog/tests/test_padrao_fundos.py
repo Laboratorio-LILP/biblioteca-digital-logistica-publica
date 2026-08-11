@@ -72,3 +72,20 @@ def test_css_catalog_hero_nao_pinta_banda_propria():
     # fundo branco por ordem de arquivo.
     assert ".catalog-hero { border-bottom" not in CSS
     assert ".catalog-hero__inner" not in CSS
+
+
+def test_documento_segue_o_trio():
+    t = _template("document_detail.html")
+    assert "breadcrumb-bar" not in t
+    abertura = t.index("sp-section sp-section--pattern doc-detail-hero")
+    assert t.index('class="breadcrumb"', abertura) > abertura
+    assert t.index("doc-resultnav") > abertura                 # resultnav dentro da abertura
+    miolo = t.index('sp-section">', abertura)
+    assert t.index("doc-detail-layout") > miolo
+    assert "sp-section--alt doc-related" in t                  # fechamento quando ha relacionados
+
+
+def test_css_doc_hero_e_resultnav_sem_banda_propria():
+    assert ".doc-detail-hero { border-bottom" not in CSS
+    assert ".doc-resultnav { border-bottom: var(--border); background" not in CSS
+    assert ".doc-detail-layout:has(+ .doc-related)" not in CSS
