@@ -778,11 +778,12 @@ main { flex: 1 0 auto; }
 .empty-state p { margin: 8px 0 0; max-width: 420px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.62); }
 
 /* Páginas de erro (404/500) — bloco central com a marca, dentro de .page. */
-.error-page { max-width: 560px; margin-inline: auto; padding-block: clamp(40px, 8vw, 80px); text-align: center; }
+.error-page { max-width: 560px; margin-inline: auto; text-align: center; }
+.sp-section--pattern .error-page { padding-top: var(--space-8); }  /* sem breadcrumb, a abertura pede mais ar */
 .error-page__code { font-family: var(--font-heading); font-weight: 700; font-size: clamp(64px, 18vw, 120px); line-height: 1; color: var(--sp-red); margin: 0; }
 .error-page h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(24px, 4vw, 34px); margin: 8px 0 0; }
 .error-page p { margin: 12px 0 0; font-size: 15px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); }
-.error-page__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 28px; }
+.error-page__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 0; }
 
 /* Paginação */
 .pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; margin-top: 24px; }

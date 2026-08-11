@@ -127,3 +127,11 @@ def test_legais_estendem_o_base_legal():
 def test_fale_conosco_nao_se_autoreferencia():
     t = _template("legal/fale_conosco.html")
     assert "legal_fechamento" in t                             # sobrescreve a banda de contato
+
+
+def test_paginas_de_erro_abrem_quadriculado():
+    for nome in ("404.html", "500.html"):
+        t = _template(nome)
+        assert "content_raw" in t, nome
+        assert "sp-section sp-section--pattern" in t, nome
+        assert t.index("error-page__actions") > t.index('sp-section">'), nome
