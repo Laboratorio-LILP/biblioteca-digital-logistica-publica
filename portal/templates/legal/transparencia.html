@@ -1,81 +1,141 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Transparência — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Informações de transparência ativa do Portal BDLP: estrutura organizacional do LILP, legislação aplicável, contatos institucionais e canais de acesso à informação (LAI).{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
+{% block content_raw %}
+<nav class="breadcrumb-bar" aria-label="Você está em">
+  <div class="sp-container breadcrumb">
+    <a href="{% url 'catalog:home' %}">Início</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <span>Transparência</span>
+  </div>
+</nav>
+
+<section class="sp-section legal-hero" data-sec="Transparência">
+  <div class="sp-container">
+    <span class="eyebrow">Transparência</span>
     <h1>Transparência e Acesso à Informação</h1>
-    <p class="sp-pagina-legal__intro">
+    <p class="page__intro">
       Esta página reúne informações de transparência ativa relacionadas ao
       Portal da Biblioteca Digital de Logística Pública (BDLP), atendendo
       à Lei nº 12.527/2011 (Lei de Acesso à Informação) e ao Decreto Federal
       nº 7.724/2012, bem como às diretrizes do Decreto Estadual nº 67.799/2023
       (Estratégia de Governo Digital de São Paulo).
     </p>
-  </header>
+  </div>
+</section>
 
-  <section>
-    <h2>Quem somos</h2>
-    <p>
-      O Portal BDLP é uma iniciativa do <strong>Laboratório de Inovação em
-      Logística Pública (LILP)</strong>, vinculado à Subsecretaria de Gestão da
-      <strong>Secretaria de Gestão e Governo Digital (SGGD)</strong> do Estado
-      de São Paulo. Foi instituído pela Resolução SGGD nº 38/2024 com a missão
-      de pesquisar, experimentar e disseminar soluções para a melhoria da
-      logística pública estadual, com foco na aplicação da Lei nº 14.133/2021
-      (nova Lei de Licitações e Contratos Administrativos).
-    </p>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Quem somos">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Quem somos</span>
+        <h2>Quem somos</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        O Portal BDLP é uma iniciativa do <strong>Laboratório de Inovação em
+        Logística Pública (LILP)</strong>, vinculado à Subsecretaria de Gestão da
+        <strong>Secretaria de Gestão e Governo Digital (SGGD)</strong> do Estado
+        de São Paulo. Foi instituído pela Resolução SGGD nº 38/2024 com a missão
+        de pesquisar, experimentar e disseminar soluções para a melhoria da
+        logística pública estadual, com foco na aplicação da Lei nº 14.133/2021
+        (nova Lei de Licitações e Contratos Administrativos).
+      </p>
+    </div>
+  </div>
+</section>
 
-  <section id="convenio">
-    <h2>Convênio SGGD nº 02/2025</h2>
-    <p>
-      O acervo do portal é gerido em parceria técnica com o
-      <strong>Sistema de Bibliotecas da Universidade Estadual de Campinas
-      (SBU/Unicamp)</strong>, conforme instrumento jurídico Convênio SGGD nº
-      02/2025. Cabe ao SBU prestar consultoria em catalogação, indexação e
-      preservação digital; cabe à SGGD/LILP a curadoria editorial, a
-      operação técnica e a divulgação institucional.
-    </p>
-  </section>
+<section id="convenio" class="sp-section sp-section--rail" data-sec="Convênio">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Parceria</span>
+        <h2>Convênio SGGD nº 02/2025</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        O acervo do portal é gerido em parceria técnica com o
+        <strong>Sistema de Bibliotecas da Universidade Estadual de Campinas
+        (SBU/Unicamp)</strong>, conforme instrumento jurídico Convênio SGGD nº
+        02/2025. Cabe ao SBU prestar consultoria em catalogação, indexação e
+        preservação digital; cabe à SGGD/LILP a curadoria editorial, a
+        operação técnica e a divulgação institucional.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Legislação aplicável</h2>
-    <ul>
-      <li><strong>Lei nº 14.133/2021</strong> — Lei de Licitações e Contratos Administrativos.</li>
-      <li><strong>Lei nº 12.527/2011</strong> — Lei de Acesso à Informação (LAI).</li>
-      <li><strong>Lei nº 13.709/2018</strong> — Lei Geral de Proteção de Dados Pessoais (LGPD).</li>
-      <li><strong>Lei nº 13.460/2017</strong> — Direitos do Usuário de Serviços Públicos.</li>
-      <li><strong>Lei nº 12.965/2014</strong> — Marco Civil da Internet.</li>
-      <li><strong>Decreto Estadual nº 67.799/2023</strong> — Estratégia de Governo Digital.</li>
-      <li><strong>Decreto Estadual nº 69.056/2024</strong> — Portal único SP.GOV.BR.</li>
-      <li><strong>Resolução SGGD nº 38/2024</strong> — Institui o LILP.</li>
-    </ul>
-  </section>
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Legislação">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Base legal</span>
+        <h2>Legislação aplicável</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <ul>
+        <li><strong>Lei nº 14.133/2021</strong> — Lei de Licitações e Contratos Administrativos.</li>
+        <li><strong>Lei nº 12.527/2011</strong> — Lei de Acesso à Informação (LAI).</li>
+        <li><strong>Lei nº 13.709/2018</strong> — Lei Geral de Proteção de Dados Pessoais (LGPD).</li>
+        <li><strong>Lei nº 13.460/2017</strong> — Direitos do Usuário de Serviços Públicos.</li>
+        <li><strong>Lei nº 12.965/2014</strong> — Marco Civil da Internet.</li>
+        <li><strong>Decreto Estadual nº 67.799/2023</strong> — Estratégia de Governo Digital.</li>
+        <li><strong>Decreto Estadual nº 69.056/2024</strong> — Portal único SP.GOV.BR.</li>
+        <li><strong>Resolução SGGD nº 38/2024</strong> — Institui o LILP.</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Onde encontrar mais informações</h2>
-    <p>
-      Para informações de transparência da SGGD e do Estado de São Paulo,
-      consulte os portais centralizados:
-    </p>
-    <ul>
-      <li><a href="http://www.transparencia.sp.gov.br/" target="_blank" rel="noopener noreferrer">Portal da Transparência do Estado de São Paulo</a></li>
-      <li><a href="http://www.sic.sp.gov.br/" target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a></li>
-      <li><a href="https://www.ouvidoria.sp.gov.br/" target="_blank" rel="noopener noreferrer">Ouvidoria Geral do Estado</a></li>
-      <li><a href="https://www.sggd.sp.gov.br/" target="_blank" rel="noopener noreferrer">Site institucional da SGGD</a></li>
-    </ul>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Mais informações">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Portais oficiais</span>
+        <h2>Onde encontrar mais informações</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        Para informações de transparência da SGGD e do Estado de São Paulo,
+        consulte os portais centralizados:
+      </p>
+      <ul>
+        <li><a href="http://www.transparencia.sp.gov.br/" target="_blank" rel="noopener noreferrer">Portal da Transparência do Estado de São Paulo</a></li>
+        <li><a href="http://www.sic.sp.gov.br/" target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a></li>
+        <li><a href="https://www.ouvidoria.sp.gov.br/" target="_blank" rel="noopener noreferrer">Ouvidoria Geral do Estado</a></li>
+        <li><a href="https://www.sggd.sp.gov.br/" target="_blank" rel="noopener noreferrer">Site institucional da SGGD</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Endereço e contatos</h2>
-    <address>
-      <p><strong>Secretaria de Gestão e Governo Digital — SGGD</strong></p>
-      <p>Av. Rangel Pestana, 300 — Sé — São Paulo/SP</p>
-      <p>E-mail institucional do LILP: <a href="mailto:lab.sggd@sp.gov.br">lab.sggd@sp.gov.br</a></p>
-    </address>
-  </section>
-</article>
+<section class="sp-section sp-section--rail" data-sec="Contato">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Contato</span>
+        <h2>Endereço e contatos</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <address>
+        <p><strong>Secretaria de Gestão e Governo Digital — SGGD</strong></p>
+        <p>Av. Rangel Pestana, 300 — Sé — São Paulo/SP</p>
+        <p>E-mail institucional do LILP: <a href="mailto:lab.sggd@sp.gov.br">lab.sggd@sp.gov.br</a></p>
+      </address>
+    </div>
+  </div>
+</section>
+{% include "_partials/_seta_secoes.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}

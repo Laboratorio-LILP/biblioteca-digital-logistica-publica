@@ -24,10 +24,9 @@
       <div class="sp-container govbar-inner">
         <span class="govbar-brand">Governo do Estado de São Paulo</span>
         <nav class="govbar-links" aria-label="Acesso institucional">
-          <a href="https://www.saopaulo.sp.gov.br/" target="_blank" rel="noopener">Ouvidoria</a>
+          <a href="https://www.ouvidoria.sp.gov.br/" target="_blank" rel="noopener">Ouvidoria</a>
           <a href="{% url 'catalog:transparencia' %}">Transparência</a>
-          <a href="{% url 'catalog:transparencia' %}">SIC</a>
-          <a href="{% url 'catalog:transparencia' %}">Acesso à Informação</a>
+          <a href="https://www.sic.sp.gov.br/" target="_blank" rel="noopener">SIC — Acesso à Informação</a>
         </nav>
         <div class="govbar-a11y" role="group" aria-label="Controles de acessibilidade">
           <button type="button" data-a11y-action="font-down" aria-label="Reduzir tamanho do texto" title="Reduzir fonte">A-</button>
@@ -109,8 +108,9 @@
           <ul>
             <li><a href="{% url 'catalog:transparencia' %}">Transparência</a></li>
             <li><a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a></li>
-            <li><a href="{% url 'catalog:politica_privacidade' %}">Privacidade</a></li>
-            <li><a href="{% url 'catalog:fale_conosco' %}">Contato</a></li>
+            <li><a href="{% url 'catalog:politica_privacidade' %}">Política de privacidade</a></li>
+            <li><a href="{% url 'catalog:politica_cookies' %}">Política de cookies</a></li>
+            <li><a href="{% url 'catalog:fale_conosco' %}">Fale conosco</a></li>
             <li><button type="button" class="footer-cookies-btn" data-cookies-action="customize">Gerenciar cookies</button></li>
           </ul>
         </div>

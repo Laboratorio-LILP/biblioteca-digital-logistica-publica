@@ -1,80 +1,122 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Mapa do Site — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Estrutura completa de páginas e conteúdos do Portal BDLP — facilita a navegação e atende à recomendação eMAG 3.1 de mapa do site.{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
+{% block content_raw %}
+<nav class="breadcrumb-bar" aria-label="Você está em">
+  <div class="sp-container breadcrumb">
+    <a href="{% url 'catalog:home' %}">Início</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <span>Mapa do Site</span>
+  </div>
+</nav>
+
+<section class="sp-section legal-hero" data-sec="Mapa do Site">
+  <div class="sp-container">
+    <span class="eyebrow">Navegação</span>
     <h1>Mapa do Site</h1>
-    <p class="sp-pagina-legal__intro">
+    <p class="page__intro">
       Esta página apresenta a estrutura hierárquica completa de páginas
       e seções do Portal BDLP, conforme recomendação <strong>eMAG 3.1</strong>.
       Use-a como atalho para encontrar rapidamente o que você procura.
     </p>
-  </header>
+  </div>
+</section>
 
-  <section>
-    <h2>Páginas principais</h2>
-    <ul class="sp-mapa-site">
-      <li>
-        <a href="{% url 'catalog:home' %}">Início</a>
-        <ul>
-          <li>Acesso rápido à busca</li>
-          <li>Coleções em destaque</li>
-          <li>Documentos recentes</li>
-          <li>Estatísticas do acervo</li>
-        </ul>
-      </li>
-      <li>
-        <a href="{% url 'catalog:search' %}">Acervo (Busca)</a>
-        <ul>
-          <li>Busca por palavra-chave</li>
-          <li>Filtros: coleção, assunto, natureza, categoria, complexidade, ano</li>
-          <li>Resultados paginados</li>
-          <li>Detalhe de cada documento (com download)</li>
-        </ul>
-      </li>
-      <li>
-        <a href="{% url 'catalog:collection_list' %}">Coleções</a>
-        <ul>
-          <li>Grade de coleções principais</li>
-          <li>Subcoleções e contagens</li>
-          <li>Documentos por coleção</li>
-        </ul>
-      </li>
-      <li>
-        <a href="{% url 'catalog:about' %}">Sobre</a>
-        <ul>
-          <li>Histórico do projeto BDLP</li>
-          <li>LILP, SGGD e SBU/Unicamp</li>
-          <li>Tecnologia e infraestrutura</li>
-        </ul>
-      </li>
-    </ul>
-  </section>
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Páginas principais">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Sumário</span>
+        <h2>Páginas principais</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <ul class="sp-mapa-site">
+        <li>
+          <a href="{% url 'catalog:home' %}">Início</a>
+          <ul>
+            <li>Acesso rápido à busca</li>
+            <li>Coleções em destaque</li>
+            <li>Documentos recentes</li>
+            <li>Estatísticas do acervo</li>
+          </ul>
+        </li>
+        <li>
+          <a href="{% url 'catalog:search' %}">Acervo (Busca)</a>
+          <ul>
+            <li>Busca por palavra-chave</li>
+            <li>Filtros: coleção, assunto, natureza, categoria, complexidade, ano</li>
+            <li>Resultados paginados</li>
+            <li>Detalhe de cada documento (com download)</li>
+          </ul>
+        </li>
+        <li>
+          <a href="{% url 'catalog:collection_list' %}">Coleções</a>
+          <ul>
+            <li>Grade de coleções principais</li>
+            <li>Subcoleções e contagens</li>
+            <li>Documentos por coleção</li>
+          </ul>
+        </li>
+        <li>
+          <a href="{% url 'catalog:about' %}">Sobre</a>
+          <ul>
+            <li>Histórico do projeto BDLP</li>
+            <li>LILP, SGGD e SBU/Unicamp</li>
+            <li>Tecnologia e infraestrutura</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Transparência e cidadania</h2>
-    <ul class="sp-mapa-site">
-      <li><a href="{% url 'catalog:transparencia' %}">Transparência (LAI)</a></li>
-      <li><a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a></li>
-      <li><a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a></li>
-      <li><a href="{% url 'catalog:politica_cookies' %}">Política de Cookies</a></li>
-      <li><a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a></li>
-      <li><a href="{% url 'catalog:mapa_site' %}">Mapa do Site (esta página)</a></li>
-    </ul>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Transparência">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Cidadania</span>
+        <h2>Transparência e cidadania</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <ul class="sp-mapa-site">
+        <li><a href="{% url 'catalog:transparencia' %}">Transparência (LAI)</a></li>
+        <li><a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a></li>
+        <li><a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a></li>
+        <li><a href="{% url 'catalog:politica_cookies' %}">Política de Cookies</a></li>
+        <li><a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a></li>
+        <li><a href="{% url 'catalog:mapa_site' %}">Mapa do Site (esta página)</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Canais oficiais externos</h2>
-    <ul class="sp-mapa-site">
-      <li><a href="https://www.saopaulo.sp.gov.br/" target="_blank" rel="noopener noreferrer">Portal do Governo do Estado de SP</a></li>
-      <li><a href="https://www.sggd.sp.gov.br/" target="_blank" rel="noopener noreferrer">Site institucional da SGGD</a></li>
-      <li><a href="https://www.ouvidoria.sp.gov.br/" target="_blank" rel="noopener noreferrer">Ouvidoria Geral do Estado</a></li>
-      <li><a href="http://www.transparencia.sp.gov.br/" target="_blank" rel="noopener noreferrer">Portal da Transparência</a></li>
-      <li><a href="http://www.sic.sp.gov.br/" target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a></li>
-    </ul>
-  </section>
-</article>
+<section class="sp-section sp-section--rail" data-sec="Canais externos">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Links oficiais</span>
+        <h2>Canais oficiais externos</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <ul class="sp-mapa-site">
+        <li><a href="https://www.saopaulo.sp.gov.br/" target="_blank" rel="noopener noreferrer">Portal do Governo do Estado de SP</a></li>
+        <li><a href="https://www.sggd.sp.gov.br/" target="_blank" rel="noopener noreferrer">Site institucional da SGGD</a></li>
+        <li><a href="https://www.ouvidoria.sp.gov.br/" target="_blank" rel="noopener noreferrer">Ouvidoria Geral do Estado</a></li>
+        <li><a href="http://www.transparencia.sp.gov.br/" target="_blank" rel="noopener noreferrer">Portal da Transparência</a></li>
+        <li><a href="http://www.sic.sp.gov.br/" target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% include "_partials/_seta_secoes.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}
