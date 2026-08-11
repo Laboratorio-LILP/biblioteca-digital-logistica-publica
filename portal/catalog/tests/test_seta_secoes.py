@@ -62,3 +62,24 @@ def test_js_da_seta_existe_e_e_csp_safe():
     assert "data-sec" in js
     assert "addEventListener" in js  # CSP-safe: sem handlers inline
     assert "prefers-reduced-motion" in js
+
+
+def test_parcial_tem_rotulo_de_chegada():
+    parcial = _template("_partials/_seta_secoes.html")
+    assert "sp-seta-secoes__rotulo" in parcial
+    assert "Veja mais" in parcial
+    assert re.search(r"<button[^>]*\shidden[\s>]", parcial)  # melhoria progressiva intacta
+
+
+def test_css_tem_estado_de_chegada():
+    css = (STATIC / "css" / "portal.css").read_text(encoding="utf-8")
+    assert ".sp-seta-secoes.is-chegada" in css
+    assert ".sp-seta-secoes__rotulo" in css
+    assert "--sp-red-dark" in css[css.index(".sp-seta-secoes.is-chegada"):]  # pílula AA-safe
+
+
+def test_js_tem_chegada_que_assenta_no_primeiro_gesto():
+    js = (STATIC / "js" / "seta-secoes.js").read_text(encoding="utf-8")
+    assert "is-chegada" in js
+    assert "Veja mais: " in js   # WCAG 2.5.3 — nome acessível contém o rótulo visível
+    assert "assentar" in js
