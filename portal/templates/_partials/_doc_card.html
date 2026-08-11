@@ -23,7 +23,7 @@ Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de I
     {% if primary %}
     <div class="doc-card__author">
       <svg class="fi" aria-hidden="true"><use href="#fi-user"/></svg>
-      <span>{{ primary }}{% with n=doc|extra_authors %}{% if n %}<span class="muted"> + {{ n }} autor(es)</span>{% endif %}{% endwith %}</span>
+      <span>{{ primary }}{% with n=doc|extra_authors %}{% if n %}<span class="muted"> + {{ n }} {{ n|pluralize_pt:"autor" }}</span>{% endif %}{% endwith %}</span>
     </div>
     {% endif %}
     {% endwith %}

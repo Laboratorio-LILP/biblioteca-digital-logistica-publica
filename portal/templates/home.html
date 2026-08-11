@@ -10,9 +10,9 @@
     <div class="hero__badge"><svg class="fi" aria-hidden="true"><use href="#fi-award"/></svg> Plataforma oficial de conhecimento e inovação pública</div>
     <h1>Biblioteca Digital de Logística Pública</h1>
     <p class="hero__copy">
-      Acervo institucional de jurisprudência, trabalhos acadêmicos, doutrina, conteúdo técnico
-      e materiais de capacitação para apoiar contratações públicas, governança e gestão de
-      suprimentos no Estado de São Paulo.
+      Reunimos jurisprudência, trabalhos acadêmicos, doutrina, conteúdos técnicos e
+      materiais de capacitação. O acervo apoia quem trabalha com contratações públicas,
+      governança e gestão de suprimentos no Estado de São Paulo.
     </p>
 
     <form class="searchbar searchbar--lg hero__search" action="{% url 'catalog:search' %}" method="get" role="search">
@@ -52,7 +52,7 @@
     </div>
     <div class="stats-grid">
       <div class="stat"><div class="stat__value">{{ total_docs }}</div><div class="stat__label">Documentos catalogados</div></div>
-      <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções curatoriais</div></div>
+      <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções com curadoria</div></div>
       <div class="stat"><div class="stat__value">{{ cobertura.macroetapas }}</div><div class="stat__label">Categorias processuais</div></div>
       <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Assuntos temáticos</div></div>
     </div>
@@ -64,7 +64,7 @@
     <div class="section-heading">
       <div>
         <span class="eyebrow">Explorar o acervo</span>
-        <h2>Coleções organizadas para a tomada de decisão pública</h2>
+        <h2>Coleções organizadas para apoiar decisões na gestão pública</h2>
       </div>
       <a class="sp-button-secondary" href="{% url 'catalog:collection_list' %}">Consultar Coleções <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
     </div>
