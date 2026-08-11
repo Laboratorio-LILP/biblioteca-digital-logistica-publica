@@ -1018,7 +1018,7 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
    Melhoria progressiva: renderiza [hidden]; seta-secoes.js revela.
    Spec: docs/superpowers/specs/2026-07-29-seta-secoes-design.md
    ============================================================ */
-[data-sec] { scroll-margin-top: 100px; }   /* header sticky — mesmo valor de .tema-grupo */
+[data-sec], #dpo { scroll-margin-top: 100px; }   /* header sticky — mesmo valor de .tema-grupo; #dpo: âncora interna (link da Política de Cookies) */
 
 .sp-seta-secoes {
   position: fixed;
