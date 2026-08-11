@@ -4,118 +4,171 @@
 {% block meta_description %}Política de Cookies do Portal BDLP. Categorias utilizadas, finalidades, retenção e instruções para gerenciar ou revogar consentimento.{% endblock %}
 
 {% block legal_crumb %}Política de Cookies{% endblock %}
+{% block legal_eyebrow %}Privacidade{% endblock %}
 {% block legal_titulo %}Política de Cookies{% endblock %}
-{% block legal_intro %}Esta política descreve como o Portal BDLP utiliza cookies e
-      tecnologias similares de armazenamento local, em conformidade
-      com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet
-      (Lei nº 12.965/2014).{% endblock %}
+{% block legal_intro %}Esta política descreve como o Portal BDLP utiliza cookies e tecnologias similares de armazenamento local, em conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei nº 12.965/2014).{% endblock %}
 
 {% block legal_corpo %}
-  <section>
-    <h2>1. O que são cookies</h2>
-    <p>
-      Cookies são pequenos arquivos de texto que um site envia ao seu
-      navegador para serem armazenados localmente no seu dispositivo.
-      Eles permitem que o site reconheça seu navegador em visitas
-      subsequentes e funcionem corretamente. Tecnologias semelhantes —
-      como <em>localStorage</em> e <em>sessionStorage</em> — são também
-      consideradas neste documento.
-    </p>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="O que são cookies">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Conceito</span>
+        <h2>1. O que são cookies</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        Cookies são pequenos arquivos de texto que um site envia ao seu
+        navegador para serem armazenados localmente no seu dispositivo.
+        Eles permitem que o site reconheça seu navegador em visitas
+        subsequentes e funcionem corretamente. Tecnologias semelhantes —
+        como <em>localStorage</em> e <em>sessionStorage</em> — são também
+        consideradas neste documento.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>2. Categorias utilizadas pelo portal</h2>
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Categorias de cookies">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Categorias</span>
+        <h2>2. Categorias utilizadas pelo portal</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <h3>2.1 Estritamente necessários</h3>
+      <p>Indispensáveis ao funcionamento do portal — não podem ser desativados.</p>
+      <div class="sp-tabela-rolagem">
+      <table class="sp-tabela-cookies">
+        <thead>
+          <tr><th scope="col">Cookie</th><th scope="col">Finalidade</th><th scope="col">Retenção</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>csrftoken</code></td>
+            <td>Proteção contra CSRF em formulários (Django).</td>
+            <td>1 ano</td>
+          </tr>
+          <tr>
+            <td><code>sessionid</code></td>
+            <td>Identificador de sessão (apenas se usuário interagir com formulários).</td>
+            <td>Sessão</td>
+          </tr>
+          <tr>
+            <td><code>sp-lgpd-consent</code> <em>(localStorage)</em></td>
+            <td>Registra sua escolha sobre cookies neste portal.</td>
+            <td>12 meses</td>
+          </tr>
+          <tr>
+            <td><code>sp-a11y:contraste</code> e <code>sp-a11y:fonte-escala</code> <em>(localStorage)</em></td>
+            <td>Preservam suas preferências de acessibilidade entre páginas.</td>
+            <td>Permanente até alteração</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
 
-    <h3>2.1 Estritamente necessários</h3>
-    <p>Indispensáveis ao funcionamento do portal — não podem ser desativados.</p>
-    <table class="sp-tabela-cookies">
-      <thead>
-        <tr><th scope="col">Cookie</th><th scope="col">Finalidade</th><th scope="col">Retenção</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>csrftoken</code></td>
-          <td>Proteção contra CSRF em formulários (Django).</td>
-          <td>1 ano</td>
-        </tr>
-        <tr>
-          <td><code>sessionid</code></td>
-          <td>Identificador de sessão (apenas se usuário interagir com formulários).</td>
-          <td>Sessão</td>
-        </tr>
-        <tr>
-          <td><code>sp-lgpd-consent</code> <em>(localStorage)</em></td>
-          <td>Registra sua escolha sobre cookies neste portal.</td>
-          <td>12 meses</td>
-        </tr>
-        <tr>
-          <td><code>sp-a11y:contraste</code> e <code>sp-a11y:fonte-escala</code> <em>(localStorage)</em></td>
-          <td>Preservam suas preferências de acessibilidade entre páginas.</td>
-          <td>Permanente até alteração</td>
-        </tr>
-      </tbody>
-    </table>
+      <h3>2.2 Funcionalidades (opcional)</h3>
+      <p>
+        Reservada para futuras melhorias de personalização (por exemplo,
+        lembrar última coleção visitada). No momento, esta categoria
+        <strong>não está ativa</strong>.
+      </p>
 
-    <h3>2.2 Funcionalidades (opcional)</h3>
-    <p>
-      Reservada para futuras melhorias de personalização (por exemplo,
-      lembrar última coleção visitada). No momento, esta categoria
-      <strong>não está ativa</strong>.
-    </p>
+      <h3>2.3 Análise de uso (opcional)</h3>
+      <p>
+        Reservada para futura medição agregada e anônima de visitantes
+        (com IP truncado), exclusivamente em ferramenta autorizada e
+        hospedada no domínio do Governo SP. No momento, esta categoria
+        <strong>não está ativa</strong>; nenhum cookie de análise é
+        disparado mesmo se você optar por aceitá-la.
+      </p>
+    </div>
+  </div>
+</section>
 
-    <h3>2.3 Análise de uso (opcional)</h3>
-    <p>
-      Reservada para futura medição agregada e anônima de visitantes
-      (com IP truncado), exclusivamente em ferramenta autorizada e
-      hospedada no domínio do Governo SP. No momento, esta categoria
-      <strong>não está ativa</strong>; nenhum cookie de análise é
-      disparado mesmo se você optar por aceitá-la.
-    </p>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Gerenciar preferências">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Preferências</span>
+        <h2>3. Como gerenciar suas preferências</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>Você pode controlar cookies opcionais de duas formas:</p>
+      <ol>
+        <li>No <strong>banner de cookies</strong> exibido na primeira
+          visita, escolhendo entre "Aceitar todos", "Apenas essenciais"
+          ou "Personalizar".</li>
+        <li>No próprio navegador, através de configurações de privacidade
+          — você pode bloquear ou apagar todos os cookies já armazenados.
+          Note que bloquear cookies estritamente necessários poderá
+          prejudicar o funcionamento do portal (formulários e busca).</li>
+      </ol>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>3. Como gerenciar suas preferências</h2>
-    <p>Você pode controlar cookies opcionais de duas formas:</p>
-    <ol>
-      <li>No <strong>banner de cookies</strong> exibido na primeira
-        visita, escolhendo entre "Aceitar todos", "Apenas essenciais"
-        ou "Personalizar".</li>
-      <li>No próprio navegador, através de configurações de privacidade
-        — você pode bloquear ou apagar todos os cookies já armazenados.
-        Note que bloquear cookies estritamente necessários poderá
-        prejudicar o funcionamento do portal (formulários e busca).</li>
-    </ol>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Revogar consentimento">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Consentimento</span>
+        <h2>4. Revogação de consentimento</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        Você pode revogar ou alterar a qualquer momento o consentimento dado
+        para cookies opcionais: use o link <strong>“Gerenciar cookies”</strong>
+        no rodapé de qualquer página para reabrir as preferências. Você também
+        pode apagar os dados de navegação deste site no seu navegador — na
+        próxima visita, o banner será exibido novamente.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>4. Revogação de consentimento</h2>
-    <p>
-      Você pode revogar ou alterar a qualquer momento o consentimento dado
-      para cookies opcionais: use o link <strong>“Gerenciar cookies”</strong>
-      no rodapé de qualquer página para reabrir as preferências. Você também
-      pode apagar os dados de navegação deste site no seu navegador — na
-      próxima visita, o banner será exibido novamente.
-    </p>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Cookies de terceiros">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Terceiros</span>
+        <h2>5. Cookies de terceiros</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        O portal não embute serviços de terceiros (Google Analytics,
+        Hotjar, redes sociais) por padrão. Se isso vier a mudar, esta
+        política será atualizada com aviso prévio e o consentimento
+        explícito será solicitado.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>5. Cookies de terceiros</h2>
-    <p>
-      O portal não embute serviços de terceiros (Google Analytics,
-      Hotjar, redes sociais) por padrão. Se isso vier a mudar, esta
-      política será atualizada com aviso prévio e o consentimento
-      explícito será solicitado.
-    </p>
-  </section>
-
-  <section>
-    <h2>6. Mais informações</h2>
-    <p>
-      Para informações sobre o tratamento de dados pessoais como um todo,
-      consulte a nossa <a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a>.
-      Em caso de dúvida, entre em contato com o
-      <a href="{% url 'catalog:politica_privacidade' %}#dpo">Encarregado de Proteção de Dados</a>
-      ou utilize o canal de <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a>.
-    </p>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Mais informações">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Saiba mais</span>
+        <h2>6. Mais informações</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        Para informações sobre o tratamento de dados pessoais como um todo,
+        consulte a nossa <a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a>.
+        Em caso de dúvida, entre em contato com o
+        <a href="{% url 'catalog:politica_privacidade' %}#dpo">Encarregado de Proteção de Dados</a>
+        ou utilize o canal de <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a>.
+      </p>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -879,8 +879,8 @@ html.js .btn-apply { display: none; }
 .curadoria-dica { max-width: 760px; margin: 16px 0 0; border-left: 4px solid var(--sp-red); background: var(--sp-gray-light); border-radius: 8px; padding: 14px 18px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.78); }
 .curadoria-acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 
-/* Páginas de Coleções e Sobre no padrão de seções da Home (full-bleed + section-heading) */
-.colecoes-hero .eyebrow, .sobre-hero .eyebrow { display: block; }
+/* Páginas de Coleções, Sobre e legais no padrão de seções da Home (full-bleed + section-heading) */
+.colecoes-hero .eyebrow, .sobre-hero .eyebrow, .legal-hero .eyebrow { display: block; }
 .colecoes-hero h1, .sobre-hero h1, .legal-hero h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.14; margin: 8px 0 10px; }
 
 /* Miolo da página de coleção (trio de fundos): h2 que antes herdavam de .page > h2 */
@@ -900,15 +900,56 @@ html.js .btn-apply { display: none; }
 .org-card--busca { flex-direction: row; align-items: flex-start; gap: 16px; }
 .org-card--busca > div { display: flex; flex-direction: column; gap: 6px; }
 
-/* compat páginas legais (.sp-pagina-legal) */
-.sp-pagina-legal { max-width: 820px; }
-.sp-pagina-legal h2 { font-family: var(--font-heading); font-weight: 700; margin: 20px 0 8px; font-size: 22px; }
-.sp-pagina-legal h3 { font-family: var(--font-subtitle); font-weight: 600; margin: 16px 0 8px; font-size: 16px; }
-.sp-pagina-legal p, .sp-pagina-legal li { font-size: 14px; line-height: 1.7; color: rgb(var(--rgb-black) / 0.76); }
-.sp-pagina-legal a { color: var(--sp-blue); text-decoration: underline; }
+/* Trilho editorial (Sobre): cabeçalho da seção num trilho à esquerda, conteúdo
+   à direita. Dá função ao espaço que sobrava ao lado da medida de leitura
+   (760px); abaixo de 900px o trilho colapsa e a seção volta a empilhar. */
+.sp-section--rail .section-heading { flex-direction: column; align-items: flex-start; }
+/* Fora da media query: no mobile o h2 genérico (piso 30px) passaria o h1 da
+   página (piso 28px) — hierarquia invertida. Aqui: 24px no mobile, teto 28px. */
+.sp-section--rail .section-heading h2 { font-size: clamp(24px, 2.6vw, 28px); }
+@media (min-width: 900px) {
+  .sp-section--rail .sp-container {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    column-gap: 64px;
+    align-items: start;
+  }
+}
+
+/* Corpo do trilho em prosa (páginas legais): tipografia sem classe por
+   parágrafo — mesmos valores da .curadoria-texto. O modificador evita vazar
+   para corpos com componentes próprios (cards, painéis) como no Sobre. */
+.sp-section__body--prosa p { max-width: 760px; margin: 0 0 16px; }
+.sp-section__body--prosa p, .sp-section__body--prosa li { font-size: 14px; line-height: 1.7; color: rgb(var(--rgb-black) / 0.76); }
+.sp-section__body--prosa ul, .sp-section__body--prosa ol { margin: 8px 0 16px; padding-left: 20px; }
+.sp-section__body--prosa h3 { font-family: var(--font-subtitle); font-weight: 600; margin: 16px 0 8px; font-size: 16px; }
+.sp-section__body--prosa a:not([class]) { color: var(--sp-blue); text-decoration: underline; }
+.sp-section__body--prosa address { font-style: normal; } /* endereço em redondo, não no itálico default do UA */
+
+/* Marco normativo — pares norma → descrição (semântica de termo/definição) */
+.normas-lista { margin: 12px 0 0; }
+.normas-lista__item {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  column-gap: 40px;
+  align-items: baseline; /* dt (subtitle) e dd (corpo) têm métricas de fonte distintas */
+  padding: 14px 0;
+  border-bottom: 1px solid rgb(var(--rgb-black) / 0.12);
+}
+.normas-lista__item:first-child { border-top: 1px solid rgb(var(--rgb-black) / 0.12); }
+.normas-lista dt { font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; }
+.normas-lista dd { margin: 0; font-size: 14px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.72); }
+@media (max-width: 640px) { .normas-lista__item { grid-template-columns: 1fr; row-gap: 2px; } }
+
+/* Contato (Sobre) — endereço e CTA em painel */
+.contato-panel { max-width: 520px; padding: 24px; }
+.contato-panel .curadoria-texto { max-width: none; margin: 0; }
+.contato-panel .curadoria-acoes { margin-top: 20px; }
+
 
 /* Páginas legais — tabela de cookies, mapa do site e canais de contato.
    Portado do design-system antigo (removido na higiene), com tokens vivos. */
+.sp-tabela-rolagem { overflow-x: auto; } /* tabela larga rola dentro de si, nunca a página */
 .sp-tabela-cookies { width: 100%; border-collapse: collapse; margin: var(--space-3) 0; font-size: 0.9rem; }
 .sp-tabela-cookies th, .sp-tabela-cookies td { border: 1px solid var(--sp-gray-medium); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
 .sp-tabela-cookies th { background: var(--sp-gray-light); color: var(--sp-black); font-weight: 700; }

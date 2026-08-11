@@ -112,9 +112,10 @@ def test_base_legal_define_o_trio():
     b = _template("legal/_base_legal.html")
     assert "sp-section sp-section--pattern legal-hero" in b
     assert 'class="breadcrumb"' in b
-    assert "sp-pagina-legal" in b                              # corpo na banda branca
+    assert "block legal_corpo" in b                            # corpo livre: seções-banda rail por página
     assert "sp-section sp-section--alt" in b                   # fechamento (banda de contato)
     assert "fale_conosco" in b                                 # CTA aponta para o Fale Conosco
+    assert "_partials/_seta_secoes.html" in b                  # seta-guia comum às legais (fusão e85289b)
 
 
 def test_legais_estendem_o_base_legal():
@@ -139,8 +140,9 @@ def test_paginas_de_erro_abrem_quadriculado():
 
 def test_css_sem_classes_orfas_do_padrao_antigo():
     assert ".breadcrumb-bar" not in CSS
-    assert ".sp-pagina-legal__cabecalho" not in CSS
-    assert ".sp-pagina-legal__intro" not in CSS
+    assert ".sp-pagina-legal" not in CSS       # morreu inteiro na fusão (corpo rail das legais)
     assert ".breadcrumb-bar + .colecoes-hero" not in CSS
     assert ".catalog-hero__crumb" not in CSS
-    assert ".legal-hero .eyebrow" not in CSS
+    assert ".sobre-hero__pattern" not in CSS   # overlay do Sobre deu lugar ao .sp-section--pattern
+    # .legal-hero .eyebrow VOLTOU a existir na fusão: o hero das legais tem eyebrow (e85289b)
+    assert ".legal-hero .eyebrow" in CSS
