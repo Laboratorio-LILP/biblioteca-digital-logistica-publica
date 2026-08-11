@@ -9,7 +9,7 @@ Params: param (campo GET), id, nome, count, disabled (bool), current (valor ativ
 {% endcomment %}
 {% load catalog_tags %}
 {% if disabled %}
-<span class="toggle-opt{% if klass %} {{ klass }}{% endif %} is-disabled" aria-disabled="true" title="Sem material nesta {{ noun }} ainda">
+<span class="toggle-opt{% if klass %} {{ klass }}{% endif %} is-disabled" aria-disabled="true" title="Ainda sem material nesta opção">
   <span class="toggle-opt__box" aria-hidden="true"></span>
   <span class="toggle-opt__name">{{ nome }}</span>
   {% if not hide_count %}<span class="toggle-opt__count">{{ count }}</span>{% endif %}

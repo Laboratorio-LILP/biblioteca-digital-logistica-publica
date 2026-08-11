@@ -2,14 +2,20 @@
 
 {% block title %}Erro interno (500) — Biblioteca Digital de Logística Pública{% endblock %}
 
-{% block content %}
-<div class="error-page">
-  <p class="error-page__code" aria-hidden="true">500</p>
-  <h1>Tivemos um problema</h1>
-  <p>Ocorreu um erro inesperado no servidor. Tente novamente em instantes — se o problema continuar, use o canal de contato.</p>
-  <div class="error-page__actions">
-    <a class="sp-button-primary" href="{% url 'catalog:home' %}">Ir para a página inicial</a>
-    <a class="sp-button-secondary" href="{% url 'catalog:fale_conosco' %}">Fale conosco</a>
+{% block content_raw %}
+<section class="sp-section sp-section--pattern">
+  <div class="sp-container error-page">
+    <p class="error-page__code" aria-hidden="true">500</p>
+    <h1>Tivemos um problema</h1>
+    <p>Ocorreu um erro inesperado no servidor. Tente novamente em instantes — se o problema continuar, fale conosco.</p>
   </div>
-</div>
+</section>
+<section class="sp-section">
+  <div class="sp-container error-page">
+    <div class="error-page__actions">
+      <a class="sp-button-primary" href="{% url 'catalog:home' %}">Ir para a página inicial</a>
+      <a class="sp-button-secondary" href="{% url 'catalog:fale_conosco' %}">Fale conosco</a>
+    </div>
+  </div>
+</section>
 {% endblock %}

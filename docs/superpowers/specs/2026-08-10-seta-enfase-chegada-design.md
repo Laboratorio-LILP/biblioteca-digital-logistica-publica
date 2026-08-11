@@ -89,3 +89,57 @@ dependências novas, sem migração.
   teclado (Tab + Enter); fonte em A+; banner LGPD visível (limpar
   `localStorage` `sp-lgpd-consent`); 375 px; `prefers-reduced-motion`.
 - CI (ruff + pytest + `check --deploy`) verde — feature só de front.
+
+## Adendo (10/08/2026) — pouso da pílula no mobile
+
+### Problema
+
+Verificação adversarial em viewports mobile (375×667, 375×812, 375×900)
+encontrou um problema de leitura: no primeiro paint de /colecoes/, os cards
+de coleção preenchem a dobra inteira e a pílula pousa **dentro** de um card
+(ex.: rect 221×840, 138×44, 100 % contido no card "Doutrina e Conteúdo
+Técnico", ao lado de "294 documentos"). Vermelha e com o mesmo raio de canto
+dos cards, ela lê como CTA do card — "veja mais desta coleção" — e não como
+guia da página.
+
+### Caminhos avaliados
+
+- **(a) Offset maior no mobile — rejeitado.** Em 375 px os cards ocupam a
+  largura e a altura úteis da primeira dobra; qualquer posição fixa pousa
+  sobre algum card (em 375×667 o pouso cai no card "Trabalhos Acadêmicos").
+  Mudar o pouso também quebraria o colapso no lugar, desenhado nesta spec.
+- **(c) Detectar sobreposição e reposicionar — rejeitado.** Os vãos entre
+  cards (16–24 px) são menores que a pílula (44 px): não existe pouso limpo
+  para onde fugir. Sobraria JS frágil e movimento — o oposto do sóbrio.
+- **(b) Scrim sob a pílula — escolhido.** Um véu em degradê branco, logo
+  abaixo da pílula, atrás dela. O conteúdo do card dissolve sob a pílula,
+  que passa a ler como camada da página. Bônus alinhado à spec de origem:
+  conteúdo cortado em fade é, ele próprio, sinal de continuação — reforça o
+  combate ao falso fundo.
+
+### Design do scrim
+
+- Pseudo-elemento `::before` do próprio botão: nasce e morre com a pílula,
+  sem mudança de template ou de JS. Todas as regras existentes valem por
+  herança — nunca coexiste com "Voltar ao topo", some no primeiro gesto,
+  acompanha o offset do banner LGPD.
+- Só no mobile (`max-width: 767px`, o breakpoint que a seta já usa) e só no
+  estado `is-chegada`. No desktop o pouso já cai em área livre.
+- Largura total do viewport; altura ~128 px; degradê de branco quase opaco
+  embaixo a transparente no topo; `pointer-events: none` (não bloqueia
+  toque nos cards); `z-index: -1` dentro do stacking context do botão (sob
+  a pílula, sobre o conteúdo, sob o banner LGPD).
+- **Ancorado ao botão, não ao viewport** (`bottom: -28px`): quando o banner
+  LGPD empurra a pílula para cima, o véu sobe junto e fecha no topo do
+  banner; sem banner, fecha na borda do viewport. Ancorar no viewport
+  falharia no primeiro acesso — o véu ficaria escondido atrás do banner,
+  exatamente no caso em que banner e chegada coincidem.
+- Fade de opacidade com os tokens de transição do componente;
+  `prefers-reduced-motion` troca sem transição, como o restante.
+
+### Validação do adendo
+
+- Screenshots (Puppeteer) em 375×667, 375×812 e 375×900, nas páginas
+  /colecoes/, / e /sobre/ (controle — não tem seta), com e sem banner LGPD.
+- Conferir: chegada com scrim → primeiro gesto assenta e o scrim some;
+  pílula não lê mais como CTA do card.

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}Fusão do trio de fundos (spec 2026-08-11) com o trilho editorial
+(merge e85289b) nas páginas legais: abertura quadriculada com breadcrumb, h1 e
+intro; corpo livre — cada página emite suas seções-banda rail; fechamento
+cinza com a banda de contato (sobrescrevível via legal_fechamento — o Fale
+Conosco fecha com a própria seção de LGPD para não apontar para si mesmo).
+A seta-guia e seu JS entram aqui, uma vez, para todas as legais.{% endcomment %}
+
+{% block content_raw %}
+<section class="sp-section sp-section--pattern legal-hero" data-sec="Apresentação">
+  <div class="sp-container">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <a href="{% url 'catalog:home' %}">Início</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <span>{% block legal_crumb %}{% endblock %}</span>
+    </nav>
+    <span class="eyebrow">{% block legal_eyebrow %}Institucional{% endblock %}</span>
+    <h1>{% block legal_titulo %}{% endblock %}</h1>
+    <p class="page__intro">{% block legal_intro %}{% endblock %}</p>
+  </div>
+</section>
+
+{% block legal_corpo %}{% endblock %}
+
+{% block legal_fechamento %}
+<section class="sp-section sp-section--alt" data-sec="Fale com o LILP">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Contato</span>
+        <h2>Dúvidas? Fale com o LILP</h2>
+      </div>
+    </div>
+    <p class="curadoria-texto">
+      Para pedidos, sugestões e correções sobre esta página ou sobre o
+      portal, use o canal de contato do LILP — Laboratório de Inovação em
+      Logística Pública, responsável pela biblioteca.
+    </p>
+    <p class="curadoria-acoes">
+      <a class="sp-button-primary" href="{% url 'catalog:fale_conosco' %}">Ir para o Fale Conosco <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+    </p>
+  </div>
+</section>
+{% endblock %}
+{% include "_partials/_seta_secoes.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
+{% endblock %}

@@ -1,30 +1,28 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Sobre — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
-{% block meta_description %}Conheça a missão do LILP e a parceria SGGD ↔ SBU/Unicamp pelo Convênio nº 02/2025 que sustenta a Biblioteca Digital de Logística Pública.{% endblock %}
+{% block meta_description %}Conheça a missão do LILP e a parceria SGGD ↔ SBU/Unicamp pelo Convênio SGGD nº 02/2025 que sustenta a Biblioteca Digital de Logística Pública.{% endblock %}
 
 {% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Sobre</span>
-  </div>
-</nav>
-
-<section class="sp-section sobre-hero">
+<section class="sp-section sp-section--pattern sobre-hero" data-sec="Sobre a Biblioteca">
   <div class="sp-container">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <a href="{% url 'catalog:home' %}">Início</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <span>Sobre</span>
+    </nav>
     <span class="eyebrow">Institucional</span>
     <h1>Sobre a Biblioteca Digital de Logística Pública</h1>
     <p class="page__intro">
       A BDLP é um repositório digital temático que centraliza produções
-      científicas, técnicas, jurisprudenciais e normativas sobre logística
+      científicas, técnicas e normativas, e decisões de tribunais (jurisprudência) sobre logística
       pública, com foco na aplicação da Lei nº 14.133/2021.
     </p>
   </div>
 </section>
 
-<section class="sp-section sp-section--alt">
+<section class="sp-section sp-section--rail" data-sec="Quem somos">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -32,25 +30,30 @@
         <h2>O Laboratório de Inovação em Logística Pública (LILP)</h2>
       </div>
     </div>
-    <p class="curadoria-texto">
-      O LILP foi criado pela <strong>Resolução SGGD nº 38, de 19 de
-      dezembro de 2024</strong>, no âmbito da Secretaria de Gestão e
-      Governo Digital do Estado de São Paulo (SGGD). O laboratório tem
-      como missão promover a inovação em logística pública, abrangendo
-      contratações, gestão de suprimentos e gestão patrimonial — com
-      ênfase na aplicação prática da nova Lei de Licitações e Contratos
-      Administrativos (Lei nº 14.133/2021).
-    </p>
-    <p class="curadoria-texto">
-      Como laboratório, o LILP atua de forma experimental: prototipa
-      soluções, gera evidências, dialoga com a academia e dissemina
-      boas práticas para todo o ecossistema de compras e contratações
-      do Estado.
-    </p>
+    <div class="sp-section__body">
+      <p class="curadoria-texto">
+        O LILP integra a estrutura da Secretaria de Gestão e Governo
+        Digital do Estado de São Paulo — SGGD (Decreto Estadual
+        nº 69.052/2024) e tem suas diretrizes de funcionamento
+        estabelecidas pela <strong>Resolução SGGD nº 38, de 27 de
+        dezembro de 2024</strong>, com competências operacionais na
+        Resolução SGGD nº 37, de 23 de dezembro de 2024. O laboratório tem
+        como missão promover a inovação em logística pública, abrangendo
+        contratações, gestão de suprimentos e gestão patrimonial — com
+        ênfase na aplicação prática da nova Lei de Licitações e Contratos
+        Administrativos (Lei nº 14.133/2021).
+      </p>
+      <p class="curadoria-texto">
+        Como laboratório, o LILP atua de forma experimental: prototipa
+        soluções, gera evidências, dialoga com a academia e dissemina
+        boas práticas para todo o ecossistema de compras e contratações
+        do Estado.
+      </p>
+    </div>
   </div>
 </section>
 
-<section class="sp-section">
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Parceria">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -58,40 +61,42 @@
         <h2>Parceria com a Unicamp / SBU</h2>
       </div>
     </div>
-    <p class="page__intro">
-      O Portal BDLP é fruto do <strong>Convênio SGGD nº 02/2025</strong>,
-      firmado entre a SGGD e a Universidade Estadual de Campinas
-      (Unicamp), por meio do <strong>Sistema de Bibliotecas da Unicamp
-      (SBU)</strong>. A parceria estabelece divisão clara de
-      responsabilidades:
-    </p>
-    <div class="org-grid org-grid--2">
-      <article class="sp-card org-card">
-        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-users"/></svg></span>
-        <h3>SGGD / LILP</h3>
-        <ul>
-          <li>Curadoria editorial</li>
-          <li>Operação técnica do portal</li>
-          <li>Divulgação institucional</li>
-          <li>Relacionamento com autores</li>
-        </ul>
-      </article>
+    <div class="sp-section__body">
+      <p class="page__intro">
+        O Portal BDLP é fruto do <strong>Convênio SGGD nº 02/2025</strong>,
+        firmado entre a SGGD e a Universidade Estadual de Campinas
+        (Unicamp), por meio do <strong>Sistema de Bibliotecas da Unicamp
+        (SBU)</strong>. A parceria estabelece divisão clara de
+        responsabilidades:
+      </p>
+      <div class="org-grid org-grid--2">
+        <article class="sp-card org-card">
+          <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-users"/></svg></span>
+          <h3>SGGD / LILP</h3>
+          <ul>
+            <li>Curadoria editorial</li>
+            <li>Operação técnica do portal</li>
+            <li>Divulgação institucional</li>
+            <li>Relacionamento com autores</li>
+          </ul>
+        </article>
 
-      <article class="sp-card org-card">
-        <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-book-open"/></svg></span>
-        <h3>SBU / Unicamp</h3>
-        <ul>
-          <li>Consultoria em catalogação e indexação</li>
-          <li>Padronização de metadados</li>
-          <li>Preservação digital</li>
-          <li>Interoperabilidade com bases acadêmicas</li>
-        </ul>
-      </article>
+        <article class="sp-card org-card">
+          <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-book-open"/></svg></span>
+          <h3>SBU / Unicamp</h3>
+          <ul>
+            <li>Consultoria em catalogação e indexação</li>
+            <li>Padronização de metadados (as informações que descrevem cada documento)</li>
+            <li>Preservação digital</li>
+            <li>Integração com bases de dados acadêmicas</li>
+          </ul>
+        </article>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="sp-section sp-section--alt">
+<section class="sp-section sp-section--rail" data-sec="Marco normativo">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -99,17 +104,34 @@
         <h2>Marco normativo</h2>
       </div>
     </div>
-    <ul class="curadoria-lista">
-      <li>Lei nº 14.133/2021 — Licitações e Contratos Administrativos.</li>
-      <li>Resolução SGGD nº 38/2024 — Institui o LILP.</li>
-      <li>Decreto Estadual nº 67.799/2023 — Estratégia de Governo Digital.</li>
-      <li>Decreto Estadual nº 69.056/2024 — Portal único SP.GOV.BR.</li>
-      <li>Convênio SGGD nº 02/2025 — Parceria SGGD ↔ SBU/Unicamp.</li>
-    </ul>
+    <div class="sp-section__body">
+      <dl class="normas-lista">
+        <div class="normas-lista__item">
+          <dt>Lei nº 14.133/2021</dt>
+          <dd>Licitações e Contratos Administrativos</dd>
+        </div>
+        <div class="normas-lista__item">
+          <dt>Resolução SGGD nº 38/2024</dt>
+          <dd>Diretrizes de funcionamento do LILP</dd>
+        </div>
+        <div class="normas-lista__item">
+          <dt>Decreto Estadual nº 67.799/2023</dt>
+          <dd>Estratégia de Governo Digital</dd>
+        </div>
+        <div class="normas-lista__item">
+          <dt>Decreto Estadual nº 69.056/2024</dt>
+          <dd>Portal único SP.GOV.BR</dd>
+        </div>
+        <div class="normas-lista__item">
+          <dt>Convênio SGGD nº 02/2025</dt>
+          <dd>Parceria entre a SGGD e a SBU/Unicamp</dd>
+        </div>
+      </dl>
+    </div>
   </div>
 </section>
 
-<section class="sp-section">
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Contato">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -117,19 +139,28 @@
         <h2>Fale com o LILP</h2>
       </div>
     </div>
-    <p class="curadoria-texto">
-      <strong>Laboratório de Inovação em Logística Pública (LILP)</strong><br>
-      Secretaria de Gestão e Governo Digital — SGGD<br>
-      Av. Rangel Pestana, 300 — Sé — São Paulo/SP<br>
-      E-mail: <a href="mailto:lab.sggd@sp.gov.br">lab.sggd@sp.gov.br</a>
-    </p>
-    <p class="curadoria-texto">
-      Para sugestões, correções e parcerias, utilize a página de
-      Fale Conosco.
-    </p>
-    <p class="curadoria-acoes">
-      <a class="sp-button-primary" href="{% url 'catalog:fale_conosco' %}">Ir para o Fale Conosco <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
-    </p>
+    <div class="sp-section__body">
+      <p class="curadoria-texto">
+        Para sugestões, correções e parcerias, use a página
+        Fale Conosco.
+      </p>
+      <div class="sp-panel contato-panel">
+        <p class="curadoria-texto">
+          <strong>Laboratório de Inovação em Logística Pública (LILP)</strong><br>
+          Secretaria de Gestão e Governo Digital — SGGD<br>
+          Av. Rangel Pestana, 300 — Sé — São Paulo/SP<br>
+          E-mail: <a href="mailto:lab.sggd@sp.gov.br">lab.sggd@sp.gov.br</a>
+        </p>
+        <p class="curadoria-acoes">
+          <a class="sp-button-primary" href="{% url 'catalog:fale_conosco' %}">Ir para o Fale Conosco <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+        </p>
+      </div>
+    </div>
   </div>
 </section>
+{% include "_partials/_seta_secoes.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}

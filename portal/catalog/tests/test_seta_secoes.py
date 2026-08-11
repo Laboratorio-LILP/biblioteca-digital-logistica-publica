@@ -83,3 +83,9 @@ def test_js_tem_chegada_que_assenta_no_primeiro_gesto():
     assert "is-chegada" in js
     assert "Veja mais: " in js   # WCAG 2.5.3 — nome acessível contém o rótulo visível
     assert "assentar" in js
+
+
+def test_css_alto_contraste_desliga_pseudos_da_pilula():
+    css = (STATIC / "css" / "portal.css").read_text(encoding="utf-8")
+    assert "body.sp-alto-contraste .sp-seta-secoes::before" in css
+    assert "body.sp-alto-contraste .sp-seta-secoes.is-chegada::after" in css

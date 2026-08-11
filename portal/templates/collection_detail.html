@@ -3,42 +3,53 @@
 
 {% block title %}{{ topic.name }} — Biblioteca Digital de Logística Pública{% endblock %}
 
-{% block content %}
-<nav class="breadcrumb" aria-label="Você está em">
-  <a href="{% url 'catalog:home' %}">Início</a>
-  <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-  <a href="{% url 'catalog:collection_list' %}">Coleções</a>
-  {% for item in breadcrumb %}<svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>{% if forloop.last %}<span>{{ item.name }}</span>{% else %}<a href="{% url 'catalog:collection_detail' item.id %}">{{ item.name }}</a>{% endif %}{% endfor %}
-</nav>
+{% block content_raw %}
+<section class="sp-section sp-section--pattern colecoes-hero">
+  <div class="sp-container">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <a href="{% url 'catalog:home' %}">Início</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <a href="{% url 'catalog:collection_list' %}">Coleções</a>
+      {% for item in breadcrumb %}<svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>{% if forloop.last %}<span>{{ item.name }}</span>{% else %}<a href="{% url 'catalog:collection_detail' item.id %}">{{ item.name }}</a>{% endif %}{% endfor %}
+    </nav>
+    <h1>{{ topic.name }}</h1>
+    {% if topic.description %}<p class="page__intro">{{ topic.description }}</p>{% endif %}
+  </div>
+</section>
 
-<h1>{{ topic.name }}</h1>
-{% if topic.description %}<p class="page__intro">{{ topic.description }}</p>{% endif %}
+<section class="sp-section colecao-miolo">
+  <div class="sp-container">
+    {% if subcollection_cards %}
+    <h2>Subcoleções</h2>
+    <div class="collections-grid">
+      {% for card in subcollection_cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
+    </div>
+    {% endif %}
 
-{% if subcollection_cards %}
-<h2>Subcoleções</h2>
-<div class="collections-grid">
-  {% for card in subcollection_cards %}{% include "_partials/_collection_card.html" %}{% endfor %}
-</div>
-{% endif %}
-
-<h2>Documentos ({{ total_docs }})</h2>
-{% if page_obj.object_list %}
-<div class="doc-grid">
-  {% for doc in page_obj %}{% include "_partials/_doc_card.html" %}{% endfor %}
-</div>
-{% else %}
-<div class="sp-panel empty-state">
-  <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
-  <strong>Ainda não há documentos nesta coleção</strong>
-  <p>Esta coleção faz parte da organização do acervo, mas ainda não recebeu materiais. Explore o <a href="{% url 'catalog:search' %}">acervo completo</a> ou veja outras <a href="{% url 'catalog:collection_list' %}">coleções</a>.</p>
-</div>
-{% endif %}
+    <h2>Documentos ({{ total_docs }})</h2>
+    {% if page_obj.object_list %}
+    <div class="doc-grid">
+      {% for doc in page_obj %}{% include "_partials/_doc_card.html" %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="sp-panel empty-state">
+      <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
+      <strong>Ainda não há documentos nesta coleção</strong>
+      <p>Esta coleção faz parte da organização do acervo, mas ainda não recebeu materiais. Explore o <a href="{% url 'catalog:search' %}">acervo completo</a> ou veja outras <a href="{% url 'catalog:collection_list' %}">coleções</a>.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
 
 {% if page_obj.has_other_pages %}
-<nav class="pagination" aria-label="Paginação dos documentos">
-  {% if page_obj.has_previous %}<a class="page-btn" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>{% endif %}
-  <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-  {% if page_obj.has_next %}<a class="page-btn" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>{% endif %}
-</nav>
+<section class="sp-section sp-section--alt">
+  <div class="sp-container">
+    <nav class="pagination" aria-label="Paginação dos documentos">
+      {% if page_obj.has_previous %}<a class="page-btn" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>{% endif %}
+      <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a class="page-btn" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>{% endif %}
+    </nav>
+  </div>
+</section>
 {% endif %}
 {% endblock %}
