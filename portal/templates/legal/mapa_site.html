@@ -1,12 +1,12 @@
 {% extends "legal/_base_legal.html" %}
 
 {% block title %}Mapa do Site — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
-{% block meta_description %}Estrutura completa de páginas e conteúdos do Portal BDLP — facilita a navegação e atende à recomendação eMAG 3.1 de mapa do site.{% endblock %}
+{% block meta_description %}Estrutura completa de páginas e conteúdos do Portal BDLP — facilita a navegação e atende ao eMAG 3.1 (item 4.4 — mapa do site).{% endblock %}
 
 {% block legal_crumb %}Mapa do Site{% endblock %}
 {% block legal_eyebrow %}Navegação{% endblock %}
 {% block legal_titulo %}Mapa do Site{% endblock %}
-{% block legal_intro %}Esta página apresenta a estrutura hierárquica completa de páginas e seções do Portal BDLP, conforme recomendação <strong>eMAG 3.1</strong>. Use-a como atalho para encontrar rapidamente o que você procura.{% endblock %}
+{% block legal_intro %}Esta página apresenta a estrutura hierárquica completa de páginas e seções do Portal BDLP, conforme o <strong>eMAG 3.1</strong>, que prevê o mapa do site como elemento padronizado (item 4.4). Use-a como atalho para encontrar rapidamente o que você procura.{% endblock %}
 
 {% block legal_corpo %}
 <section class="sp-section sp-section--rail" data-sec="Páginas principais">
@@ -69,7 +69,7 @@
     </div>
     <div class="sp-section__body sp-section__body--prosa">
       <ul class="sp-mapa-site">
-        <li><a href="{% url 'catalog:transparencia' %}">Transparência (LAI)</a></li>
+        <li><a href="{% url 'catalog:transparencia' %}">Transparência (Lei de Acesso à Informação — LAI)</a></li>
         <li><a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a></li>
         <li><a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a></li>
         <li><a href="{% url 'catalog:politica_cookies' %}">Política de Cookies</a></li>
