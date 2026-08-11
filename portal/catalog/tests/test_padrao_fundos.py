@@ -40,3 +40,13 @@ def test_colecoes_segue_o_trio():
     # fechamento cinza: a ultima secao (Como encontrar) e --alt; a do meio nao e
     assert t.count("sp-section--alt") == 1
     assert t.index("sp-section--alt") > t.index("Como o acervo se organiza")
+
+
+def test_sobre_segue_o_trio():
+    t = _template("about.html")
+    assert "breadcrumb-bar" not in t
+    abertura = t.index('sp-section sp-section--pattern sobre-hero')
+    assert t.index('class="breadcrumb"', abertura) > abertura
+    # miolo alterna branco/cinza a partir do branco; contato fecha cinza
+    assert t.count("sp-section--alt") == 2
+    assert t.rindex("sp-section--alt") > t.index("Fale com o LILP") - 400

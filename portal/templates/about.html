@@ -4,16 +4,13 @@
 {% block meta_description %}Conheça a missão do LILP e a parceria SGGD ↔ SBU/Unicamp pelo Convênio nº 02/2025 que sustenta a Biblioteca Digital de Logística Pública.{% endblock %}
 
 {% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Sobre</span>
-  </div>
-</nav>
-
-<section class="sp-section sobre-hero">
+<section class="sp-section sp-section--pattern sobre-hero">
   <div class="sp-container">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <a href="{% url 'catalog:home' %}">Início</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <span>Sobre</span>
+    </nav>
     <span class="eyebrow">Institucional</span>
     <h1>Sobre a Biblioteca Digital de Logística Pública</h1>
     <p class="page__intro">
@@ -24,7 +21,7 @@
   </div>
 </section>
 
-<section class="sp-section sp-section--alt">
+<section class="sp-section">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -50,7 +47,7 @@
   </div>
 </section>
 
-<section class="sp-section">
+<section class="sp-section sp-section--alt">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -91,7 +88,7 @@
   </div>
 </section>
 
-<section class="sp-section sp-section--alt">
+<section class="sp-section">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -109,7 +106,7 @@
   </div>
 </section>
 
-<section class="sp-section">
+<section class="sp-section sp-section--alt">
   <div class="sp-container">
     <div class="section-heading">
       <div>
