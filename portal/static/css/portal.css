@@ -1013,6 +1013,39 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
     min-width: 44px; height: 44px; right: 16px;
     bottom: calc(16px + var(--sp-seta-offset, 0px)); font-size: 18px;
   }
+  /* Scrim da chegada (só mobile): no primeiro paint os cards preenchem a
+     dobra e a pílula pousaria dentro de um deles, lendo como CTA do card.
+     O véu em degradê dissolve o conteúdo sob a pílula — ela volta a ler
+     como camada da página, e o corte em fade sinaliza continuação.
+     Ancorado ao botão (não ao viewport): sobe junto quando o banner LGPD
+     empurra a pílula. bottom -28px = 16px do pouso do botão + 12px da
+     folga do offset — fecha na borda do viewport sem banner e no topo do
+     banner com ele. z-index -1: sob a pílula, sobre a página. */
+  .sp-seta-secoes::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -16px;
+    bottom: -28px;
+    width: 100vw; height: 128px;
+    background: linear-gradient(to top, rgb(var(--rgb-white) / 0.96) 32%, rgb(var(--rgb-white) / 0));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+  }
+  .sp-seta-secoes.is-chegada::before { opacity: 1; }
+  /* Pele da pílula sobre o véu: na ordem de pintura, um descendente com
+     z-index negativo fica ACIMA do fundo do próprio botão — sem isto o
+     véu lavaria o vermelho da pílula. ::after vem depois de ::before na
+     árvore, então cobre o véu; o texto e o chevron pintam acima dos dois. */
+  .sp-seta-secoes.is-chegada::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: 6px;
+    background: var(--sp-red-dark);
+  }
 }
 
 /* Anti-falso-fundo (Home): em telas baixas (inclusive mobile em retrato,
@@ -1029,5 +1062,5 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }          /* rolagem instantânea */
-  .sp-seta-secoes, .sp-seta-secoes__rotulo { transition: none; }
+  .sp-seta-secoes, .sp-seta-secoes__rotulo, .sp-seta-secoes::before { transition: none; }
 }
