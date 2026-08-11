@@ -1,21 +1,17 @@
-{% extends "base.html" %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Política de Privacidade — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Política de Privacidade do Portal BDLP em conformidade com a LGPD (Lei 13.709/2018). Identificação do controlador, finalidades, base legal e direitos do titular.{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
-    <h1>Política de Privacidade</h1>
-    <p class="sp-pagina-legal__intro">
-      Esta política descreve como o Portal da Biblioteca Digital de Logística
+{% block legal_crumb %}Política de Privacidade{% endblock %}
+{% block legal_titulo %}Política de Privacidade{% endblock %}
+{% block legal_intro %}Esta política descreve como o Portal da Biblioteca Digital de Logística
       Pública (BDLP) trata os dados pessoais coletados de seus visitantes,
       em observância à <strong>Lei nº 13.709/2018 (Lei Geral de Proteção
       de Dados — LGPD)</strong>, ao Marco Civil da Internet (Lei nº
-      12.965/2014) e à Estratégia de Governo Digital do Estado de SP.
-    </p>
-  </header>
+      12.965/2014) e à Estratégia de Governo Digital do Estado de SP.{% endblock %}
 
+{% block legal_corpo %}
   <section>
     <h2>1. Controlador dos dados</h2>
     <address>
@@ -146,5 +142,4 @@
     </p>
     <p><em>Esta política está em processo de validação jurídica e poderá ser atualizada.</em></p>
   </section>
-</article>
 {% endblock %}

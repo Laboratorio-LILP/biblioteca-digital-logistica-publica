@@ -1,19 +1,15 @@
-{% extends "base.html" %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Fale Conosco — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Entre em contato com a equipe do Portal BDLP — LILP/SGGD. Canais de contato, e-mail institucional e Ouvidoria do Estado de São Paulo.{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
-    <h1>Fale Conosco</h1>
-    <p class="sp-pagina-legal__intro">
-      Estamos à disposição para esclarecer dúvidas sobre o acervo,
+{% block legal_crumb %}Fale Conosco{% endblock %}
+{% block legal_titulo %}Fale Conosco{% endblock %}
+{% block legal_intro %}Estamos à disposição para esclarecer dúvidas sobre o acervo,
       receber sugestões de melhoria e abrir canal para contribuições
-      acadêmicas e institucionais.
-    </p>
-  </header>
+      acadêmicas e institucionais.{% endblock %}
 
+{% block legal_corpo %}
   <section>
     <h2>Canais de contato</h2>
     <dl class="sp-canais-contato">
@@ -70,16 +66,23 @@
       os prazos legais previstos na LAI e em normas correlatas.
     </p>
   </section>
+{% endblock %}
 
-  <section>
-    <h2>Sobre o tratamento de seus dados de contato</h2>
-    <p>
-      Os dados que você nos enviar serão utilizados exclusivamente para
-      responder à sua solicitação, conforme nossa
-      <a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a>.
-      Você pode, a qualquer momento, solicitar exclusão dos seus dados
-      ao Encarregado de Proteção de Dados da SGGD.
-    </p>
-  </section>
-</article>
+{% block legal_fechamento %}
+<section class="sp-section sp-section--alt">
+  <div class="sp-container">
+    <article class="sp-pagina-legal">
+      <section>
+        <h2>Sobre o tratamento de seus dados de contato</h2>
+        <p>
+          Os dados que você nos enviar serão utilizados exclusivamente para
+          responder à sua solicitação, conforme nossa
+          <a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a>.
+          Você pode, a qualquer momento, solicitar exclusão dos seus dados
+          ao Encarregado de Proteção de Dados da SGGD.
+        </p>
+      </section>
+    </article>
+  </div>
+</section>
 {% endblock %}

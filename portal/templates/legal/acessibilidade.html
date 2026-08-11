@@ -1,20 +1,16 @@
-{% extends "base.html" %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Acessibilidade — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Compromisso de acessibilidade do Portal BDLP em conformidade com eMAG 3.1 e WCAG 2.0 AA. Atalhos de teclado, recursos disponíveis e canal para reportar barreiras.{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
-    <h1>Acessibilidade</h1>
-    <p class="sp-pagina-legal__intro">
-      O Portal da Biblioteca Digital de Logística Pública (BDLP) busca
+{% block legal_crumb %}Acessibilidade{% endblock %}
+{% block legal_titulo %}Acessibilidade{% endblock %}
+{% block legal_intro %}O Portal da Biblioteca Digital de Logística Pública (BDLP) busca
       ser navegável e compreensível por todas as pessoas, independentemente
       de suas capacidades físicas, sensoriais ou cognitivas, dos dispositivos
-      que utilizam ou da tecnologia assistiva empregada.
-    </p>
-  </header>
+      que utilizam ou da tecnologia assistiva empregada.{% endblock %}
 
+{% block legal_corpo %}
   <section>
     <h2>Padrões adotados</h2>
     <p>
@@ -92,5 +88,4 @@
       <li>Formulário interno: <a href="{% url 'catalog:fale_conosco' %}">Fale Conosco</a></li>
     </ul>
   </section>
-</article>
 {% endblock %}

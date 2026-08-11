@@ -1,19 +1,15 @@
-{% extends "base.html" %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Mapa do Site — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Estrutura completa de páginas e conteúdos do Portal BDLP — facilita a navegação e atende à recomendação eMAG 3.1 de mapa do site.{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
-    <h1>Mapa do Site</h1>
-    <p class="sp-pagina-legal__intro">
-      Esta página apresenta a estrutura hierárquica completa de páginas
+{% block legal_crumb %}Mapa do site{% endblock %}
+{% block legal_titulo %}Mapa do Site{% endblock %}
+{% block legal_intro %}Esta página apresenta a estrutura hierárquica completa de páginas
       e seções do Portal BDLP, conforme recomendação <strong>eMAG 3.1</strong>.
-      Use-a como atalho para encontrar rapidamente o que você procura.
-    </p>
-  </header>
+      Use-a como atalho para encontrar rapidamente o que você procura.{% endblock %}
 
+{% block legal_corpo %}
   <section>
     <h2>Páginas principais</h2>
     <ul class="sp-mapa-site">
@@ -76,5 +72,4 @@
       <li><a href="http://www.sic.sp.gov.br/" target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a></li>
     </ul>
   </section>
-</article>
 {% endblock %}

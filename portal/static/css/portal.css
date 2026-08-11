@@ -882,8 +882,8 @@ html.js .btn-apply { display: none; }
 .curadoria-acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 
 /* Páginas de Coleções e Sobre no padrão de seções da Home (full-bleed + section-heading) */
-.colecoes-hero .eyebrow, .sobre-hero .eyebrow { display: block; }
-.colecoes-hero h1, .sobre-hero h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.14; margin: 8px 0 10px; }
+.colecoes-hero .eyebrow, .sobre-hero .eyebrow, .legal-hero .eyebrow { display: block; }
+.colecoes-hero h1, .sobre-hero h1, .legal-hero h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.14; margin: 8px 0 10px; }
 
 /* Miolo da página de coleção (trio de fundos): h2 que antes herdavam de .page > h2 */
 .colecao-miolo h2 { font-family: var(--font-heading); font-weight: 700; margin: 24px 0 12px; font-size: 22px; }

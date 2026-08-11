@@ -99,3 +99,31 @@ def test_colecao_migrou_para_o_trio():
     assert "colecao-miolo" in t
     fecho = t.index("sp-section sp-section--alt")
     assert t.index('class="pagination"') > fecho
+
+
+LEGAIS = [
+    "legal/transparencia.html", "legal/acessibilidade.html",
+    "legal/politica_privacidade.html", "legal/politica_cookies.html",
+    "legal/mapa_site.html", "legal/fale_conosco.html",
+]
+
+
+def test_base_legal_define_o_trio():
+    b = _template("legal/_base_legal.html")
+    assert "sp-section sp-section--pattern legal-hero" in b
+    assert 'class="breadcrumb"' in b
+    assert "sp-pagina-legal" in b                              # corpo na banda branca
+    assert "sp-section sp-section--alt" in b                   # fechamento (banda de contato)
+    assert "fale_conosco" in b                                 # CTA aponta para o Fale Conosco
+
+
+def test_legais_estendem_o_base_legal():
+    for nome in LEGAIS:
+        t = _template(nome)
+        assert 'extends "legal/_base_legal.html"' in t, nome
+        assert "block content" not in t.replace("content_raw", ""), nome
+
+
+def test_fale_conosco_nao_se_autoreferencia():
+    t = _template("legal/fale_conosco.html")
+    assert "legal_fechamento" in t                             # sobrescreve a banda de contato
