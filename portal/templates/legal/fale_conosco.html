@@ -1,85 +1,124 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Fale Conosco — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Entre em contato com a equipe do Portal BDLP — LILP/SGGD. Canais de contato, e-mail institucional e Ouvidoria do Estado de São Paulo.{% endblock %}
 
-{% block content %}
-<article class="sp-pagina-legal">
-  <header>
+{% block content_raw %}
+<nav class="breadcrumb-bar" aria-label="Você está em">
+  <div class="sp-container breadcrumb">
+    <a href="{% url 'catalog:home' %}">Início</a>
+    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+    <span>Fale Conosco</span>
+  </div>
+</nav>
+
+<section class="sp-section legal-hero" data-sec="Fale Conosco">
+  <div class="sp-container">
+    <span class="eyebrow">Atendimento</span>
     <h1>Fale Conosco</h1>
-    <p class="sp-pagina-legal__intro">
+    <p class="page__intro">
       Estamos à disposição para esclarecer dúvidas sobre o acervo,
       receber sugestões de melhoria e abrir canal para contribuições
       acadêmicas e institucionais.
     </p>
-  </header>
+  </div>
+</section>
 
-  <section>
-    <h2>Canais de contato</h2>
-    <dl class="sp-canais-contato">
-      <dt>E-mail institucional do LILP</dt>
-      <dd>
-        <a href="mailto:lab.sggd@sp.gov.br">lab.sggd@sp.gov.br</a>
-      </dd>
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Canais de contato">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Canais</span>
+        <h2>Canais de contato</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <dl class="sp-canais-contato">
+        <dt>E-mail institucional do LILP</dt>
+        <dd>
+          <a href="mailto:lab.sggd@sp.gov.br">lab.sggd@sp.gov.br</a>
+        </dd>
 
-      <dt>Endereço postal</dt>
-      <dd>
-        <address>
-          Secretaria de Gestão e Governo Digital — SGGD<br>
-          Av. Rangel Pestana, 300 — Sé<br>
-          São Paulo/SP
-        </address>
-      </dd>
+        <dt>Endereço postal</dt>
+        <dd>
+          <address>
+            Secretaria de Gestão e Governo Digital — SGGD<br>
+            Av. Rangel Pestana, 300 — Sé<br>
+            São Paulo/SP
+          </address>
+        </dd>
 
-      <dt>Reportar erros de acessibilidade</dt>
-      <dd>
-        Use a página de <a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a>
-        ou o canal central
-        <a href="https://www.saopaulo.sp.gov.br/fale-conosco/comunicar-erros/"
-           target="_blank" rel="noopener noreferrer">Comunicar erros do Governo SP</a>
-       .
-      </dd>
+        <dt>Reportar erros de acessibilidade</dt>
+        <dd>
+          Use a página de <a href="{% url 'catalog:acessibilidade' %}">Acessibilidade</a>
+          ou o canal central
+          <a href="https://www.saopaulo.sp.gov.br/fale-conosco/comunicar-erros/"
+             target="_blank" rel="noopener noreferrer">Comunicar erros do Governo SP</a>.
+        </dd>
 
-      <dt>Ouvidoria, denúncias e reclamações</dt>
-      <dd>
-        Para manifestações formais (reclamação, denúncia, elogio,
-        solicitação de providência) que envolvam serviços públicos
-        estaduais, utilize a
-        <a href="https://www.ouvidoria.sp.gov.br/"
-           target="_blank" rel="noopener noreferrer">Ouvidoria Geral do Estado</a>
-       .
-      </dd>
+        <dt>Ouvidoria, denúncias e reclamações</dt>
+        <dd>
+          Para manifestações formais (reclamação, denúncia, elogio,
+          solicitação de providência) que envolvam serviços públicos
+          estaduais, utilize a
+          <a href="https://www.ouvidoria.sp.gov.br/"
+             target="_blank" rel="noopener noreferrer">Ouvidoria Geral do Estado</a>.
+        </dd>
 
-      <dt>Pedido de acesso à informação (LAI)</dt>
-      <dd>
-        Conforme Lei nº 12.527/2011, qualquer cidadão pode formular
-        pedido de acesso à informação ao Estado de SP através do
-        <a href="http://www.sic.sp.gov.br/"
-           target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a>
-       .
-      </dd>
-    </dl>
-  </section>
+        <dt>Pedido de acesso à informação (LAI)</dt>
+        <dd>
+          Conforme Lei nº 12.527/2011, qualquer cidadão pode formular
+          pedido de acesso à informação ao Estado de SP através do
+          <a href="http://www.sic.sp.gov.br/"
+             target="_blank" rel="noopener noreferrer">Sistema de Informações ao Cidadão (SIC)</a>.
+        </dd>
+      </dl>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Tempo de resposta</h2>
-    <p>
-      Mensagens institucionais relacionadas ao acervo são respondidas
-      em até <strong>10 dias úteis</strong>, sempre que possível em
-      prazo menor. Para pedidos formais via SIC ou Ouvidoria, valem
-      os prazos legais previstos na LAI e em normas correlatas.
-    </p>
-  </section>
+<section class="sp-section sp-section--rail" data-sec="Tempo de resposta">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Prazos</span>
+        <h2>Tempo de resposta</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        Mensagens institucionais relacionadas ao acervo são respondidas
+        em até <strong>10 dias úteis</strong>, sempre que possível em
+        prazo menor. Para pedidos formais via SIC ou Ouvidoria, valem
+        os prazos legais previstos na LAI e em normas correlatas.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <section>
-    <h2>Sobre o tratamento de seus dados de contato</h2>
-    <p>
-      Os dados que você nos enviar serão utilizados exclusivamente para
-      responder à sua solicitação, conforme nossa
-      <a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a>.
-      Você pode, a qualquer momento, solicitar exclusão dos seus dados
-      ao Encarregado de Proteção de Dados da SGGD.
-    </p>
-  </section>
-</article>
+<section class="sp-section sp-section--rail" data-sec="Seus dados de contato">
+  <div class="sp-container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Privacidade</span>
+        <h2>Sobre o tratamento de seus dados de contato</h2>
+      </div>
+    </div>
+    <div class="sp-section__body sp-section__body--prosa">
+      <p>
+        Os dados que você nos enviar serão utilizados exclusivamente para
+        responder à sua solicitação, conforme nossa
+        <a href="{% url 'catalog:politica_privacidade' %}">Política de Privacidade</a>.
+        Você pode, a qualquer momento, solicitar exclusão dos seus dados
+        ao Encarregado de Proteção de Dados da SGGD.
+      </p>
+    </div>
+  </div>
+</section>
+{% include "_partials/_seta_secoes.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}
