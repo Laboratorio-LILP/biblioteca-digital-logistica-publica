@@ -135,3 +135,12 @@ def test_paginas_de_erro_abrem_quadriculado():
         assert "content_raw" in t, nome
         assert "sp-section sp-section--pattern" in t, nome
         assert t.index("error-page__actions") > t.index('sp-section">'), nome
+
+
+def test_css_sem_classes_orfas_do_padrao_antigo():
+    assert ".breadcrumb-bar" not in CSS
+    assert ".sp-pagina-legal__cabecalho" not in CSS
+    assert ".sp-pagina-legal__intro" not in CSS
+    assert ".breadcrumb-bar + .colecoes-hero" not in CSS
+    assert ".catalog-hero__crumb" not in CSS
+    assert ".legal-hero .eyebrow" not in CSS
