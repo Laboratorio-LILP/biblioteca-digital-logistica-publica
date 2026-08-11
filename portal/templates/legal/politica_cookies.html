@@ -1,31 +1,14 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Política de Cookies — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Política de Cookies do Portal BDLP. Categorias utilizadas, finalidades, retenção e instruções para gerenciar ou revogar consentimento.{% endblock %}
 
-{% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Política de Cookies</span>
-  </div>
-</nav>
+{% block legal_crumb %}Política de Cookies{% endblock %}
+{% block legal_eyebrow %}Privacidade{% endblock %}
+{% block legal_titulo %}Política de Cookies{% endblock %}
+{% block legal_intro %}Esta política descreve como o Portal BDLP utiliza cookies e tecnologias similares de armazenamento local, em conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei nº 12.965/2014).{% endblock %}
 
-<section class="sp-section legal-hero" data-sec="Política de Cookies">
-  <div class="sp-container">
-    <span class="eyebrow">Privacidade</span>
-    <h1>Política de Cookies</h1>
-    <p class="page__intro">
-      Esta política descreve como o Portal BDLP utiliza cookies e
-      tecnologias similares de armazenamento local, em conformidade
-      com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet
-      (Lei nº 12.965/2014).
-    </p>
-  </div>
-</section>
-
+{% block legal_corpo %}
 <section class="sp-section sp-section--rail" data-sec="O que são cookies">
   <div class="sp-container">
     <div class="section-heading">
@@ -188,9 +171,4 @@
     </div>
   </div>
 </section>
-{% include "_partials/_seta_secoes.html" %}
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}

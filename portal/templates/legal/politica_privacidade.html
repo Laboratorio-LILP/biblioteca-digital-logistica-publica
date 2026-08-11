@@ -1,32 +1,14 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Política de Privacidade — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Política de Privacidade do Portal BDLP em conformidade com a LGPD (Lei 13.709/2018). Identificação do controlador, finalidades, base legal e direitos do titular.{% endblock %}
 
-{% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Política de Privacidade</span>
-  </div>
-</nav>
+{% block legal_crumb %}Política de Privacidade{% endblock %}
+{% block legal_eyebrow %}Privacidade{% endblock %}
+{% block legal_titulo %}Política de Privacidade{% endblock %}
+{% block legal_intro %}Esta política descreve como o Portal da Biblioteca Digital de Logística Pública (BDLP) trata os dados pessoais coletados de seus visitantes, em observância à <strong>Lei nº 13.709/2018 (Lei Geral de Proteção de Dados — LGPD)</strong>, ao Marco Civil da Internet (Lei nº 12.965/2014) e à Estratégia de Governo Digital do Estado de SP.{% endblock %}
 
-<section class="sp-section legal-hero" data-sec="Política de Privacidade">
-  <div class="sp-container">
-    <span class="eyebrow">Privacidade</span>
-    <h1>Política de Privacidade</h1>
-    <p class="page__intro">
-      Esta política descreve como o Portal da Biblioteca Digital de Logística
-      Pública (BDLP) trata os dados pessoais coletados de seus visitantes,
-      em observância à <strong>Lei nº 13.709/2018 (Lei Geral de Proteção
-      de Dados — LGPD)</strong>, ao Marco Civil da Internet (Lei nº
-      12.965/2014) e à Estratégia de Governo Digital do Estado de SP.
-    </p>
-  </div>
-</section>
-
+{% block legal_corpo %}
 <section class="sp-section sp-section--rail" data-sec="Quem controla os dados">
   <div class="sp-container">
     <div class="section-heading">
@@ -229,9 +211,4 @@
     </div>
   </div>
 </section>
-{% include "_partials/_seta_secoes.html" %}
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}

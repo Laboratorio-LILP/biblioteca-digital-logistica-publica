@@ -1,31 +1,14 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Acessibilidade — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Compromisso de acessibilidade do Portal BDLP em conformidade com eMAG 3.1 e WCAG 2.0 AA. Atalhos de teclado, recursos disponíveis e canal para reportar barreiras.{% endblock %}
 
-{% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Acessibilidade</span>
-  </div>
-</nav>
+{% block legal_crumb %}Acessibilidade{% endblock %}
+{% block legal_eyebrow %}Compromisso{% endblock %}
+{% block legal_titulo %}Acessibilidade{% endblock %}
+{% block legal_intro %}O Portal da Biblioteca Digital de Logística Pública (BDLP) busca ser navegável e compreensível por todas as pessoas, independentemente de suas capacidades físicas, sensoriais ou cognitivas, dos dispositivos que utilizam ou da tecnologia assistiva empregada.{% endblock %}
 
-<section class="sp-section legal-hero" data-sec="Acessibilidade">
-  <div class="sp-container">
-    <span class="eyebrow">Compromisso</span>
-    <h1>Acessibilidade</h1>
-    <p class="page__intro">
-      O Portal da Biblioteca Digital de Logística Pública (BDLP) busca
-      ser navegável e compreensível por todas as pessoas, independentemente
-      de suas capacidades físicas, sensoriais ou cognitivas, dos dispositivos
-      que utilizam ou da tecnologia assistiva empregada.
-    </p>
-  </div>
-</section>
-
+{% block legal_corpo %}
 <section class="sp-section sp-section--rail" data-sec="Padrões adotados">
   <div class="sp-container">
     <div class="section-heading">
@@ -148,9 +131,4 @@
     </div>
   </div>
 </section>
-{% include "_partials/_seta_secoes.html" %}
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}

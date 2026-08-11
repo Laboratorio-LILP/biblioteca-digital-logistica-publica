@@ -5,16 +5,13 @@
 {% block meta_description %}As quatro coleções da Biblioteca Digital de Logística Pública e como o acervo é organizado: as dimensões de classificação (assunto, categoria e natureza) e como encontrar o que você precisa.{% endblock %}
 
 {% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Coleções</span>
-  </div>
-</nav>
-
-<section class="sp-section colecoes-hero" data-sec="Coleções">
+<section class="sp-section sp-section--pattern colecoes-hero" data-sec="Coleções">
   <div class="sp-container">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <a href="{% url 'catalog:home' %}">Início</a>
+      <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+      <span>Coleções</span>
+    </nav>
     <span class="eyebrow">Acervo</span>
     <h1>Coleções</h1>
     <p class="page__intro">
@@ -28,7 +25,7 @@
   </div>
 </section>
 
-<section class="sp-section sp-section--alt" data-sec="Como o acervo se organiza">
+<section class="sp-section" data-sec="Como o acervo se organiza">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -78,7 +75,7 @@
   </div>
 </section>
 
-<section class="sp-section" data-sec="Como encontrar o que você procura">
+<section class="sp-section sp-section--alt" data-sec="Como encontrar o que você procura">
   <div class="sp-container">
     <div class="section-heading">
       <div>

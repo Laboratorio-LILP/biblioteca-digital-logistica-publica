@@ -1,31 +1,15 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "legal/_base_legal.html" %}
 
 {% block title %}Fale Conosco — Biblioteca Digital de Logística Pública | Governo de SP{% endblock %}
 {% block meta_description %}Entre em contato com a equipe do Portal BDLP — LILP/SGGD. Canais de contato, e-mail institucional e Ouvidoria do Estado de São Paulo.{% endblock %}
 
-{% block content_raw %}
-<nav class="breadcrumb-bar" aria-label="Você está em">
-  <div class="sp-container breadcrumb">
-    <a href="{% url 'catalog:home' %}">Início</a>
-    <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-    <span>Fale Conosco</span>
-  </div>
-</nav>
+{% block legal_crumb %}Fale Conosco{% endblock %}
+{% block legal_eyebrow %}Atendimento{% endblock %}
+{% block legal_titulo %}Fale Conosco{% endblock %}
+{% block legal_intro %}Estamos à disposição para esclarecer dúvidas sobre o acervo, receber sugestões de melhoria e abrir canal para contribuições acadêmicas e institucionais.{% endblock %}
 
-<section class="sp-section legal-hero" data-sec="Fale Conosco">
-  <div class="sp-container">
-    <span class="eyebrow">Atendimento</span>
-    <h1>Fale Conosco</h1>
-    <p class="page__intro">
-      Estamos à disposição para esclarecer dúvidas sobre o acervo,
-      receber sugestões de melhoria e abrir canal para contribuições
-      acadêmicas e institucionais.
-    </p>
-  </div>
-</section>
-
-<section class="sp-section sp-section--alt sp-section--rail" data-sec="Canais de contato">
+{% block legal_corpo %}
+<section class="sp-section sp-section--rail" data-sec="Canais de contato">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -96,8 +80,10 @@
     </div>
   </div>
 </section>
+{% endblock %}
 
-<section class="sp-section sp-section--rail" data-sec="Seus dados de contato">
+{% block legal_fechamento %}
+<section class="sp-section sp-section--alt sp-section--rail" data-sec="Seus dados de contato">
   <div class="sp-container">
     <div class="section-heading">
       <div>
@@ -116,9 +102,4 @@
     </div>
   </div>
 </section>
-{% include "_partials/_seta_secoes.html" %}
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/seta-secoes.js' %}" defer></script>
 {% endblock %}
