@@ -7,7 +7,7 @@
 {% colecao_visual document as cv %}
 <section class="sp-section sp-section--pattern doc-detail-hero">
   <div class="sp-container">
-    <nav class="breadcrumb" aria-label="Você está em">
+    <nav class="breadcrumb" aria-label="Trilha de navegação">
       <a href="{% url 'catalog:home' %}">Início</a>
       <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
       <a href="{% url 'catalog:search' %}">Acervo</a>
@@ -78,7 +78,7 @@
       <h2 class="doc-section-title">Classificação BDLP</h2>
       <div class="meta-grid">
         <div class="meta-item"><div class="label">Coleção</div><div class="value"><a href="{% url 'catalog:search' %}?colecao_v6={{ cv.slug }}">{{ cv.nome }}</a></div></div>
-        {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de Informação</div><div class="value"><a href="{% url 'catalog:search' %}?typeinform_id={{ document.typeinform_id }}">{{ document.type_info.name }}</a></div></div>{% endif %}
+        {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de informação</div><div class="value"><a href="{% url 'catalog:search' %}?typeinform_id={{ document.typeinform_id }}">{{ document.type_info.name }}</a></div></div>{% endif %}
         {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value"><a href="{% url 'catalog:search' %}?assunto_id={{ document.assunto_id }}">{{ assunto.nome }}</a></div></div>{% endif %}{% endwith %}
         {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value"><a href="{% url 'catalog:search' %}?natureza={{ document.natureza|urlencode }}">{{ document.natureza }}</a></div></div>{% endif %}
         {% if document.category %}<div class="meta-item"><div class="label">Categoria</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ document.category.name|titulo_pt }}</a></div></div>{% endif %}
@@ -95,7 +95,7 @@
         <a class="sp-button-primary" href="{{ document.acesso_eletronico }}" target="_blank" rel="noopener"><svg class="fi" aria-hidden="true"><use href="#fi-external-link"/></svg> Acessar documento</a>
         {% with dom=document.acesso_eletronico|url_domain %}{% if dom %}<span class="facet-empty">Abre em nova aba — {{ dom }}</span>{% endif %}{% endwith %}
         {% elif document.filename %}
-        <a class="sp-button-primary" href="{% url 'catalog:download' document.code %}"><svg class="fi" aria-hidden="true"><use href="#fi-download"/></svg> Download</a>
+        <a class="sp-button-primary" href="{% url 'catalog:download' document.code %}"><svg class="fi" aria-hidden="true"><use href="#fi-download"/></svg> Baixar documento</a>
         {% else %}
         <span class="facet-empty">Acesso ao arquivo indisponível.</span>
         {% endif %}

@@ -7,7 +7,7 @@
 <form id="acervo-form" action="{% url 'catalog:search' %}" method="get">
   <section class="sp-section sp-section--pattern catalog-hero">
     <div class="sp-container">
-      <nav class="breadcrumb" aria-label="Você está em">
+      <nav class="breadcrumb" aria-label="Trilha de navegação">
         <a href="{% url 'catalog:home' %}">Início</a>
         <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
         {% if crumb %}
@@ -21,8 +21,8 @@
       <div class="catalog-hero__grid">
         <div>
           <span class="eyebrow">Acervo</span>
-          <h1>Pesquisa institucional</h1>
-          <p>Consulte jurisprudência, trabalhos acadêmicos, doutrina, conteúdo técnico e materiais
+          <h1>Pesquise no acervo</h1>
+          <p>Consulte decisões de tribunais (jurisprudência), trabalhos acadêmicos, estudos de especialistas (doutrina), conteúdo técnico e materiais
              de capacitação sobre logística pública, licitações e gestão de suprimentos.</p>
         </div>
         <div class="searchbar">
@@ -99,7 +99,7 @@
 
       <details class="side-section"{% if filters.natureza %} open{% endif %}>
         <summary><h3>Natureza</h3></summary>
-        <p class="side-section__hint">A natureza da contratação — o objeto contratado: materiais, serviços, obras ou TIC.</p>
+        <p class="side-section__hint">A natureza da contratação — o objeto contratado: materiais, serviços, obras ou TIC (tecnologia da informação e comunicação).</p>
         {% include "_partials/_facet_options.html" with facet=facets.naturezas param="natureza" current=filters.natureza empty_msg="Sem materiais classificados por natureza ainda." %}
       </details>
 
@@ -180,8 +180,8 @@
         <strong>Nenhum documento encontrado</strong>
         <p>Tente outros termos de pesquisa.</p>
         {% else %}
-        <strong>Nenhum documento encontrado</strong>
-        <p>Tente outros termos de pesquisa para começar.</p>
+        <strong>O acervo ainda não tem documentos</strong>
+        <p>Digite um termo na busca para começar.</p>
         {% endif %}
       </div>
       {% endif %}
