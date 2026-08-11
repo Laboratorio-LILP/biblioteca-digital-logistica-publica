@@ -18,11 +18,11 @@ continua plenamente navegável.
     <div class="sp-banner-cookies__texto">
       <h2 class="sp-banner-cookies__titulo">Privacidade e cookies</h2>
       <p>
-        Este portal utiliza cookies estritamente necessários para o seu
-        funcionamento e, mediante seu consentimento, cookies opcionais
-        para análise agregada de uso, em conformidade com a
-        <strong>Lei nº 13.709/2018 (LGPD)</strong>. Saiba mais na
-        <a href="{% url 'catalog:politica_cookies' %}">Política de Cookies</a>.
+        Este portal usa cookies essenciais para funcionar. Se você
+        consentir, ele também usa cookies opcionais para medir o uso de
+        forma agregada, conforme a <strong>Lei nº 13.709/2018
+        (LGPD)</strong>. Saiba mais na
+        <a href="{% url 'catalog:politica_cookies' %}">Política de cookies</a>.
       </p>
     </div>
     <div class="sp-banner-cookies__acoes">
@@ -66,15 +66,15 @@ pelo módulo Cookies em main.js.
     </header>
     <p id="sp-cookies-modal-desc">
       Escolha quais categorias de cookies opcionais deseja permitir.
-      Cookies estritamente necessários não podem ser desativados pois
-      são indispensáveis ao funcionamento do portal.
+      Cookies essenciais não podem ser desativados, pois são
+      indispensáveis ao funcionamento do portal.
     </p>
 
     <fieldset class="sp-cookies-modal__categoria">
-      <legend>Estritamente necessários</legend>
+      <legend>Essenciais</legend>
       <label for="cookie-cat-essenciais">
         <input type="checkbox" id="cookie-cat-essenciais" checked disabled>
-        Sempre ativos — funcionamento básico, segurança e CSRF.
+        Sempre ativos — garantem o funcionamento básico, a segurança e a proteção dos formulários.
       </label>
     </fieldset>
 
@@ -92,7 +92,7 @@ pelo módulo Cookies em main.js.
       <label for="cookie-cat-analytics">
         <input type="checkbox" id="cookie-cat-analytics"
                name="cookie-cat-analytics" data-cookies-cat="analytics">
-        Permitir medição agregada e anônima de visitas (IP truncado).
+        Permitir medição agregada e anônima de visitas (sem guardar o endereço IP completo).
       </label>
     </fieldset>
 
