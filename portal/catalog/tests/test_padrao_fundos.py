@@ -89,3 +89,13 @@ def test_css_doc_hero_e_resultnav_sem_banda_propria():
     assert ".doc-detail-hero { border-bottom" not in CSS
     assert ".doc-resultnav { border-bottom: var(--border); background" not in CSS
     assert ".doc-detail-layout:has(+ .doc-related)" not in CSS
+
+
+def test_colecao_migrou_para_o_trio():
+    t = _template("collection_detail.html")
+    assert "content_raw" in t                                  # saiu do wrapper .page
+    abertura = t.index("sp-section sp-section--pattern colecoes-hero")
+    assert t.index('class="breadcrumb"', abertura) > abertura
+    assert "colecao-miolo" in t
+    fecho = t.index("sp-section sp-section--alt")
+    assert t.index('class="pagination"') > fecho
