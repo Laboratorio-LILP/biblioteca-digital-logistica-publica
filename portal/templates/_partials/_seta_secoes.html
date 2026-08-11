@@ -1,0 +1,16 @@
+{% comment %}
+Seta-guia de seções — botão flutuante que rola até a próxima seção lógica
+da página (âncoras [data-sec]). Melhoria progressiva: renderiza oculto
+([hidden]) e o seta-secoes.js revela; sem JS a página funciona normalmente.
+Na chegada (página aberta no topo), vira pílula "Veja mais" até o primeiro
+gesto — ver spec 2026-08-10-seta-enfase-chegada-design.md.
+Spec do componente: docs/superpowers/specs/2026-07-29-seta-secoes-design.md
+{% endcomment %}
+<button type="button"
+        class="sp-seta-secoes"
+        data-seta-secoes
+        aria-label="Ir para a próxima seção"
+        hidden>
+  <span class="sp-seta-secoes__rotulo">Veja mais</span>
+  <svg class="fi" aria-hidden="true"><use href="#fi-chevron-down"/></svg>
+</button>
