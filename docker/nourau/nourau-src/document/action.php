@@ -9,6 +9,106 @@ require_once BASE . 'include/defs_d.php';
 require_once BASE . 'include/util_d.php';
 
 
+/*-------------- consultas com parâmetros ligados --------------*/
+
+// include/db.php só aceita SQL já montada; para ligar valores é preciso
+// pg_query_params(). A conexão é a mesma global usada por include/db.php.
+
+function nr_query_params ($sql, $params)
+{
+  global $db_conn;
+
+  if (!($q = pg_query_params($db_conn, $sql, $params)))
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+  return $q;
+}
+
+function nr_command_params ($sql, $params)
+{
+  global $db_conn;
+
+  if (!pg_query_params($db_conn, $sql, $params))
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+}
+
+
+/*-------------- controle de acesso desta ação --------------*/
+
+// Os auxiliares de include/control.php testam $_SESSION['session'], que não é
+// atribuído em nenhum ponto da árvore, e por isso liberam acesso indevidamente.
+// As funções abaixo não dependem deles: leem $_SESSION['suid']/$_SESSION['slevel']
+// diretamente e resolvem a coleção sempre pelo registro do documento.
+
+function nr_session_level ()
+{
+  return isset($_SESSION['slevel']) ? (int) $_SESSION['slevel'] : 0;
+}
+
+function nr_session_uid ()
+{
+  return (isset($_SESSION['suid']) && valid_int($_SESSION['suid'])) ? (int) $_SESSION['suid'] : 0;
+}
+
+// Encerra a requisição: visitante anônimo vai para o login, autenticado sem
+// direito recebe recusa. Tanto redirect() quanto message() terminam o script.
+function nr_deny_access ()
+{
+  global $cfg_site;
+
+  if (nr_session_uid() < 1)
+    redirect("{$cfg_site}user/login.php?url=" . rawurlencode($_SERVER['REQUEST_URI']));
+  message($cfg_site, "Acesso negado", "failure");
+}
+
+function nr_is_administrator ()
+{
+  return nr_session_level() == ADM_LEVEL;
+}
+
+// Curador/responsável vinculado à coleção do documento (tabela topic_users).
+function nr_is_topic_curator ($tid)
+{
+  $level = nr_session_level();
+  $uid   = nr_session_uid();
+
+  if ($uid < 1 || ($level != MNT_LEVEL && $level != RES_LEVEL))
+    return false;
+  if (!valid_int($tid) || (int) $tid < 1)
+    return false;
+
+  $q = nr_query_params('SELECT 1 FROM topic_users WHERE topic_id=$1 AND users_id=$2',
+                       array((int) $tid, $uid));
+  return db_rows($q) > 0;
+}
+
+// Porteiro das operações de curadoria (aprovar, rejeitar, remover, trocar de
+// coleção): administrador, ou curador/responsável da coleção do documento.
+function nr_check_curator_rights ($tid)
+{
+  if (nr_is_administrator() || nr_is_topic_curator($tid))
+    return;
+  nr_deny_access();
+}
+
+function nr_check_administrator_rights ()
+{
+  if (nr_is_administrator())
+    return;
+  nr_deny_access();
+}
+
+// Descarte de documento ainda em elaboração: o próprio depositante, além do
+// curador da coleção e do administrador.
+function nr_check_discard_rights ($tid, $owner_id)
+{
+  $uid = nr_session_uid();
+
+  if ($uid > 0 && valid_int($owner_id) && (int) $owner_id === $uid)
+    return;
+  nr_check_curator_rights($tid);
+}
+
+
 if(isset($_GET)) {
 	
  if (isset($_GET['op']))
@@ -50,17 +150,23 @@ if(isset($_POST)) {
 if (!valid_int($did))
    message("{$cfg_site}document/?code=" . rawurlencode($a['code']),"Parâmetro Inválido !", "failure");
 
+$did = (int) $did;
+
 $a = get_document($did);
+
+// coleção do documento: vem sempre do registro, nunca da requisição
+$doc_tid = (int) $a['topic_id'];
 
 if ($op == 'v') { // ---------------- accept document after verification
   //validate access
+  nr_check_administrator_rights();
    check_administrator_rights();
   check_user_rights();
   if ($a['status'] != 'v')
     error('Acesso Negado');
   if (substr($a['code'],0,4)!='vtls') {
       // update document
-      db_command("UPDATE nr_document SET status='w' WHERE id='$did'");
+      nr_command_params('UPDATE nr_document SET status=\'w\' WHERE id=$1', array($did));
       add_log('n', 'dv', "did=$did");
 
       // notify maintainer
@@ -74,9 +180,9 @@ if ($op == 'v') { // ---------------- accept document after verification
       $q2 = db_query("SELECT extension,compress FROM nr_format WHERE id='{$a['format_id']}'");
       $a2 = db_fetch_array($q2);
       $old = "$cfg_dir_incoming/{$a['filename']}";
-      if (!file_exists("$cfg_dir_archive/{$a['topic_id']}"))
-        mkdir("$cfg_dir_archive/{$a['topic_id']}");
-      $new = "$cfg_dir_archive/{$a['topic_id']}/$did.{$a2['extension']}";
+      if (!file_exists("$cfg_dir_archive/$doc_tid"))
+        mkdir("$cfg_dir_archive/$doc_tid");
+      $new = "$cfg_dir_archive/$doc_tid/$did.{$a2['extension']}";
       $filename = substr($a['filename'], 5); // remove random prefix
       if (!@rename($old, $new))
 	  error(_('Rename failed')); // FIXME: notify admin?
@@ -86,11 +192,12 @@ if ($op == 'v') { // ---------------- accept document after verification
       }
 
       // update document
-      db_command("UPDATE nr_document SET status='a',filename='$filename',visits='0',downloads='0' WHERE id='$did'");
+      nr_command_params('UPDATE nr_document SET status=\'a\',filename=$1,visits=\'0\',downloads=\'0\' WHERE id=$2',
+                        array($filename, $did));
       add_log('n', 'dv', "did=$did");
 
       // add document to search index
-      db_command("INSERT INTO nr_document_queue (op,document_id) VALUES ('i','$did')");
+      nr_command_params('INSERT INTO nr_document_queue (op,document_id) VALUES (\'i\',$1)', array($did));
 
       // notify owner
       $title = $a['title'];
@@ -103,12 +210,15 @@ if ($op == 'v') { // ---------------- accept document after verification
 }
 else if ($op == 'a') { // ---------------- approve document
   	// validate access
-  	 $tid = $a['topic_id'];
+  	 $tid = $doc_tid;
+  	nr_check_curator_rights($doc_tid);
   	check_maintainer_rights($tid);
-   	
-	if ($a['status'] != 'w')
+
+	if ($a['status'] != 'w') {
     	  print "acesso_negado";
-  
+    	  exit();
+	}
+
   	// ask confirmation
   	if (empty($conf)) {
     	$title = $a['title'];
@@ -125,15 +235,15 @@ else if ($op == 'a') { // ---------------- approve document
 			$a2 = db_fetch_array($q2);
 			$old = "$cfg_dir_incoming/{$a['filename']}";
 			
-			//echo "$cfg_dir_archive/{$a['topic_id']}";
+			//echo "$cfg_dir_archive/$doc_tid";
 
 		
 		
-			if (!file_exists("$cfg_dir_archive/{$a['topic_id']}"))
-				mkdir("$cfg_dir_archive/{$a['topic_id']}");
+			if (!file_exists("$cfg_dir_archive/$doc_tid"))
+				mkdir("$cfg_dir_archive/$doc_tid");
 	
 
-			$new = "$cfg_dir_archive/{$a['topic_id']}/$did.{$a2['extension']}";
+			$new = "$cfg_dir_archive/$doc_tid/$did.{$a2['extension']}";
 			$filename = substr($a['filename'], 5); // remove random prefix
 		
 
@@ -150,11 +260,11 @@ else if ($op == 'a') { // ---------------- approve document
 			
 			/*Arquivos Anexos*/
 						
-			$qsf = db_query("SELECT * FROM supplementary_files WHERE document_id=$did");
+			$qsf = nr_query_params('SELECT * FROM supplementary_files WHERE document_id=$1', array($did));
 				
 			if (db_rows($qsf)>=1){
 
-				db_command("UPDATE supplementary_files SET topic_id = $tid WHERE document_id=$did");
+				nr_command_params('UPDATE supplementary_files SET topic_id = $1 WHERE document_id=$2', array($tid, $did));
 			
 				while ($asf = db_fetch_array($qsf)){
 							
@@ -165,7 +275,7 @@ else if ($op == 'a') { // ---------------- approve document
 					if ($asf2['compress'] == 'y')
 						$old .= '.gz';
 										
-					$new = "$cfg_dir_archive/{$a['topic_id']}/S{$asf['id']}.{$asf2['extension']}";
+					$new = "$cfg_dir_archive/$doc_tid/S{$asf['id']}.{$asf2['extension']}";
 					if ($asf2['compress'] == 'y')
 					$new .= '.gz';	
 									
@@ -190,7 +300,8 @@ else if ($op == 'a') { // ---------------- approve document
 			$filename =  $a['acesso_eletronico'];
 		}
   
-   db_command("UPDATE nr_document SET status='a',filename='$filename',visits='0',downloads='0' WHERE id='$did'");
+   nr_command_params('UPDATE nr_document SET status=\'a\',filename=$1,visits=\'0\',downloads=\'0\' WHERE id=$2',
+                     array($filename, $did));
    add_log('n', 'dv', "did=$did");
    print "sucesso";
  }
@@ -199,10 +310,13 @@ else if ($op == 'a') { // ---------------- approve document
 }
 else if ($op == 'r') { // ---------------- reject document
   // validate access
-  $tid = $a['topic_id'];
+  $tid = $doc_tid;
+  nr_check_curator_rights($doc_tid);
   check_maintainer_rights($tid);
-  if ($a['status'] != 'v' && $a['status'] != 'w')
+  if ($a['status'] != 'v' && $a['status'] != 'w') {
     print "error";
+    exit();
+  }
 
   // ask confirmation
   if (empty($conf)) {
@@ -241,7 +355,7 @@ else if ($op == 'r') { // ---------------- reject document
 	         //					}	 
 		//		}	
 	}
-    db_command("DELETE FROM nr_document WHERE id='$did'");
+    nr_command_params('DELETE FROM nr_document WHERE id=$1', array($did));
     add_log('n', 'dr', "did=$did");
 
      print "sucesso";
@@ -254,8 +368,11 @@ else if ($op == 'r') { // ---------------- reject document
 }
 else if ($op == 'd') { // ---------------- remove document
   // validate access
-  if ($a['status'] != 'a')
+  nr_check_curator_rights($doc_tid);
+  if ($a['status'] != 'a') {
     print "error";
+    exit();
+  }
 
   // ask confirmation
   if (empty($conf)) {
@@ -269,7 +386,7 @@ else if ($op == 'd') { // ---------------- remove document
    // remove file and document entry
     $q2 = db_query("SELECT extension,compress FROM nr_format WHERE id='{$a['format_id']}'");
     $a2 = db_fetch_array($q2);
-    $file = "$cfg_dir_archive/{$a['topic_id']}/$did.{$a2['extension']}";
+    $file = "$cfg_dir_archive/$doc_tid/$did.{$a2['extension']}";
     
 	
 		if ($a2['compress'] == 'y')
@@ -292,7 +409,7 @@ else if ($op == 'd') { // ---------------- remove document
     //db_command("INSERT INTO nr_document_queue (op,document_id,flag) VALUES ('d','$did',0)");
 
 	//Remove os arquivos suplementares
-	 $qsf = db_query("SELECT * FROM supplementary_files WHERE document_id=$did");
+	 $qsf = nr_query_params('SELECT * FROM supplementary_files WHERE document_id=$1', array($did));
   		if (db_rows($qsf)>=1){
   			while ($asf = db_fetch_array($qsf)){
 			 	$qformat = db_query("SELECT extension,compress FROM nr_format WHERE id='{$asf['format_id']}'");
@@ -310,12 +427,12 @@ else if ($op == 'd') { // ---------------- remove document
 				     print 'error' ;
 			     
 			  //@unlink($file);
-    		  db_command("DELETE FROM supplementary_files WHERE id = {$asf['id']}");
+    		  nr_command_params('DELETE FROM supplementary_files WHERE id = $1', array($asf['id']));
 		  }
 		}
 	}	
 	
-	 db_command("UPDATE nr_document SET status='d', updated='NOW' WHERE id='$did'");
+	 nr_command_params('UPDATE nr_document SET status=\'d\', updated=\'NOW\' WHERE id=$1', array($did));
     add_log('n', 'dd', "did=$did");
 
    print "sucesso";
@@ -327,10 +444,19 @@ else if ($op == 'd') { // ---------------- remove document
 else if ($op == 't') { // ---------------- Troca de Tópico 
   
   // validate access
+  nr_check_curator_rights($doc_tid);
   if ($a['status'] != 'a' ){
 	   print 'error';
 	   exit();
   }
+
+  // os identificadores de coleção viram componentes de caminho: só inteiros
+  if (!valid_int($tid) || !valid_int($tidold) || (int) $tid < 1 || (int) $tidold < 1) {
+	   print 'error';
+	   exit();
+  }
+  $tid = (int) $tid;
+  $tidold = (int) $tidold;
   
 	// update document
 		if($tidold != $tid){
@@ -363,10 +489,10 @@ else if ($op == 't') { // ---------------- Troca de Tópico
 			  
 			 /*Arquivos Anexos*/
 					
-			  $qsf = db_query("SELECT * FROM supplementary_files WHERE document_id=$did");
+			  $qsf = nr_query_params('SELECT * FROM supplementary_files WHERE document_id=$1', array($did));
 			
 				  if (db_rows($qsf)>=1){
-					db_command("UPDATE supplementary_files SET topic_id = $tid WHERE document_id=$did");
+					nr_command_params('UPDATE supplementary_files SET topic_id = $1 WHERE document_id=$2', array($tid, $did));
 					
 						while ($asf = db_fetch_array($qsf)){
 							
@@ -391,14 +517,14 @@ else if ($op == 't') { // ---------------- Troca de Tópico
 		}
 		
 		
-		   db_command("UPDATE nr_document SET topic_id = $tid, updated='now' WHERE id='$did'");
+		   nr_command_params('UPDATE nr_document SET topic_id = $1, updated=\'now\' WHERE id=$2', array($tid, $did));
 		   add_log('n', 'du', "did=$did");
 
             $code = get_document($did, 'code');
 			
 			/*atualiza a colecao na tabela de visitas e download */
-			 $update = "UPDATE visitas_downloads SET topic_id =".$tid."  WHERE code = '".$code."'";
-	         db_command($update);
+			 $update = 'UPDATE visitas_downloads SET topic_id = $1  WHERE code = $2';
+	         nr_command_params($update, array($tid, $code));
 	      
 		  print 'sucesso';
   
@@ -408,6 +534,7 @@ else if ($op == 't') { // ---------------- Troca de Tópico
 	      print 'error';
 }
 else if ($op == 'dc') {
+  nr_check_discard_rights($doc_tid, $a['owner_id']);
   check_user_rights();
  /*Descartat documento*/
  // validate access
@@ -446,7 +573,7 @@ else if ($op == 'dc') {
 	         					}	 
 				}	
 	}*/
-    db_command("DELETE FROM nr_document WHERE id='$did'");
+    nr_command_params('DELETE FROM nr_document WHERE id=$1', array($did));
     add_log('n', 'dr', "did=$did");
 
      print "sucesso";
