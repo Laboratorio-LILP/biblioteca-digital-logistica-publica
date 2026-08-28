@@ -11,6 +11,29 @@ require_once BASE . 'include/util_d.php';
 $params = $_REQUEST;
 $op = isset($params['op']) && $params['op'] !='' ? $params['op'] : '0'; 
 
+// Controle de acesso proprio deste endpoint: exige sessao autenticada com
+// nivel de administrador. Nao depende de check_administrator_rights(), que
+// retorna normalmente quando a sessao nao tem nivel definido (anonimo).
+$auth_uid   = isset($_SESSION['suid'])   ? $_SESSION['suid']   : '';
+$auth_level = isset($_SESSION['slevel']) ? $_SESSION['slevel'] : '';
+if ($auth_uid === '' || !is_numeric($auth_level) || (int) $auth_level !== ADM_LEVEL) {
+  http_response_code(403);
+  header('Content-Type: application/json; charset=utf-8');
+  echo json_encode(array('status' => false, 'error' => 'Acesso negado'));
+  exit();
+}
+
+// Executa SQL com parametros vinculados (pg_query_params), para que valores
+// vindos da requisicao nunca sejam concatenados na consulta.
+function db_query_params ($sql, $bind)
+{
+  global $db_conn;
+
+  if (!($q = pg_query_params($db_conn, $sql, $bind)))
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+  return $q;
+}
+
 
 //Inserir o Tipo de Informação
 if ($op == 'i') { // ---------------- accept document after verification
@@ -25,7 +48,7 @@ if ($op == 'i') { // ---------------- accept document after verification
    $resp['id'] = 0;
 
 
-   db_command("INSERT INTO type_information (name) VALUES ('$type_name')");
+   db_query_params('INSERT INTO type_information (name) VALUES ($1)', array($type_name));
    $id = db_simple_query("select max(id) from type_information");
 
    //echo " $id ";
@@ -44,7 +67,7 @@ if ($op == 'd') { // ---------------- accept document after verification
   
    $resp['status'] = false;
    
-   db_command("DELETE FROM type_information WHERE id = ".$id);
+   db_query_params('DELETE FROM type_information WHERE id = $1', array($id));
 
    $resp['status'] = true;
    echo json_encode($resp); 
@@ -60,7 +83,7 @@ if ($op == 'u') { // ---------------- accept document after verification
    $type_name = trim($_POST['type_name']);
    $id = $_POST['id'];
  
-   db_command("UPDATE type_information SET name = '".$type_name."' WHERE id = ".$id);
+   db_query_params('UPDATE type_information SET name = $1 WHERE id = $2', array($type_name, $id));
 
    $resp['status'] = true;
   // $resp['value']="UPDATE FROM type_information SET type_name = '".$type_name."' WHERE id = ".$id;
@@ -80,7 +103,7 @@ if ($op == 'a') { // ---------------- accept document after verification
   
   $topicos= carrega_topicos($tid);
   foreach ($topicos as $topico){
-      db_command("insert INTO topic_type (topic_id, type_id ) VALUES ($topico[0], $idtif)");
+      db_query_params('insert INTO topic_type (topic_id, type_id ) VALUES ($1, $2)', array($topico[0], $idtif));
   }
   
   $resp['status'] = true;
@@ -93,20 +116,20 @@ function carrega_topicos($tid){
   global $db_conn;
   $topico = array();
  
-  $topic = db_query("SELECT id FROM topic WHERE parent_id = $tid ORDER BY name");
+  $topic = db_query_params('SELECT id FROM topic WHERE parent_id = $1 ORDER BY name', array($tid));
   $topico[]=array($tid); 
   while ($q = db_fetch_array($topic)){
       $topico[]=array($q['id']);
-      $resulttopic = db_query("SELECT id From topic where parent_id =".$q['id']." order by name");
+      $resulttopic = db_query_params('SELECT id From topic where parent_id = $1 order by name', array($q['id']));
     while ($qtopic = pg_fetch_array($resulttopic)){
           $topico[]=array($qtopic['id']);
-          $resulttopic1 = db_query("SELECT id From topic where parent_id =".$qtopic['id']." order by name");
+          $resulttopic1 = db_query_params('SELECT id From topic where parent_id = $1 order by name', array($qtopic['id']));
         while ($qtopic1 = pg_fetch_array($resulttopic1)){
             $topico[]=array($qtopic1['id']);
-            $resulttopic2 = db_query("SELECT id  From topic where parent_id =".$qtopic1['id']." order by name");
+            $resulttopic2 = db_query_params('SELECT id  From topic where parent_id = $1 order by name', array($qtopic1['id']));
         while ($qtopic2 = pg_fetch_array($resulttopic2)){
             $topico[]=array($qtopic2['id']);
-            $resulttopic3 = db_query("SELECT id  From topic where parent_id =".$qtopic2['id']." order by name");
+            $resulttopic3 = db_query_params('SELECT id  From topic where parent_id = $1 order by name', array($qtopic2['id']));
           while ($qtopic3 = pg_fetch_array($resulttopic3)){
             $topico[]=array($qtopic3['id']);
           }
