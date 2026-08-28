@@ -21,15 +21,17 @@ $did = $_POST['did'];
 $sent = $_POST['sent'];
 
 
-$title = pg_escape_string(trim($_POST['title']));
-$title_en = pg_escape_string(trim($_POST['title_en']));
-$author = pg_escape_string(trim($_POST['author']));
-$autor_principal =  pg_escape_string(trim($_POST['autor_principal']));
+// os valores abaixo são gravados com pg_query_params(): não podem ser
+// pré-escapados, sob pena de gravar as aspas dobradas no banco
+$title = trim($_POST['title']);
+$title_en = trim($_POST['title_en']);
+$author = trim($_POST['author']);
+$autor_principal =  trim($_POST['autor_principal']);
 
-$keywords = pg_escape_string(trim($_POST['keywords']));
-$keywords_en = pg_escape_string(trim($_POST['keywords_en']));
-$abstract = trim( pg_escape_string($_POST['abstract']));
-$description = trim(pg_escape_string($_POST['description']));
+$keywords = trim($_POST['keywords']);
+$keywords_en = trim($_POST['keywords_en']);
+$abstract = trim($_POST['abstract']);
+$description = trim($_POST['description']);
 $code = trim($_POST['code']);
 $info = trim($_POST['info']);
 
@@ -38,6 +40,10 @@ if (isset($_POST['prefix']))
 
 $filename = isset($_POST['filename'])?trim($_POST['filename']):'';
 $remote = $_POST['remote'];
+// arquivo local: o nome é um componente de caminho sob archive/incoming,
+// não pode carregar diretórios vindos do pedido
+if ($remote == 'n')
+  $filename = basename($filename);
 if (isset($_POST['remoteold']))
 	$remoteold = $_POST['remoteold'];
 $cid = trim($_POST['cid']);
@@ -47,14 +53,14 @@ $professor = trim($_POST['professor']);
 $departamento = trim($_POST['departamento']);
 $tipoInformacao =isset($_POST['tipoInformacao'])?$_POST['tipoInformacao']:0;
 $capa = isset($_POST['capa'])?trim($_POST['capa']):'';
-$source =  pg_escape_string(trim($_POST['source']));
-$nota_versao_ori= pg_escape_string(trim($_POST['nota_versao_ori']));
+$source =  trim($_POST['source']);
+$nota_versao_ori= trim($_POST['nota_versao_ori']);
 $descricao_fisica= trim($_POST['descricao_fisica']);
 $doi=isset($_POST['doi'])?trim($_POST['doi']):'';
 $acesso_eletronico=isset($_POST['acesso_eletronico'])?trim($_POST['acesso_eletronico']):'';
 $nlspi=trim($_POST['nlspi']);
 $tipoAcesso = (isset($_POST['tipoAcesso'])?$_POST['tipoAcesso']:0);
-$edicao =  pg_escape_string(trim($_POST['edicao']));
+$edicao =  trim($_POST['edicao']);
 $event_description=isset($_POST['event_description'])?trim($_POST['event_description']):'';
 $avulso =isset($_POST['avulso'])?'y':'n';
 $ods_id = isset($_POST['ods_id'])?$_POST['ods_id']:NUll;
@@ -68,10 +74,17 @@ if (!valid_int($did))
     message("{$cfg_site}document/?code=" . rawurlencode($a['code']),"Parâmetro Inválido !", "failure");
 
 // check access rights
-//// if (!can_edit_document($did))
-//  message("{$cfg_site}document/?code=" . rawurlencode($a['code']),"Acesso Negado !", "failure");
+// É preciso sessão autenticada antes de qualquer leitura, gravação ou
+// recebimento de arquivo. A verificação fica aqui, acima de todos os
+// desvios: com $sent preenchido o POST não chega a form()/page_begin().
+if (!isset($_SESSION['suid']) || !valid_int($_SESSION['suid']) ||
+    !isset($_SESSION['slevel']) || (int) $_SESSION['slevel'] < USR_LEVEL)
+  redirect("{$cfg_site}user/login.php?url=" . rawurlencode($_SERVER['REQUEST_URI']));
 
 $a = get_document($did);
+
+// e é preciso direito sobre este documento (coleção lida do registro)
+check_edit_rights($a);
 
   if (empty($sent)) {
     // first time; load from base
@@ -192,7 +205,7 @@ if (file_exists($_FILES['file']['tmp_name'])){
 			@unlink($fDel);
 
 		// nome do arquivo para gravar na tabela
-		$filename = $file_name;
+		$filename = basename($file_name);
 		
 
 		//Grava o novo arquivo no servidor
@@ -215,8 +228,17 @@ if (file_exists($_FILES['file']['tmp_name'])){
  
   	$trocaarquivo = 1;
 	// update file size
-    $sql_update = "UPDATE nr_document SET title='$title',title_en='$title_en',author='$author',autor_principal ='$autor_principal',keywords='$keywords',keywords_en='$keywords_en',abstract='$abstract',description='$description',code='$code',info='$info',status='$status',remote ='$remote', filename='$filename', category_id=$cid, format_id=$fid, size='$file_size', updated='now', curso= '$curso', disciplina = '$disciplina', professor = '$professor', departamento='$departamento', typeInform_id = $tipoInformacao, capa = '$capa', source='$source', descricao_fisica='$descricao_fisica', doi='$doi', acesso_eletronico='$acesso_eletronico', nlspi= '$nlspi', tacesso =$tipoAcesso, nota_versao_ori = '$nota_versao_ori', edicao = '$edicao',  event_description = '$event_description', avulso='$avulso', ods_id='$ods_ids', view_document=$view_document WHERE id='$did'";
-    db_command($sql_update);
+    $sql_update = 'UPDATE nr_document SET title=$1,title_en=$2,author=$3,autor_principal =$4,keywords=$5,keywords_en=$6,abstract=$7,description=$8,code=$9,info=$10,status=$11,remote =$12, filename=$13, category_id=$14, format_id=$15, size=$16, updated=\'now\', curso= $17, disciplina = $18, professor = $19, departamento=$20, typeInform_id = $21, capa = $22, source=$23, descricao_fisica=$24, doi=$25, acesso_eletronico=$26, nlspi= $27, tacesso =$28, nota_versao_ori = $29, edicao = $30,  event_description = $31, avulso=$32, ods_id=$33, view_document=$34 WHERE id=$35';
+    db_command_params($sql_update,
+                      array($title, $title_en, $author, $autor_principal,
+                            $keywords, $keywords_en, $abstract, $description,
+                            $code, $info, $status, $remote, $filename, $cid,
+                            $fid, $file_size, $curso, $disciplina, $professor,
+                            $departamento, $tipoInformacao, $capa, $source,
+                            $descricao_fisica, $doi, $acesso_eletronico,
+                            $nlspi, $tipoAcesso, $nota_versao_ori, $edicao,
+                            $event_description, $avulso, $ods_ids,
+                            $view_document, $did));
     add_log('n', 'du', "did=$did Troca de arquivo");
 }
 }else {
@@ -256,8 +278,16 @@ if ($sent == "Continuar Depois") {
 }	
 	
 	
-$sql_update = "UPDATE nr_document SET title='$title',title_en='$title_en',author='$author',autor_principal ='$autor_principal',keywords='$keywords',keywords_en='$keywords_en',abstract='$abstract',description='$description',code='$code',info='$info',status='$status',remote ='$remote', filename='$filename',updated='now', curso= '$curso', disciplina = '$disciplina', professor = '$professor', departamento='$departamento', typeInform_id = $tipoInformacao, capa = '$capa', source='$source', descricao_fisica='$descricao_fisica', doi='$doi', acesso_eletronico='$acesso_eletronico', nlspi= '$nlspi', tacesso =$tipoAcesso, nota_versao_ori = '$nota_versao_ori', edicao = '$edicao',  event_description = '$event_description', avulso='$avulso', ods_id='$ods_ids', view_document=$view_document WHERE id='$did'";
-db_command($sql_update);
+$sql_update = 'UPDATE nr_document SET title=$1,title_en=$2,author=$3,autor_principal =$4,keywords=$5,keywords_en=$6,abstract=$7,description=$8,code=$9,info=$10,status=$11,remote =$12, filename=$13,updated=\'now\', curso= $14, disciplina = $15, professor = $16, departamento=$17, typeInform_id = $18, capa = $19, source=$20, descricao_fisica=$21, doi=$22, acesso_eletronico=$23, nlspi= $24, tacesso =$25, nota_versao_ori = $26, edicao = $27,  event_description = $28, avulso=$29, ods_id=$30, view_document=$31 WHERE id=$32';
+db_command_params($sql_update,
+                  array($title, $title_en, $author, $autor_principal,
+                        $keywords, $keywords_en, $abstract, $description,
+                        $code, $info, $status, $remote, $filename, $curso,
+                        $disciplina, $professor, $departamento,
+                        $tipoInformacao, $capa, $source, $descricao_fisica,
+                        $doi, $acesso_eletronico, $nlspi, $tipoAcesso,
+                        $nota_versao_ori, $edicao, $event_description,
+                        $avulso, $ods_ids, $view_document, $did));
 
 // finish
 if ($a['status'] == 'i') {
@@ -469,8 +499,8 @@ if (empty($capa))
 
  //Carrega os Anexos
 
- $sqlsf = "SELECT supplementary_files.id, supplementary_files.filename, supplementary_files.remote FROM supplementary_files INNER JOIN nr_document on supplementary_files.document_id = nr_document.id WHERE supplementary_files.document_id =$did";
- $qsf = db_query($sqlsf);
+ $sqlsf = 'SELECT supplementary_files.id, supplementary_files.filename, supplementary_files.remote FROM supplementary_files INNER JOIN nr_document on supplementary_files.document_id = nr_document.id WHERE supplementary_files.document_id =$1';
+ $qsf = db_query_params_d($sqlsf, array($did));
  
  echo "<p><label for=\"nomearq\">Anexos: </label>";
  echo html_button(format_action("Acrescentar Arquivos", "javascript:janelaArquivoSuplementar('arquivosuplementar.php?did=".$did."&tid=".$a['topic_id']."&op=i&status=".$a['status']."',370,540)"));
@@ -725,6 +755,71 @@ function find_format ($file_type)
   }	  
 
   return ['fid' => $format_id, 'cid' =>  $category_id ];
+}
+
+/* Consulta com valores ligados. include/db.php só aceita SQL pronto, por
+   isso as duas funções abaixo falam direto com a conexão, como ele faz. A
+   mensagem de erro é a genérica: a consulta não volta para o navegador. */
+
+function db_query_params_d ($sql, $params)
+{
+  global $db_conn;
+
+  if (!($q = pg_query_params($db_conn, $sql, $params)))
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+  return $q;
+}
+
+function db_command_params ($sql, $params)
+{
+  return @pg_affected_rows(db_query_params_d($sql, $params));
+}
+
+/* Direito de edição sobre um documento. Apurado aqui, sem depender dos
+   auxiliares de include/control.php e include/util_d.php, para que este
+   arquivo se defenda sozinho:
+
+     - administrador edita qualquer documento;
+     - curador (mantenedor/responsável) edita os documentos das coleções
+       em que está inscrito, como em document/action.php (via
+       check_maintainer_rights) e em document/index.php;
+     - depositante edita o documento que depositou — ou o de uma coleção
+       sua — enquanto está em curadoria, como em document/index.php
+       ('i' ou 'w') e em collab_index.ini.
+
+   A coleção vem sempre do registro do documento, nunca do pedido. */
+
+function check_edit_rights ($a)
+{
+  global $cfg_site;
+
+  $uid = (string) $_SESSION['suid'];
+  $level = (int) $_SESSION['slevel'];
+  $tid = isset($a['topic_id']) ? (string) $a['topic_id'] : '';
+  $owner = isset($a['owner_id']) ? (string) $a['owner_id'] : '';
+
+  if ($level == ADM_LEVEL)
+    return;
+
+  if ($level == MNT_LEVEL || $level == RES_LEVEL) {
+    if (is_topic_user($tid, $uid))
+      return;
+  }
+  else if ($level == USR_LEVEL && ($a['status'] == 'i' || $a['status'] == 'w')) {
+    if ($owner === $uid || is_topic_user($tid, $uid))
+      return;
+  }
+
+  message("{$cfg_site}document/?code=" . rawurlencode($a['code']),"Acesso Negado !", "failure");
+}
+
+function is_topic_user ($tid, $uid)
+{
+  if (!valid_int($tid) || !valid_int($uid))
+    return false;
+  $q = db_query_params_d('SELECT 1 FROM topic_users WHERE topic_id=$1 AND users_id=$2',
+                         array($tid, $uid));
+  return (db_rows($q) > 0);
 }
 
 
