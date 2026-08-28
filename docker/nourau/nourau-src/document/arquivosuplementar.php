@@ -41,6 +41,23 @@ if (!valid_int($did))
 // check access rights
   check_user_rights();
 
+/* O alvo da operação é resolvido no banco, não no pedido: do cliente vem apenas
+   um id (o do anexo, em op='d'; o do documento, nos demais casos). Documento,
+   coleção, situação, formato e caminho em disco saem sempre da linha carregada
+   aqui - nunca de $_POST/$_GET. */
+if ($op == 'd')
+   $sf = sf_load_file($id);
+else
+   $sf = sf_load_document($did);
+
+// controle de acesso real, avaliado sobre a coleção resolvida no banco
+sf_check_topic_rights($sf);
+
+$did    = (int) $sf['document_id'];
+$tid    = (int) $sf['topic_id'];
+$id     = (int) $sf['sf_id'];
+$status = $sf['status'];
+
 if (empty($sent)) {
 	form();
 }
@@ -51,14 +68,19 @@ else if ($sent == 'Sim' || $sent == 'Salvar') {
 
 		//Apaga o arquivo suplementar
   	
-		$format_id = $_POST['format_id'];
+		$format_id = (int) $sf['format_id'];
 	
        //Apaga o fisicamnete arquivo anterior
-	   $qDel = db_query("SELECT extension,compress FROM nr_format WHERE id=".$format_id);
-	   $aDel = db_fetch_array($qDel);
+	   $qDel = pg_query_params($db_conn, 'SELECT extension,compress FROM nr_format WHERE id = $1', array($format_id));
+	   if ($qDel === false)
+	      fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+	   $aDel = pg_fetch_array($qDel);
+	   /* $id e $tid já são inteiros vindos do banco; a extensão é reduzida a
+	      alfanuméricos para que o caminho não possa sair do diretório configurado */
+	   $extDel = preg_replace('/[^A-Za-z0-9]/', '', isset($aDel['extension']) ? $aDel['extension'] : '');
 	   
 	   if ($status == 'i' ||$status == 'w') {
-		   $fDel = "$cfg_dir_incoming/S"."$id.{$aDel['extension']}";
+		   $fDel = "$cfg_dir_incoming/S"."$id.$extDel";
 		   if ($aDel['compress'] == 'y')
 				$fDel .= '.gz';
 		   
@@ -66,13 +88,14 @@ else if ($sent == 'Sim' || $sent == 'Salvar') {
        }  
        else { 
 	   
-	   	   $fDel = "$cfg_dir_archive/$tid/S"."$id.{$aDel['extension']}";
+	   	   $fDel = "$cfg_dir_archive/$tid/S"."$id.$extDel";
 			if ($aDel['compress'] == 'y')
 				$fDel .= '.gz';
 			@unlink($fDel);
 	   }
      
-       db_command("DELETE FROM supplementary_files WHERE id = $id");
+       if (pg_query_params($db_conn, 'DELETE FROM supplementary_files WHERE id = $1', array($id)) === false)
+          fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
 	}
 	else if ($op == 'i'){
 		
@@ -94,16 +117,21 @@ else if ($sent == 'Sim' || $sent == 'Salvar') {
 		}
         
        //  insert supplementary document
-		db_command("INSERT INTO supplementary_files (filename,size,document_id,category_id,format_id, owner_id, topic_id) values ('$file_name','$file_size',$did,'$cid','$fid','{$_SESSION['suid']}','$tid')");
-		$id = db_simple_query("SELECT CURRVAL('supplementary_files_seq')");
+		if (pg_query_params($db_conn, 'INSERT INTO supplementary_files (filename,size,document_id,category_id,format_id, owner_id, topic_id) values ($1,$2,$3,$4,$5,$6,$7)',
+		                    array($file_name, $file_size, $did, $cid, $fid, $_SESSION['suid'], $tid)) === false)
+		   fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+		$id = (int) db_simple_query("SELECT CURRVAL('supplementary_files_seq')");
 		//Grava o arquivo no servidor
-		$qSave = db_query("SELECT extension,compress FROM nr_format WHERE id=".$fid);
+		$qSave = db_query("SELECT extension,compress FROM nr_format WHERE id=".(int) $fid);
 		$aSave = db_fetch_array($qSave);
+		/* $id e $tid são inteiros; a extensão é reduzida a alfanuméricos para
+		   que o caminho não possa sair do diretório configurado */
+		$extSave = preg_replace('/[^A-Za-z0-9]/', '', isset($aSave['extension']) ? $aSave['extension'] : '');
 		
        
 	   if ($status == 'i' ||$status == 'w') {
            chmod($file, 0644);
-		   $new = "$cfg_dir_incoming/S"."$id.{$aSave['extension']}";
+		   $new = "$cfg_dir_incoming/S"."$id.$extSave";
            copy($file, $new); 
 		   
 		   if ($aSave['compress'] == 'y') {
@@ -116,7 +144,7 @@ else if ($sent == 'Sim' || $sent == 'Salvar') {
        }  
        else { 
             chmod($file, 0644);
-			$new = "$cfg_dir_archive/$tid/S"."$id.{$aSave['extension']}";
+			$new = "$cfg_dir_archive/$tid/S"."$id.$extSave";
 
 			copy($file, $new);
    
@@ -144,6 +172,88 @@ else if ($sent == "Cancelar" || $sent =="Não" ) {
    echo "setTimeout('window.close();', 100);";
    echo "</script>";
   exit();
+}
+
+/* Carrega o anexo pelo id e traz junto o documento a que ele pertence.
+   É a única forma de identificar o alvo de op='d'. */
+function sf_load_file ($sfid)
+{
+  global $cfg_site, $db_conn;
+
+  if (!valid_int($sfid))
+    message($cfg_site,"Parâmetro inválido", "failure");
+
+  $q = pg_query_params($db_conn,
+       'SELECT S.id AS sf_id, S.filename, S.format_id, D.id AS document_id,' .
+       ' D.topic_id, D.owner_id, D.status' .
+       ' FROM supplementary_files S INNER JOIN nr_document D ON S.document_id = D.id' .
+       ' WHERE S.id = $1', array($sfid));
+  if ($q === false)
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+  if (!pg_num_rows($q))
+    message($cfg_site,"Arquivo não encontrado", "failure");
+  return pg_fetch_array($q);
+}
+
+/* Carrega o documento pelo id, para as operações que ainda não têm anexo. */
+function sf_load_document ($did)
+{
+  global $cfg_site, $db_conn;
+
+  if (!valid_int($did))
+    message($cfg_site,"Parâmetro inválido", "failure");
+
+  $q = pg_query_params($db_conn,
+       'SELECT id AS document_id, topic_id, owner_id, status FROM nr_document WHERE id = $1',
+       array($did));
+  if ($q === false)
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+  if (!pg_num_rows($q))
+    message($cfg_site,"Documento não encontrado", "failure");
+  $a = pg_fetch_array($q);
+  $a['sf_id']    = 0;  // nenhum anexo selecionado
+  $a['filename'] = '';
+  $a['format_id'] = 0;
+  return $a;
+}
+
+/* Autorização do endpoint, avaliada sobre a coleção do documento resolvido no
+   banco. Espelha a regra de edição do documento (document/edit.php,
+   document/index.php e document/action.php): administrador; curador ou
+   responsável inscrito na coleção do documento (topic_users, como em
+   check_maintainer_rights/check_topic_users_edit); ou o próprio depositante,
+   enquanto o documento ainda está em curadoria (status 'i' ou 'w'), como diz
+   document/index.php ("O depositante pode editar apenas os documentos que ele
+   inserir que estão em aprovação").
+   A sessão é lida direto de $_SESSION e a inscrição é conferida direto em
+   topic_users para que esta página não dependa de include/control.php. */
+function sf_check_topic_rights ($row)
+{
+  global $cfg_site, $db_conn;
+
+  $slevel = isset($_SESSION['slevel']) ? (int) $_SESSION['slevel'] : 0;
+  $suid   = isset($_SESSION['suid']) ? $_SESSION['suid'] : '';
+
+  if (!valid_int($suid) || $slevel < USR_LEVEL)
+    message($cfg_site,"Acesso negado", "failure");
+
+  if ($slevel >= ADM_LEVEL)
+    return;
+
+  if ($slevel == MNT_LEVEL || $slevel == RES_LEVEL) {
+    $q = pg_query_params($db_conn,
+         'SELECT 1 FROM topic_users WHERE topic_id = $1 AND users_id = $2',
+         array($row['topic_id'], $suid));
+    if ($q !== false && pg_num_rows($q) > 0)
+      return;
+    message($cfg_site,"Acesso negado", "failure");
+  }
+
+  if ($slevel == USR_LEVEL && (int) $row['owner_id'] === (int) $suid &&
+      ($row['status'] == 'i' || $row['status'] == 'w'))
+    return;
+
+  message($cfg_site,"Acesso negado", "failure");
 }
 
 function find_format ($file_type)
@@ -201,7 +311,7 @@ function find_format ($file_type)
 
 function form ($msg = ""){
 	global $cfg_site;
-	global $cid, $did, $op, $id, $tid, $status;
+	global $cid, $did, $op, $id, $tid, $status, $sf;
 	
 	echo "<div class='arqsuplementar'>";
 
@@ -234,8 +344,8 @@ function form ($msg = ""){
 
      echo html_h("Excluir Anexo");
 
-     $q = db_query("SELECT filename, format_id FROM supplementary_files WHERE id =$id");
-	 $a = db_fetch_array($q);
+     // o anexo já foi carregado e autorizado acima; nada aqui vem do pedido
+	 $a = $sf;
 
    
      $msg = "Você deseja remover o arquivo ". $a['filename']. "?";
