@@ -42,6 +42,30 @@ if (!valid_opt_int($pid) || !valid_opt_int($tid))
 $back = "{$cfg_site}document/list.php?tid=$pid";
 //check_administrator_maintainer_rights();
 
+// Controle de acesso -- nega por padrão. Precisa vir antes de qualquer leitura
+// ou escrita: no caminho POST (com "sent") form()/page_begin() nunca é chamado,
+// então a verificação de sessão de page_begin_aux() não é alcançada ao salvar.
+// A sessão é lida diretamente aqui, sem depender de check_*_rights().
+$suid   = (isset($_SESSION['suid'])   && valid_int($_SESSION['suid']))   ? (int) $_SESSION['suid']   : 0;
+$slevel = (isset($_SESSION['slevel']) && valid_int($_SESSION['slevel'])) ? (int) $_SESSION['slevel'] : 0;
+
+if ($suid <= 0 || $slevel < MNT_LEVEL)
+  redirect("{$cfg_site}user/login.php?url=" . rawurlencode($_SERVER['REQUEST_URI']));
+
+if ($slevel != ADM_LEVEL) {
+  if (!empty($tid)) {
+    // edição: só quem mantém esta coleção (topic_users) pode alterá-la
+    if (!topic_maintained_by($tid, $suid))
+      message($back,"Acesso Negado!", "failure");
+  }
+  else {
+    // criação: coleção raiz é exclusiva do administrador; os demais só criam
+    // sub-coleção sob uma coleção que já mantêm
+    if (empty($pid) || !topic_maintained_by($pid, $suid))
+      message($back,"Acesso Negado!", "failure");
+  }
+}
+
 
   // handle edit mode
   if (empty($sent)) { 
@@ -76,7 +100,7 @@ if (empty($tid)) {
   if (empty($pid))
     $pid = 0;
 
-  db_command("INSERT INTO topic (name,  description,  url, tipo_acesso, parent_id, remote, archieve) VALUES ('$name','$description','$url', $tipoAcesso,'$pid','$remote','$archieve')");
+  db_command_params('INSERT INTO topic (name,  description,  url, tipo_acesso, parent_id, remote, archieve) VALUES ($1,$2,$3,$4,$5,$6,$7)', array($name, $description, $url, $tipoAcesso, $pid, $remote, $archieve));
   $tid = db_simple_query("SELECT CURRVAL('topic_seq')");
   add_log('c', 'tc', "tid=$tid");
 
@@ -85,14 +109,14 @@ if (empty($tid)) {
  if (!empty($category)) {
   if (count($category) > 0 ) 
     foreach ($category as $cid) 
-	  db_command("INSERT INTO nr_topic_category (topic_id,category_id) VALUES ('$tid','$cid')");
+	  db_command_params('INSERT INTO nr_topic_category (topic_id,category_id) VALUES ($1,$2)', array($tid, $cid));
  }
  
  
  if (!empty($tipoInformacao)) {
   if (count($tipoInformacao) > 0 ) 
     foreach ($tipoInformacao as $type) 
-	  db_command("INSERT INTO topic_type (topic_id, type_id) VALUES ('$tid','$type')");
+	  db_command_params('INSERT INTO topic_type (topic_id, type_id) VALUES ($1,$2)', array($tid, $type));
  }
  
   // promote new maintainer
@@ -127,25 +151,25 @@ else {
 	   $old = get_topic($tid, 'maintainer_id');
 
 	  // update topic info
-	  db_command("UPDATE topic SET name='$name', description='$description', url='$url', tipo_acesso=$tipoAcesso, remote='$remote', archieve='$archieve' WHERE id='$tid'");
+	  db_command_params('UPDATE topic SET name=$1, description=$2, url=$3, tipo_acesso=$4, remote=$5, archieve=$6 WHERE id=$7', array($name, $description, $url, $tipoAcesso, $remote, $archieve, $tid));
 	  add_log('c', 'tu', "tid=$tid");
 
 	  // update categories
-	  db_command("DELETE FROM nr_topic_category WHERE topic_id='$tid'");
+	  db_command_params('DELETE FROM nr_topic_category WHERE topic_id=$1', array($tid));
 	   
 	 if (!empty($category)) {
 	  if (count($category) > 0 ) 
 		foreach ($category as $cid) {
-		   db_command("INSERT INTO nr_topic_category (topic_id,category_id) VALUES ('$tid','$cid')");
+		   db_command_params('INSERT INTO nr_topic_category (topic_id,category_id) VALUES ($1,$2)', array($tid, $cid));
 		}  
 	 }
 	 
-	  db_command("DELETE FROM topic_type WHERE topic_id='$tid'");
+	  db_command_params('DELETE FROM topic_type WHERE topic_id=$1', array($tid));
 	 
 	   if (!empty($tipoInformacao)) {
 		  if (count($tipoInformacao) > 0 ) 
 			foreach ($tipoInformacao as $type) 
-			  db_command("INSERT INTO topic_type (topic_id, type_id) VALUES ('$tid','$type')");
+			  db_command_params('INSERT INTO topic_type (topic_id, type_id) VALUES ($1,$2)', array($tid, $type));
 	 }
 
 /*  // change maintainers if needed
@@ -164,6 +188,29 @@ else {
 
 
 /*-------------- functions --------------*/
+
+// Executa um comando com valores ligados (bind), para os dados vindos da
+// requisição. include/db.php só aceita SQL já montado, então usa-se
+// pg_query_params() com a mesma conexão global e o mesmo tratamento de erro.
+function db_command_params ($sql, $params)
+{
+  global $db_conn;
+
+  if (!($q = pg_query_params($db_conn, $sql, $params)))
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+  return @pg_affected_rows($q);
+}
+
+// Verdadeiro se o usuário está vinculado (topic_users) à coleção informada.
+// O vínculo é resolvido pelo id do próprio registro de topic, não por um
+// identificador fornecido pela requisição.
+function topic_maintained_by ($topic_id, $users_id)
+{
+  global $db_conn;
+
+  $q = pg_query_params($db_conn, 'SELECT topic.id FROM topic INNER JOIN topic_users ON topic_users.topic_id = topic.id WHERE topic.id = $1 AND topic_users.users_id = $2', array($topic_id, $users_id));
+  return ($q !== FALSE && pg_num_rows($q) > 0);
+}
 
 function form ($msg = "")
 {

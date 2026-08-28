@@ -50,10 +50,20 @@ CREATE TABLE topic_path (
   PRIMARY KEY (topic_id)
 );
 
+--
+-- ⚠️ CREDENCIAIS. A coluna password comporta um hash moderno (bcrypt/argon2
+-- cabem em 255), mas o Nou-Rau AINDA grava rot13() do texto claro — formato
+-- reversível, não um hash. Trocar o esquema exige mudar junto o seed de
+-- 03-reset.sql e as comparações literais em
+-- docker/nourau/nourau-src/user/{login,loginsemrecatcha,change}.php, e remover
+-- o envio da senha por e-mail de .../user/remind.php — nada disso foi feito
+-- aqui. O acesso da role read-only do portal a esta tabela é retirado em
+-- 10-portal-readonly-revoke-users.sql.
+--
 CREATE TABLE users (
   id             INT DEFAULT NEXTVAL('users_seq'),
   username       VARCHAR(10) UNIQUE,
-  password       VARCHAR(10),
+  password       VARCHAR(255),
   name           VARCHAR(100),
   email          VARCHAR(50),
   info           VARCHAR(500) DEFAULT '',

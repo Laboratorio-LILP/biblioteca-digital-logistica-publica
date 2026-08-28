@@ -1,0 +1,27 @@
+--
+-- Tira da role read-only do portal (portal_reader, criada em
+-- 09-portal-readonly-user.sh) o acesso à tabela de credenciais do Nou-Rau.
+--
+-- Roda DEPOIS do 09: o entrypoint do Postgres executa os arquivos de
+-- docker-entrypoint-initdb.d em ordem lexical e "10-" vem depois de "09-",
+-- então a role já existe aqui. O REVOKE precisa ficar em arquivo próprio —
+-- dentro do 01-schema.sql ele abortaria o initdb ("role portal_reader does
+-- not exist").
+--
+-- Motivo: o GRANT SELECT ON ALL TABLES IN SCHEMA public do 09 entrega users
+-- (username + password) à role com que o portal Django, exposto na internet,
+-- se conecta. O portal não lê essa tabela — portal/catalog/models.py mapeia 12
+-- tabelas (topic, topic_path, nr_category, nr_format, type_information,
+-- nr_assunto, nr_subcategoria, nr_microcategoria, nr_document, nr_ods,
+-- supplementary_files, visitas_downloads) e users não está entre elas —, então
+-- o REVOKE não custa nada à busca, às facetas nem à página de documento.
+--
+-- ⚠️ NÃO conserta o armazenamento: as senhas continuam em rot13() do texto
+-- claro (seed em 03-reset.sql; comparação literal em
+-- docker/nourau/nourau-src/user/{login,loginsemrecatcha,change}.php) e
+-- .../user/remind.php continua mandando a senha por e-mail. Isto fecha só a
+-- exposição por portal_reader; o POSTGRES_USER, com que o Nou-Rau se conecta,
+-- segue lendo a tabela.
+--
+
+REVOKE ALL ON TABLE users FROM portal_reader;
