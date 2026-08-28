@@ -55,7 +55,7 @@ if (empty($code))
 
 
 // get document
-$q = db_query("SELECT * FROM nr_document WHERE code='$code'");
+$q = doc_query_params('SELECT * FROM nr_document WHERE code=$1', array($code));
 if (!db_rows($q))
     message($cfg_site,"Documento não encontrado", "failure");
 $a = db_fetch_array($q);
@@ -810,29 +810,112 @@ else {
 
 }
 
+// Consulta com parâmetros vinculados. A camada de include/db.php só aceita SQL
+// já interpolado; enquanto ela não for revista, os dados vindos da requisição
+// são vinculados aqui, nunca concatenados na consulta.
+function doc_query_params ($sql, $params)
+{
+	global $db_conn;
+
+	if (!($q = @pg_query_params($db_conn, $sql, $params)))
+		fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+	return $q;
+}
+
+// Tamanho descompactado gravado no rodapé do gzip (campo ISIZE), usado para o
+// Content-Length do arquivo que será realmente enviado. Devolve FALSE se não
+// for possível determiná-lo.
+function doc_gzip_length ($file)
+{
+	$size = false;
+	if (($fp = @fopen($file, 'rb')) !== false) {
+		if (@fseek($fp, -4, SEEK_END) === 0) {
+			$tail = @fread($fp, 4);
+			if ($tail !== false && strlen($tail) == 4) {
+				$u = unpack('V', $tail);
+				$size = $u[1];
+			}
+		}
+		@fclose($fp);
+	}
+	return $size;
+}
+
+// Controle de acesso ao download, feito aqui e não em include/control.php:
+// check_administrator_rights() devolve normalmente (libera) quando não há
+// sessão, e check_user_rights() não declara parâmetro algum, descartando o
+// tópico que lhe é passado. Esta verificação olha a sessão e topic_users
+// diretamente, valendo mesmo que aquele arquivo não tenha sido corrigido.
+function check_document_download_rights ($status, $tid)
+{
+	global $cfg_site;
+
+	// documento arquivado: público, é o que o portal publica
+	if ($status == 'a')
+		return;
+
+	// os demais estados estão em curadoria e exigem sessão autenticada
+	if (empty($_SESSION['suid']) || !isset($_SESSION['slevel']))
+		redirect("{$cfg_site}user/login.php?url=" . rawurlencode($_SERVER['REQUEST_URI']));
+
+	// administrador alcança qualquer documento
+	if ($_SESSION['slevel'] == ADM_LEVEL)
+		return;
+
+	// 'v' aguarda verificação: só a curadoria; 'w' e 'i' também o depositante
+	if ($status == 'v')
+		$min_level = MNT_LEVEL;
+	else if ($status == 'w' || $status == 'i')
+		$min_level = USR_LEVEL;
+	else
+		message($cfg_site, "Documento não encontrado", "failure");
+
+	if (!valid_int($_SESSION['slevel']) || $_SESSION['slevel'] < $min_level)
+		message($cfg_site, "Documento não encontrado", "failure");
+
+	// e apenas dentro da coleção a que o documento pertence
+	if (!valid_int($tid) || !valid_int($_SESSION['suid']))
+		message($cfg_site, "Documento não encontrado", "failure");
+
+	$qt = doc_query_params('SELECT id FROM topic_users WHERE topic_id=$1 AND users_id=$2',
+	                       array($tid, $_SESSION['suid']));
+	if (!db_rows($qt))
+		message($cfg_site, "Documento não encontrado", "failure");
+}
+
 function view_document ($code, $force_download, $sfid, $open){
 	global $cfg_site, $cfg_dir_archive, $cfg_dir_incoming;
 
 	// find document - Se a variavel $idsf está vazia busca na tabela nr_document caso contrario supplementary_files
-	 
+	// $code e $sfid vêm da requisição: vão vinculados, nunca concatenados.
 	if (empty($sfid))
-		$q = db_query("SELECT D.id,D.topic_id,D.status,D.filename,D.size,D.remote,F.type,F.subtype,F.extension,F.compress FROM nr_document D,nr_format F WHERE D.code='$code' AND D.format_id=F.id");
-    else
-    	$q = db_query("SELECT D.id,D.topic_id, D.filename,D.size,D.remote,F.type,F.subtype,F.extension,F.compress FROM supplementary_files D, nr_format F WHERE D.id='$sfid' AND D.format_id=F.id");
+		$q = doc_query_params('SELECT D.id,D.topic_id,D.status,D.filename,D.size,D.remote,F.type,F.subtype,F.extension,F.compress FROM nr_document D,nr_format F WHERE D.code=$1 AND D.format_id=F.id', array($code));
+    else {
+    	if (!valid_int($sfid))
+    		message($cfg_site, "Parâmetro inválido", "failure");
+    	// o anexo tem de pertencer ao documento pedido
+    	$q = doc_query_params('SELECT D.id,D.topic_id,D.filename,D.size,D.remote,F.type,F.subtype,F.extension,F.compress,P.topic_id AS parent_topic_id FROM supplementary_files D, nr_format F, nr_document P WHERE D.id=$1 AND D.format_id=F.id AND D.document_id=P.id AND P.code=$2', array($sfid, $code));
+    }
 
 	if (!db_rows($q))
-	    error(_('Document not found'));
+	    message($cfg_site, "Documento não encontrado", "failure");
 
 	 $a = db_fetch_array($q);
 
    if (empty($sfid))
       $status = $a['status'];
     else {
-		$qas = db_query("SELECT status FROM  nr_document  WHERE code='$code'" );
+		$qas = doc_query_params('SELECT status FROM  nr_document  WHERE code=$1', array($code));
 	    $as = db_fetch_array($qas);
         $status = $as['status'];	
     }
 	
+	// autoriza antes de qualquer saída: nada é emitido enquanto o direito de ver
+	// este documento não estiver decidido. Para anexo vale a coleção do documento
+	// dono, e não a gravada no anexo, que pode estar defasada após troca de base.
+	check_document_download_rights($status,
+	                               empty($sfid) ? $a['topic_id'] : $a['parent_topic_id']);
+
 	// handle remote documents
 	if ($a['remote'] == 'y')
 		redirect($a['filename']);
@@ -845,14 +928,11 @@ function view_document ($code, $force_download, $sfid, $open){
 
 	if ($status == 'v') {
 		// document needs verification
-		check_administrator_rights();
 		$file = "$cfg_dir_incoming/$filename";
 		$compress = 'n'; // output as is
 	}
 	else if ($status == 'w' || $status == 'i') {
 		// document waiting for approval
-	    check_user_rights($a['topic_id']);
-   
          if (empty($sfid)){
 	   	   $file = "$cfg_dir_incoming/$filename";
 		   $compress = 'n';
@@ -880,10 +960,22 @@ function view_document ($code, $force_download, $sfid, $open){
 
 	}
 	else
-		error(_('Access denied'));
-	
-  
+		message($cfg_site, "Documento não encontrado", "failure");
+
+	// o caminho resolvido tem de cair dentro dos diretórios configurados
+	$path = @realpath($file);
+	$dir_archive = @realpath($cfg_dir_archive);
+	$dir_incoming = @realpath($cfg_dir_incoming);
+	if ($path === false || !is_file($path) ||
+	    !(($dir_archive !== false && strpos($path, $dir_archive . '/') === 0) ||
+	      ($dir_incoming !== false && strpos($path, $dir_incoming . '/') === 0)))
+		message($cfg_site, "Documento não encontrado", "failure");
+
 		// output document
+		// descarta a saída pendente para não corromper o corpo binário
+		while (ob_get_level() > 0)
+			@ob_end_clean();
+
 		if (!$force_download) {
 			
 		    header("Content-Type: {$a['type']}/{$a['subtype']}");
@@ -892,7 +984,6 @@ function view_document ($code, $force_download, $sfid, $open){
 		    header('Expires: 0');
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
-            header('Content-Length: ' . filesize($file));
 		}
 		else {
 			header("Content-type: application/octet-stream");
@@ -900,31 +991,22 @@ function view_document ($code, $force_download, $sfid, $open){
 		    header('Expires: 0');
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
-            header('Content-Length: ' . filesize($file));
 		}
 
 		if ($compress == 'y') {
-
-			header("Content-Length: {$a['size']}");
-			@passthru("gzip -cd $file");
-			
 			// decompress file on the fly
-			/*@passthru("gzip -cd $file");
-			ob_clean();
-            flush();
-			@readfile($file);*/
+			$length = doc_gzip_length($path);
+			if ($length !== false)
+				header("Content-Length: $length");
+			@readgzfile($path);
 		}
 		else {
-			header("Content-Length: {$a['size']}");
-			@passthru("gzip -cd $file");
-
 			// simply output file
-		   /* ob_clean();
-            flush();
-			@readfile($file);*/
-		
+			header('Content-Length: ' . filesize($path));
+			@readfile($path);
 		}
 		// finish explicitly
+		exit();
 }
 
 ?>
