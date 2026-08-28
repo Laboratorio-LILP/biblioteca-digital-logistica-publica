@@ -33,18 +33,27 @@ $sent = $_POST['sent'];
 }
 
 // validate access
-if ($_SESSION['suid'] != $uid && !is_administrator())
- message("{$cfg_site}","Acesso Negado !", "failure");  
+// exige uma sessão realmente autenticada antes de qualquer coisa; o nível do
+// editor vem da sessão, nunca da requisição
+if (!isset($_SESSION['suid']) || !isset($_SESSION['slevel']) || !valid_int($_SESSION['suid']))
+  redirect("{$cfg_site}user/login.php?url=" . rawurlencode($_SERVER['REQUEST_URI']));
+
+$is_admin = ((int) $_SESSION['slevel'] === ADM_LEVEL);
 
 
 	// validate input
 	if (!valid_opt_int($uid))
 	   message("{$cfg_site}user/list.php","Parâmetro Inválido !", "failure");
    
-	if (!empty($uid)) {
+	if (empty($uid)) {
+		// handle create mode; criar usuário é operação de administrador
+		if (!$is_admin)
+	    	message("{$cfg_site}","Acesso Negado !", "failure");
+	}
+	else {
 		// handle edit mode
-		if ($_SESSION['suid'] != $uid && !is_administrator())
-	    	message("{$cfg_site}","Acesso Negado !", "failure");  
+		if (!$is_admin && (string) $_SESSION['suid'] !== (string) $uid)
+	    	message("{$cfg_site}","Acesso Negado !", "failure");
 
 		if (empty($sent)) {
 			// first time; load from base
@@ -87,8 +96,27 @@ $n = strlen($info) - $cfg_max_user_info;
 if ($n > 0)
   form("O tamanho da informação excedeu o máximo permitido em $n caracteres");
 
-/*if(empty($level))
- form('Por favor escolha um nível de acesso');*/
+// o nível de acesso só é aceito da requisição quando o editor é administrador;
+// na auto-edição preserva-se o nível já gravado para o usuário
+if ($is_admin) {
+  if (!valid_int((string) $level)
+      || !in_array((int) $level, array(USR_LEVEL, MNT_LEVEL, RES_LEVEL, ADM_LEVEL), true))
+    form('Por favor escolha um nível de acesso');
+  $level = (int) $level;
+}
+else {
+  $level = get_user($uid, 'level');
+  // o widget de acesso aos tópicos só existe no formulário do administrador
+  $acesso = NULL;
+}
+
+// os tópicos vêm da requisição; aceite apenas inteiros
+if (!empty($acesso)) {
+  foreach ((array) $acesso as $selected) {
+    if (!valid_int((string) $selected))
+      message("{$cfg_site}user/list.php","Parâmetro Inválido !", "failure");
+  }
+}
 
 /*if(empty($incluir))
   form('Por favor especifique os tópicos, que o usuário terá acesso');*/
@@ -98,13 +126,13 @@ if (!empty($sec) && empty($tid))
 
 if (empty($uid)) {
   // insert new user
- db_command("INSERT INTO users (username,password,name,email,info,level) VALUES ('$username','" . rot13($password) . "','$name','$email','$info', '$level')");
+ db_command_params('INSERT INTO users (username,password,name,email,info,level) VALUES ($1,$2,$3,$4,$5,$6)',
+                   array($username, rot13($password), $name, $email, $info, $level));
  $uid = db_simple_query("SELECT CURRVAL('users_seq')");
  add_log('c', 'uc', "uid=$uid&from={$_SERVER['HTTP_X_FORWARDED_FOR']}- {$_SERVER['HTTP_USER_AGENT']}");
 
   foreach($acesso as $selected){
-	  $sqlIns = "INSERT INTO topic_users (users_id,topic_id) VALUES ({$uid}, {$selected})";
-	  db_command($sqlIns);
+	  db_command_params('INSERT INTO topic_users (users_id,topic_id) VALUES ($1, $2)', array($uid, $selected));
   }
     
 	message("{$cfg_site}user/list.php","O Usuário foi criado.", "success");
@@ -112,16 +140,16 @@ if (empty($uid)) {
 } else {
 	
 // update user info
-  db_command("UPDATE users SET name='$name',email='$email',info='$info', level='$level' WHERE id='$uid'");
+  db_command_params('UPDATE users SET name=$1,email=$2,info=$3, level=$4 WHERE id=$5',
+                    array($name, $email, $info, $level, $uid));
   add_log('c', 'uu', "uid=$uid&from={$_SERVER['HTTP_X_FORWARDED_FOR']}- {$_SERVER['HTTP_USER_AGENT']}");
   
 	  if(!empty($acesso)){
 	  
-	  db_command("DELETE FROM topic_users WHERE users_id=$uid");
+	  db_command_params('DELETE FROM topic_users WHERE users_id=$1', array($uid));
 
 		foreach($acesso as $selected){
-		  $sqlIns = "INSERT INTO topic_users (users_id,topic_id) VALUES ({$uid}, {$selected})";
-		  db_command($sqlIns);
+		  db_command_params('INSERT INTO topic_users (users_id,topic_id) VALUES ($1, $2)', array($uid, $selected));
 		}	  
   }	  
 } 
@@ -132,6 +160,19 @@ if (empty($uid)) {
 
 
 /*-------------- functions --------------*/
+
+// como db_command() só aceita SQL pronto, aqui os valores vão ligados
+// (bind) em vez de interpolados na consulta
+function db_command_params ($sql, $params)
+{
+  global $db_conn;
+
+  if (!($q = pg_query_params($db_conn, $sql, $params)))
+    fatal("Se você está tendo problemas, por favor entre em contato com os administradores da Biblioteca Digital");
+
+  return @pg_affected_rows($q);
+}
+
 function form ($msg = ""){
 	global $cfg_site, $cfg_max_user_info;
 	global $uid, $username, $password, $password2, $name,$email, $info, $level,  $topic_id, $option, $topico, $opttopicos, $incluir, $excluir;
