@@ -265,6 +265,28 @@ def assunto_nome(doc):
     return _assunto_names().get(getattr(doc, "assunto_id", None), "")
 
 
+@register.simple_tag
+def classificacao_card(doc):
+    """Os dois eixos do rodapé do cartão — e do badge "Etapa" do documento —
+    resolvidos SÓ pelos mapas cacheados (zero query por cartão; nada de
+    doc.category/doc.subcategoria, que disparam uma consulta cada).
+
+    Devolve {"etapa": "Seleção do Fornecedor › Licitação" | "", "assunto":
+    "Governança" | ""}. A etapa é a Categoria processual em Title Case
+    (titulo_pt) seguida da Subcategoria no rótulo curado (rotulo_sub), quando
+    houver; a microcategoria não vai ao cartão. Sem categoria → etapa vazia
+    (o cartão mostra só o Assunto); sem assunto → assunto vazio (o cartão cai
+    no nome da coleção).
+    """
+    cat = _category_names().get(getattr(doc, "category_id", None))
+    etapa = titulo_pt(cat) if cat else ""
+    if etapa:
+        sub = _subcategoria_names().get(getattr(doc, "subcategoria_id", None))
+        if sub:
+            etapa += " › " + rotulo_sub(sub)
+    return {"etapa": etapa, "assunto": _assunto_names().get(getattr(doc, "assunto_id", None), "")}
+
+
 @register.filter
 def primary_author(doc):
     """Primeiro autor de `author` (coluna 'Autor Principal' do v8); fallback para

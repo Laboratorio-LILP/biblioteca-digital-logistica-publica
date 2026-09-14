@@ -1,6 +1,9 @@
 {% comment %}
 DocCard — card de documento fiel ao protótipo do Eduardo (Next.js).
 Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de Informação).
+Rodapé (set/2026): os dois eixos da classificação — "Etapa: <categoria › subcategoria>"
+e "Assunto: <assunto>" — resolvidos por classificacao_card (mapas cacheados, zero
+query por cartão). Sem categoria mostra só o Assunto; sem Assunto cai no nome da coleção.
 {% endcomment %}
 {% load catalog_tags %}
 {% colecao_visual doc as cv %}
@@ -36,7 +39,8 @@ Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de I
     {% endif %}
 
     <div class="doc-card__bottom">
-      {% with a=doc|assunto_nome %}<span class="doc-card__assunto">{% if a %}{{ a }}{% else %}{{ cv.nome }}{% endif %}</span>{% endwith %}
+      {% classificacao_card doc as cl %}
+      <span class="doc-card__assunto doc-card__eixos">{% if cl.etapa %}<span class="doc-card__eixo"><span class="doc-card__eixo-rotulo">Etapa:</span> {{ cl.etapa }} <span class="doc-card__eixo-sep" aria-hidden="true">·</span></span> {% endif %}<span class="doc-card__eixo"><span class="doc-card__eixo-rotulo">Assunto:</span> {% if cl.assunto %}{{ cl.assunto }}{% else %}{{ cv.nome }}{% endif %}</span></span>
       <span class="doc-card__ver">Ver documento <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></span>
     </div>
   </div>

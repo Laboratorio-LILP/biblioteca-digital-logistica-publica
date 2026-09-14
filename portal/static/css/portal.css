@@ -551,6 +551,13 @@ main { flex: 1 0 auto; }
 .doc-card__aberto .fi { color: var(--sp-green); }
 .doc-card__bottom { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: var(--border); padding-top: 10px; }
 .doc-card__assunto { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: rgb(var(--rgb-black) / 0.55); }
+/* Rodapé com os dois eixos (set/2026): "Etapa: … · Assunto: …" na MESMA tipografia
+   do .doc-card__assunto (11px, cor 0.55). Cada eixo trunca por si (elipse) e o
+   segundo desce de linha quando os dois não cabem juntos — o Assunto nunca some
+   atrás da elipse da Etapa (cards estreitos no mobile). Só o rótulo ganha peso. */
+.doc-card__eixos { white-space: normal; line-height: 1.5; }
+.doc-card__eixo { display: inline-block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+.doc-card__eixo-rotulo { font-family: var(--font-subtitle); font-weight: 600; }
 .doc-card__ver { flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--sp-red-dark); font-family: var(--font-subtitle); font-weight: 600; }
 
 /* ============================================================
@@ -839,6 +846,9 @@ html.js .btn-apply { display: none; }
 .doc-aplicabilidade p, .doc-callout p { margin-top: 8px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
 .doc-detail-tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
 .doc-detail-tags .tg { border: 1px solid var(--sp-gray-medium); background: var(--sp-white); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: rgb(var(--rgb-black) / 0.7); }
+/* Fórmula da classificação (set/2026) sob o título "Classificação BDLP" — mesmo
+   corpo/cor dos parágrafos de callout do painel. */
+.classificacao-formula { margin: 12px 0 0; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
 .meta-grid { display: grid; gap: 14px; margin-top: 16px; grid-template-columns: 1fr; }
 @media (min-width: 600px) { .meta-grid { grid-template-columns: repeat(2, 1fr); } }
 .meta-item { border-bottom: var(--border); padding-bottom: 12px; }

@@ -5,6 +5,7 @@
 
 {% block content_raw %}
 {% colecao_visual document as cv %}
+{% classificacao_card document as cl %}
 <section class="sp-section sp-section--pattern doc-detail-hero">
   <div class="sp-container">
     <nav class="breadcrumb" aria-label="Trilha de navegação">
@@ -36,6 +37,7 @@
         {% if document.type_info %}{{ document.type_info.name }}{% else %}{{ cv.nome }}{% endif %}
       </span>
       {% with an=document|assunto_nome %}{% if an %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-bookmark"/></svg>{{ an }}</span>{% endif %}{% endwith %}
+      {% if cl.etapa %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-layers"/></svg>Etapa: {{ cl.etapa }}</span>{% endif %}
       {% if document.permissao %}
       <span class="doc-badge {{ document.permissao|lower }}">
         {% if document.permissao == 'Aberto' %}<svg class="fi" aria-hidden="true"><use href="#fi-unlock"/></svg>{% else %}<svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>{% endif %}
@@ -76,12 +78,14 @@
 
     <section class="sp-panel doc-panel">
       <h2 class="doc-section-title">Classificação BDLP</h2>
+      {# Fórmula da classificação (Lina, 10/09/2026), em Linguagem Simples. #}
+      <p class="classificacao-formula">Todo material recebe uma coleção (o tipo de material), uma etapa da contratação (a categoria; subcategoria e microcategoria quando couber), um assunto (o tema) e, quando couber, a natureza (o que se contrata). A classificação tem várias dimensões: você pode combinar esses filtros no Acervo ou buscar por palavra sem filtro nenhum.</p>
       <div class="meta-grid">
         <div class="meta-item"><div class="label">Coleção</div><div class="value"><a href="{% url 'catalog:search' %}?colecao_v6={{ cv.slug }}">{{ cv.nome }}</a></div></div>
         {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de informação</div><div class="value"><a href="{% url 'catalog:search' %}?typeinform_id={{ document.typeinform_id }}">{{ document.type_info.name }}</a></div></div>{% endif %}
         {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value"><a href="{% url 'catalog:search' %}?assunto_id={{ document.assunto_id }}">{{ assunto.nome }}</a></div></div>{% endif %}{% endwith %}
         {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value"><a href="{% url 'catalog:search' %}?natureza={{ document.natureza|urlencode }}">{{ document.natureza }}</a></div></div>{% endif %}
-        {% if document.category %}<div class="meta-item"><div class="label">Categoria</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ document.category.name|titulo_pt }}</a></div></div>{% endif %}
+        {% if document.category %}<div class="meta-item"><div class="label">Etapa (categoria processual)</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ document.category.name|titulo_pt }}</a></div></div>{% endif %}
         {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?subcategoria_id={{ document.subcategoria_id }}">{{ sub.nome|rotulo_sub }}</a></div></div>{% endif %}{% endwith %}
         {% with mic=document.microcategoria %}{% if mic %}<div class="meta-item"><div class="label">Microcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?microcategoria_id={{ document.microcategoria_id }}">{{ mic.nome|titulo_pt }}</a></div></div>{% endif %}{% endwith %}
       </div>
