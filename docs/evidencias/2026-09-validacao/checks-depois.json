@@ -1,9 +1,44 @@
 {
-  "colecoes": {
+  "filtro-desktop-js": {
     "erros": [],
     "checks": {
-      "glossario_assuntos": "ok — 16 itens",
-      "glossario_categorias": "ok — 6 itens"
+      "url_com_assunto_id": "ok — assunto_id=10",
+      "rolagem_preservada": "ok — antes=1143 depois=1143",
+      "sem_recarregar_pagina": true,
+      "foco_no_checkbox": "ok — assunto_id:10:1",
+      "chip_do_assunto": "ok — Assunto: Micro e Pequenas Empresas",
+      "anuncio_aria_live": "ok — Resultados atualizados: 19 documentos",
+      "voltar_sem_recarregar": "ok — http://localhost:8000/busca/",
+      "voltar_desmarca_filtro": true
+    }
+  },
+  "filtro-desktop-semjs": {
+    "erros": [],
+    "checks": {
+      "url_com_assunto_id": "ok — q=&assunto_id=10&ano_min=&ano_max=&sort=#acervo-resultados",
+      "ancora_resultados": "ok — http://localhost:8000/busca/?q=&assunto_id=10&ano_min=&ano_max=&sort=#acervo-resultados",
+      "pagina_posicionada_nos_resultados": "ok — scrollY=456"
+    }
+  },
+  "filtro-mobile-js": {
+    "erros": [],
+    "checks": {
+      "drawer_continua_aberto": "ok — is-open=True aria-expanded=true",
+      "sem_recarregar_pagina": true,
+      "url_com_assunto_id": true,
+      "lista_atualizada_por_tras": "ok — Assunto: Micro e Pequenas Empresas"
+    }
+  },
+  "cartao-desktop": {
+    "erros": [],
+    "checks": {
+      "rodape_do_cartao": "ok — Etapa: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento"
+    }
+  },
+  "cartao-mobile": {
+    "erros": [],
+    "checks": {
+      "rodape_do_cartao": "ok — Etapa: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento"
     }
   },
   "documento": {
@@ -11,6 +46,13 @@
     "checks": {
       "badges_do_heroi": "ok — Artigos | Aspectos Jurídicos e Regulatórios | Etapa: Seleção do Fornecedor › Procedimentos Auxiliares | Aberto",
       "rotulos_classificacao": "ok — Coleção | Tipo de informação | Assunto | Natureza | Etapa (categoria processual) | Subcategoria | Microcategoria"
+    }
+  },
+  "colecoes": {
+    "erros": [],
+    "checks": {
+      "glossario_assuntos": "ok — 16 itens",
+      "glossario_categorias": "ok — 6 itens"
     }
   }
 }
