@@ -1,0 +1,32 @@
+{
+  "filtro-desktop-js": {
+    "erros": [],
+    "checks": {
+      "url_com_assunto_id": "ok — assunto_id=10",
+      "rolagem_preservada": "ok — antes=1112 depois=1112",
+      "sem_recarregar_pagina": true,
+      "foco_no_checkbox": "ok — assunto_id:10:1",
+      "chip_do_assunto": "ok — Assunto: Micro e Pequenas Empresas",
+      "anuncio_aria_live": "ok — Resultados atualizados: 19 documentos",
+      "voltar_sem_recarregar": "ok — http://localhost:8000/busca/",
+      "voltar_desmarca_filtro": true
+    }
+  },
+  "filtro-desktop-semjs": {
+    "erros": [],
+    "checks": {
+      "url_com_assunto_id": "ok — q=&assunto_id=10&ano_min=&ano_max=&sort=#acervo-resultados",
+      "ancora_resultados": "ok — http://localhost:8000/busca/?q=&assunto_id=10&ano_min=&ano_max=&sort=#acervo-resultados",
+      "pagina_posicionada_nos_resultados": "ok — scrollY=456"
+    }
+  },
+  "filtro-mobile-js": {
+    "erros": [],
+    "checks": {
+      "drawer_continua_aberto": "ok — is-open=True aria-expanded=true",
+      "sem_recarregar_pagina": true,
+      "url_com_assunto_id": true,
+      "lista_atualizada_por_tras": "ok — Assunto: Micro e Pequenas Empresas"
+    }
+  }
+}

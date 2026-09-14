@@ -1,9 +1,21 @@
-/* Acervo — filtros em cascata + drawer mobile.
+/* Acervo — filtros em cascata + drawer mobile + atualização sem voltar ao topo.
  *
- * Progressive enhancement: SEM JS, o <form> envia por GET e o botão
- * "Aplicar filtros" funciona. COM JS, mudar uma faceta, a ordenação ou o ano
- * envia o form (GET) e a página recarrega no topo — comportamento previsível,
- * sem restauração de rolagem.
+ * Melhoria progressiva (set/2026, "toda vez que clica, ele vai lá pra cima"):
+ *   SEM JS: o <form> envia por GET, o botão "Aplicar filtros" funciona e a
+ *   página recarrega já posicionada em #acervo-resultados (âncora do action e
+ *   dos links de chips, "Limpar tudo" e paginação).
+ *   COM JS: mudar uma faceta, a ordenação ou o ano — e clicar num chip, em
+ *   "Limpar tudo" ou na paginação — busca o HTML COMPLETO da mesma view
+ *   (fetch) e troca só três regiões: #acervo-sidebar, #acervo-resultados e
+ *   #acervo-paginacao. A rolagem não se move, o foco volta ao controle tocado,
+ *   os <details> abertos continuam abertos e o drawer mobile fica como estava.
+ *   A URL passa a refletir a busca (pushState) e "voltar/avançar" refaz a
+ *   troca (popstate) sem recarregar. Qualquer falha — rede, HTTP ≠ 200, HTML
+ *   sem as regiões — cai no envio clássico do form (que aterrissa na âncora).
+ *
+ * CSP script-src 'self': só addEventListener, sem handler inline, sem eval.
+ * Sub-path (/Biblioteca/): usa form.action, a.href e location — nunca um
+ * caminho absoluto chumbado. O cabeçalho X-Requested-With é só informativo.
  */
 (function () {
   "use strict";
@@ -15,7 +27,8 @@
   document.documentElement.classList.add("js");
 
   var sidebar = document.getElementById("acervo-sidebar");
-  var mobileToggle = form.querySelector(".acervo-mobile-toggle");
+  var resultados = document.getElementById("acervo-resultados");
+  var wrapper = document.querySelector(".acervo-results");
 
   // Grupos single-select (rádio); os demais (Assunto, Natureza, Tipo) são multi.
   var SINGLE_SELECT = new Set(["colecao_v6", "category_id", "subcategoria_id", "microcategoria_id"]);
@@ -31,24 +44,190 @@
     ["category_id", "subcategoria_id", "microcategoria_id"],
   ];
 
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Troca parcial só quando o navegador tem tudo que ela precisa; senão, o
+  // envio clássico do form continua valendo (com a âncora).
+  var podeTrocar = !!(window.fetch && window.DOMParser && window.URL && window.URLSearchParams &&
+    window.FormData && window.history && window.history.pushState && sidebar && resultados);
+
+  // Elementos que vivem DENTRO das regiões trocadas são consultados na hora
+  // (referência guardada ficaria obsoleta depois do fetch).
+  function statusEl() { return document.getElementById("acervo-status"); }
+  function mobileToggle() { return form.querySelector(".acervo-mobile-toggle"); }
+
   function clearGroup(name) {
     form.querySelectorAll('input[name="' + name + '"]').forEach(function (el) { el.checked = false; });
   }
 
-  // Feedback de "atualizando" ao auto-submeter (a página recarrega no servidor).
-  var results = document.querySelector(".acervo-results");
-  var statusEl = document.getElementById("acervo-status");
-  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function doSubmit() {
-    if (results && !reduce) results.classList.add("is-updating");
-    if (statusEl) statusEl.textContent = "Atualizando resultados…";
+  function chaveDe(href) {
+    var u = new URL(href, location.href);
+    return u.pathname + u.search;
+  }
+  var chaveAtual = podeTrocar ? chaveDe(location.href) : "";
+
+  // URL da busca a partir do form: sem `page`, sem campos vazios, sem hash.
+  function urlDoForm() {
+    var u = new URL(form.action, location.href);
+    var params = new URLSearchParams();
+    new FormData(form).forEach(function (valor, nome) {
+      if (nome === "page") return;
+      if (typeof valor !== "string" || valor.trim() === "") return;
+      params.append(nome, valor);
+    });
+    u.search = params.toString();
+    u.hash = "";
+    return u.href;
+  }
+
+  // Envio clássico (fallback): a página recarrega e aterrissa em #acervo-resultados.
+  function envioClassico() {
+    if (wrapper && !reduce) wrapper.classList.add("is-updating");
+    var s = statusEl();
+    if (s) s.textContent = "Atualizando resultados…";
     form.submit();
   }
 
+  // ---- estado a preservar na troca: <details> abertos, foco, drawer, rolagem ----
+  function chaveDetails(d) {
+    var s = d.querySelector(":scope > summary");
+    return (s ? s.textContent : "").replace(/\s+/g, " ").trim();
+  }
+  function detailsAbertos() {
+    var estado = {};
+    sidebar.querySelectorAll("details").forEach(function (d) { estado[chaveDetails(d)] = d.open; });
+    return estado;
+  }
+  function reaplicarDetails(estado) {
+    sidebar.querySelectorAll("details").forEach(function (d) {
+      var k = chaveDetails(d);
+      if (Object.prototype.hasOwnProperty.call(estado, k)) d.open = estado[k];
+    });
+  }
+  function focoAtual() {
+    var a = document.activeElement;
+    if (!a || !form.contains(a)) return null;
+    return { id: a.id || "", name: a.getAttribute("name") || "", value: a.value || "", tag: a.tagName };
+  }
+  function focar(el) {
+    if (!el) return;
+    if (!el.hasAttribute("tabindex") && !/^(INPUT|SELECT|BUTTON|A|TEXTAREA)$/.test(el.tagName)) {
+      el.setAttribute("tabindex", "-1");
+    }
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+  function restaurarFoco(foco, fallbackSel) {
+    var el = null;
+    if (foco) {
+      if (foco.id) el = document.getElementById(foco.id);
+      if (!el && foco.name) {
+        var cands = form.querySelectorAll(foco.tag.toLowerCase() + '[name="' + foco.name + '"]');
+        for (var i = 0; i < cands.length; i++) {
+          if (foco.tag !== "INPUT" || cands[i].value === foco.value) { el = cands[i]; break; }
+        }
+      }
+    }
+    if (!el && fallbackSel) el = form.querySelector(fallbackSel);
+    focar(el);
+  }
+
+  // ---- fetch + troca das três regiões ----
+  var seq = 0;
+  var controller = null;
+
+  function trocar(url, opts) {
+    opts = opts || {};
+    if (!podeTrocar) { (opts.fallback || envioClassico)(); return; }
+
+    var minha = ++seq;                      // resposta atrasada de um pedido anterior é ignorada
+    if (controller) controller.abort();
+    controller = window.AbortController ? new AbortController() : null;
+
+    if (wrapper && !reduce) wrapper.classList.add("is-updating");
+    resultados.setAttribute("aria-busy", "true");
+    var s = statusEl();
+    if (s) s.textContent = "Atualizando resultados…";
+
+    var init = { headers: { "X-Requested-With": "fetch" }, credentials: "same-origin" };
+    if (controller) init.signal = controller.signal;
+
+    fetch(url, init)
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      })
+      .then(function (html) {
+        if (minha !== seq) return;
+        var doc = new DOMParser().parseFromString(html, "text/html");
+        var novoSidebar = doc.getElementById("acervo-sidebar");
+        var novoRes = doc.getElementById("acervo-resultados");
+        if (!novoSidebar || !novoRes) throw new Error("HTML sem as regiões esperadas");
+        var novaPag = doc.getElementById("acervo-paginacao");
+
+        // Nada é alterado antes de o HTML novo ser validado: sem estado meio-trocado.
+        // O HTML vem da MESMA view, na mesma origem, renderizado pelos templates
+        // (auto-escape do Django) — o mesmo nível de confiança da página inicial;
+        // por isso innerHTML, sem sanitizador extra.
+        var estado = detailsAbertos();
+        var foco = focoAtual();
+        var drawerAberto = sidebar.classList.contains("is-open");
+        var sx = window.scrollX, sy = window.scrollY;
+
+        sidebar.innerHTML = novoSidebar.innerHTML;
+        resultados.innerHTML = novoRes.innerHTML;
+        var pagAtual = document.getElementById("acervo-paginacao");
+        if (novaPag && pagAtual) {
+          pagAtual.innerHTML = novaPag.innerHTML;
+        } else if (novaPag && !pagAtual) {
+          form.appendChild(document.adoptNode(novaPag));   // paginação passou a existir
+        } else if (!novaPag && pagAtual) {
+          pagAtual.parentNode.removeChild(pagAtual);        // paginação deixou de existir
+        }
+
+        reaplicarDetails(estado);
+        var t = mobileToggle();
+        if (t) t.setAttribute("aria-expanded", drawerAberto ? "true" : "false");
+        window.scrollTo(sx, sy);                            // o leitor continua onde estava
+
+        var titulo = doc.querySelector("title");
+        if (titulo) document.title = titulo.textContent;
+        if (opts.push) {
+          if (chaveDe(url) === chaveAtual) history.replaceState({ acervo: true }, "", url);
+          else history.pushState({ acervo: true }, "", url);
+        }
+        chaveAtual = chaveDe(location.href);
+
+        if (opts.focus !== false || opts.focusFallback) {
+          restaurarFoco(opts.focus === false ? null : foco, opts.focusFallback);
+        }
+
+        var count = resultados.querySelector(".results-bar__count");
+        var s2 = statusEl();
+        if (s2) {
+          s2.textContent = "Resultados atualizados: " +
+            (count ? count.textContent.replace(/\s+/g, " ").trim() : "lista atualizada");
+        }
+      })
+      .catch(function (err) {
+        if (err && err.name === "AbortError") return;      // substituído por um pedido mais novo
+        if (minha !== seq) return;
+        (opts.fallback || envioClassico)();
+      })
+      .then(function () {                                   // "finally"
+        if (minha !== seq) return;
+        if (wrapper) wrapper.classList.remove("is-updating");
+        resultados.setAttribute("aria-busy", "false");
+      });
+  }
+
+  function atualizarPeloForm() {
+    trocar(urlDoForm(), { push: true, fallback: envioClassico });
+  }
+
   var timer = null;
-  function submitSoon(delay) {
+  function agendar(delay) {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(doSubmit, delay);
+    timer = setTimeout(atualizarPeloForm, delay);
   }
 
   // Valida os campos de Ano: clampa cada um à faixa [min,max] do input e, se De/Até
@@ -72,24 +251,27 @@
     if (a !== null && b !== null && a > b) { lo.value = String(b); hi.value = String(a); }
   }
 
+  function ehAno(el) { return !!el && (el.id === "ano_min" || el.id === "ano_max"); }
+
   // O spinner (setas ↑↓) de um <input type=number> VAZIO salta para o atributo
   // `min` (1991), ignorando o placeholder — daí "subo e vai para 1991". Correção:
   // se o valor pulou de vazio direto para o min, parte do placeholder (o limite do
-  // campo: 1991 no "De", 2025 no "Até"). Não afeta digitação (vai char a char).
-  function bindAnoSpinner(el) {
-    if (!el) return;
-    var prev = el.value;
-    el.addEventListener("input", function () {
-      if (prev === "" && el.value === el.getAttribute("min")) {
-        el.value = el.getAttribute("placeholder") || el.value;
-      }
-      prev = el.value;
-    });
-  }
-  bindAnoSpinner(form.querySelector("#ano_min"));
-  bindAnoSpinner(form.querySelector("#ano_max"));
+  // campo: 1991 no "De", 2025 no "Até"). Delegado (os inputs são recriados na
+  // troca): o valor anterior é lembrado no foco e a cada entrada.
+  form.addEventListener("focusin", function (e) {
+    if (ehAno(e.target)) e.target.dataset.valorAnterior = e.target.value;
+  });
+  form.addEventListener("input", function (e) {
+    var el = e.target;
+    if (!ehAno(el)) return;
+    var prev = el.dataset.valorAnterior || "";
+    if (prev === "" && el.value === el.getAttribute("min")) {
+      el.value = el.getAttribute("placeholder") || el.value;
+    }
+    el.dataset.valorAnterior = el.value;
+  });
 
-  // Auto-submit em mudança de faceta (cascata), ordenação e ano.
+  // Auto-atualização em mudança de faceta (cascata), ordenação e ano.
   form.addEventListener("change", function (e) {
     var t = e.target;
     if (!t) return;
@@ -102,42 +284,74 @@
         if (dim.indexOf(param) === -1) return;
         dim.forEach(function (name) { if (name !== param) clearGroup(name); });
       });
-      submitSoon(40);
+      agendar(40);
       return;
     }
-    if (t.matches && t.matches('select[name="sort"]')) { doSubmit(); return; }
-    if (t.id === "ano_min" || t.id === "ano_max") { validarAno(); submitSoon(500); }
+    if (t.matches && t.matches('select[name="sort"]')) { atualizarPeloForm(); return; }
+    if (ehAno(t)) { validarAno(); agendar(500); }
   });
 
-  // Enter nos inputs de ano envia o form.
+  // Enter nos inputs de ano atualiza na hora.
   form.addEventListener("keydown", function (e) {
-    if ((e.target.id === "ano_min" || e.target.id === "ano_max") && e.key === "Enter") {
+    if (ehAno(e.target) && e.key === "Enter") {
       e.preventDefault();
       validarAno();
-      doSubmit();
+      atualizarPeloForm();
     }
   });
 
-  // Drawer mobile.
-  if (mobileToggle && sidebar) {
-    mobileToggle.addEventListener("click", function () {
-      var isOpen = sidebar.classList.toggle("is-open");
-      mobileToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      document.body.classList.toggle("acervo-drawer-open", isOpen);
+  // Chips de "Seus filtros", "Limpar tudo" e paginação: links GET (funcionam sem
+  // JS, com a âncora); com JS, o mesmo caminho de fetch + troca. Cliques com
+  // modificador (nova aba etc.) seguem o navegador.
+  form.addEventListener("click", function (e) {
+    if (!podeTrocar || e.defaultPrevented || e.button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest ? e.target.closest("a[href]") : null;
+    if (!a || !form.contains(a)) return;
+    var chip = a.matches(".applied-filter-chip__remove");
+    var limpar = a.matches(".clear-btn") || !!a.closest(".empty-state");
+    var pag = !!a.closest(".pagination");
+    if (!chip && !limpar && !pag) return;
+    e.preventDefault();
+    var href = a.href;
+    var u = new URL(href, location.href);
+    u.hash = "";
+    var foco = chip ? ".applied-filter-chip__remove, #acervo-sidebar details.side-section > summary"
+      : limpar ? "#acervo-sidebar details.side-section > summary"
+      : '.pagination [aria-current="page"]';
+    trocar(u.href, { push: true, focus: false, focusFallback: foco, fallback: function () { location.assign(href); } });
+  });
+
+  // Voltar/avançar: refaz a troca para a URL restaurada, sem recarregar.
+  window.addEventListener("popstate", function () {
+    if (!podeTrocar) return;
+    if (chaveDe(location.href) === chaveAtual) return;   // só o hash mudou (ex.: skip link)
+    trocar(location.href, { push: false, focus: false, fallback: function () { location.reload(); } });
+  });
+
+  // Drawer mobile (delegado: o botão vive na região trocada).
+  if (sidebar) {
+    var drawer = function (aberto) {
+      sidebar.classList.toggle("is-open", aberto);
+      var t = mobileToggle();
+      if (t) t.setAttribute("aria-expanded", aberto ? "true" : "false");
+      document.body.classList.toggle("acervo-drawer-open", aberto);
+    };
+    form.addEventListener("click", function (e) {
+      var t = e.target.closest ? e.target.closest(".acervo-mobile-toggle") : null;
+      if (!t) return;
+      drawer(!sidebar.classList.contains("is-open"));
     });
     document.addEventListener("click", function (e) {
-      if (sidebar.classList.contains("is-open") && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
-        sidebar.classList.remove("is-open");
-        mobileToggle.setAttribute("aria-expanded", "false");
-        document.body.classList.remove("acervo-drawer-open");
-      }
+      if (!sidebar.classList.contains("is-open")) return;
+      var t = mobileToggle();
+      if (sidebar.contains(e.target) || (t && t.contains(e.target))) return;
+      drawer(false);
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && sidebar.classList.contains("is-open")) {
-        sidebar.classList.remove("is-open");
-        mobileToggle.setAttribute("aria-expanded", "false");
-        document.body.classList.remove("acervo-drawer-open");
-        mobileToggle.focus();
+        drawer(false);
+        focar(mobileToggle());
       }
     });
   }

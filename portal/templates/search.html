@@ -4,7 +4,8 @@
 {% block title %}{% if query %}{{ query }} — busca{% else %}Acervo{% endif %} — Biblioteca Digital de Logística Pública{% endblock %}
 
 {% block content_raw %}
-<form id="acervo-form" action="{% url 'catalog:search' %}" method="get">
+{# A âncora no action faz o envio sem JS aterrissar nos resultados (o navegador preserva o fragmento do action ao montar a URL GET); com JS, acervo-filters.js troca as regiões sem recarregar. #}
+<form id="acervo-form" action="{% url 'catalog:search' %}#acervo-resultados" method="get">
   <section class="sp-section sp-section--pattern catalog-hero">
     <div class="sp-container">
       <nav class="breadcrumb" aria-label="Trilha de navegação">
@@ -134,6 +135,8 @@
 
     <div class="acervo-results">
       <p id="acervo-status" class="sr-only" role="status" aria-live="polite"></p>
+      {# #acervo-resultados: alvo da âncora sem JS e região trocada pelo fetch. O status aria-live fica FORA dela (uma live region recém-inserida não é anunciada). #}
+      <div id="acervo-resultados">
       <button type="button" class="acervo-mobile-toggle" aria-expanded="false" aria-controls="acervo-sidebar">
         <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
         Filtros{% if filtros_count %} ({{ filtros_count }}){% endif %}
@@ -175,7 +178,7 @@
         <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
         {% if filters %}
         <strong>Nenhum documento com esses filtros</strong>
-        <p>Remova um filtro ou amplie o intervalo de anos para ver mais resultados. <a href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}">Limpar tudo</a></p>
+        <p>Remova um filtro ou amplie o intervalo de anos para ver mais resultados. <a href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}#acervo-resultados">Limpar tudo</a></p>
         {% elif query %}
         <strong>Nenhum documento encontrado</strong>
         <p>Tente outros termos de pesquisa.</p>
@@ -185,29 +188,31 @@
         {% endif %}
       </div>
       {% endif %}
+      </div>
     </div>
   </div>
   </section>
 
+  {# #acervo-paginacao: terceira região trocada pelo fetch (inserida/removida quando a paginação aparece/some); os links levam a âncora para o caminho sem JS. #}
   {% if page_obj.has_other_pages %}
-  <section class="sp-section sp-section--alt">
+  <section id="acervo-paginacao" class="sp-section sp-section--alt">
     <div class="sp-container">
       <nav class="pagination" aria-label="Paginação dos resultados">
         {% if page_obj.has_previous %}
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' 1 %}" aria-label="Primeira página">Primeira</a>
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}" aria-label="Página anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' 1 %}#acervo-resultados" aria-label="Primeira página">Primeira</a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}#acervo-resultados" aria-label="Página anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>
         {% else %}
         <span class="page-btn is-disabled" aria-disabled="true">Primeira</span>
         <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-left"/></svg></span>
         {% endif %}
         {% for num in page_obj.paginator.page_range %}
           {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
-          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}"{% if num == page_obj.number %} aria-current="page"{% endif %} aria-label="Página {{ num }}">{{ num }}</a>
+          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}#acervo-resultados"{% if num == page_obj.number %} aria-current="page"{% endif %} aria-label="Página {{ num }}">{{ num }}</a>
           {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}" aria-label="Próxima página"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.paginator.num_pages %}" aria-label="Última página">Última</a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}#acervo-resultados" aria-label="Próxima página"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.paginator.num_pages %}#acervo-resultados" aria-label="Última página">Última</a>
         {% else %}
         <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-right"/></svg></span>
         <span class="page-btn is-disabled" aria-disabled="true">Última</span>

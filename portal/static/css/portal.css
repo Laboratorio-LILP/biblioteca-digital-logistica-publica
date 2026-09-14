@@ -799,6 +799,19 @@ main { flex: 1 0 auto; }
    apenas ao fallback sem-JS; esconder via classe .js. */
 html.js .btn-apply { display: none; }
 
+/* Filtros sem voltar ao topo (set/2026). Sem JS, o form e os links GET (chips,
+   "Limpar tudo", paginação) aterrissam em #acervo-resultados — folga para o
+   cabeçalho sticky (mesmo valor de .tema-grupo). Com JS, acervo-filters.js troca
+   as regiões por fetch e a rolagem não se move. Em telas largas a barra lateral
+   fica sticky com rolagem própria, para os filtros continuarem à vista; a grade
+   .acervo-layout e o visual do painel não mudam, e o drawer mobile (html.js,
+   < 1024px, position: fixed) segue intacto. */
+#acervo-resultados { scroll-margin-top: 88px; }
+@media (min-width: 1024px) {
+  #acervo-sidebar { position: sticky; top: 88px; max-height: calc(100vh - 88px); overflow-y: auto; }
+}
+#acervo-resultados[aria-busy="true"] { cursor: progress; }
+
 /* ============================================================
    Detalhe do documento
    ============================================================ */
