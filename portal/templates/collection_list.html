@@ -33,17 +33,26 @@
         <h2>Como cada documento é classificado</h2>
       </div>
     </div>
+    {# Fórmula da classificação (curadoria, reunião de 10/09/2026) e a natureza multidimensional da taxonomia. #}
     <p class="page__intro">
-      Além da coleção, cada documento recebe três marcas: assunto, categoria e
-      natureza. Você combina essas marcas nos filtros do Acervo para estreitar a busca.
+      Todo material recebe uma classificação com esta fórmula:
+      <strong>COLEÇÃO</strong> (obrigatória) + <strong>CATEGORIA</strong> (obrigatória) +
+      <strong>SUBCATEGORIA</strong> (quando couber) + <strong>MICROCATEGORIA</strong> (quando couber) +
+      <strong>ASSUNTO</strong> (obrigatório) + <strong>NATUREZA</strong> (quando couber).
+    </p>
+    <p class="page__intro">
+      A classificação tem várias dimensões: a coleção diz o tipo de material, a categoria diz a
+      etapa da contratação, o assunto diz o tema e a natureza diz o que se contrata. O assunto é
+      só um dos filtros — e a busca por palavra funciona sem filtro nenhum. Você combina essas
+      marcas nos filtros do Acervo para estreitar a busca.
     </p>
 
     <div class="org-grid org-grid--3">
       <article class="sp-card org-card">
         <span class="org-card__icon" aria-hidden="true"><svg class="fi"><use href="#fi-bookmark"/></svg></span>
         <h3>Assunto</h3>
-        <p>O tema central do documento — por exemplo, governança, sustentabilidade ou uso de sistemas.</p>
-        <p class="org-card__nota">Hoje são 14 assuntos.</p>
+        <p>O tema central do documento — por exemplo, governança, sustentabilidade ou uso de sistemas. Cada documento tem um assunto principal.</p>
+        <p class="org-card__nota">Hoje são {{ assuntos_glossario|length }} assuntos. <a href="#assuntos">Veja o que entra em cada um</a>.</p>
       </article>
 
       <article class="sp-card org-card">
@@ -51,13 +60,9 @@
         <h3>Categoria</h3>
         <p>A etapa da contratação a que o documento se refere. Segue o ciclo de uma contratação, do planejamento à gestão do contrato:</p>
         <ul>
-          <li>Plano de Contratações Anual</li>
-          <li>Planejamento/Fase Preparatória</li>
-          <li>Seleção do Fornecedor</li>
-          <li>Gestão Contratual</li>
-          <li>Ciclo Completo da Contratação</li>
-          <li>Conteúdos Transversais</li>
+          {% for c in categorias_glossario %}<li>{{ c.nome|titulo_pt }}</li>{% endfor %}
         </ul>
+        <p class="org-card__nota"><a href="#categorias">Veja o que entra em cada etapa</a>.</p>
       </article>
 
       <article class="sp-card org-card">
@@ -71,6 +76,42 @@
           <li>Tecnologia da informação e comunicação (TIC)</li>
         </ul>
       </article>
+    </div>
+
+    {# Glossário público: definições escritas pela curadoria (Assuntos: taxonomy_v6.ASSUNTOS_DESCRICAO; Categorias: nr_category.description). As âncoras #assuntos e #categorias são o destino dos links "O que significa cada opção?" das facetas do Acervo. #}
+    <div class="glossario">
+      <section class="glossario__grupo" id="assuntos" aria-labelledby="glossario-assuntos-titulo">
+        <h3 id="glossario-assuntos-titulo" class="glossario__titulo">O que entra em cada assunto</h3>
+        <p class="glossario__intro">Definições escritas pela curadoria. Clique no nome para ver os materiais daquele assunto no Acervo; abra "Saiba mais" para ler a explicação completa.</p>
+        <ul class="glossario__lista">
+          {% for a in assuntos_glossario %}
+          <li class="glossario__item">
+            <a class="glossario__nome" href="{% url 'catalog:search' %}?assunto_id={{ a.id }}">{{ a.nome }}</a>
+            {% if a.curta %}<span class="glossario__curta">{{ a.curta }}</span>{% endif %}
+            {% if a.longa %}
+            <details class="glossario__mais">
+              <summary>Saiba mais<span class="sr-only"> sobre {{ a.nome }}</span></summary>
+              <p>{{ a.longa }}</p>
+            </details>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="glossario__grupo" id="categorias" aria-labelledby="glossario-categorias-titulo">
+        <h3 id="glossario-categorias-titulo" class="glossario__titulo">O que entra em cada categoria (etapa da contratação)</h3>
+        <p class="glossario__intro">Cada categoria é uma etapa do ciclo da contratação pública (Lei nº 14.133/2021). Algumas se dividem em subcategorias e microcategorias, que aparecem nos filtros do Acervo. Clique no nome para ver os materiais daquela etapa.</p>
+        <ul class="glossario__lista">
+          {% for c in categorias_glossario %}
+          <li class="glossario__item">
+            <a class="glossario__nome" href="{% url 'catalog:search' %}?category_id={{ c.id }}">{{ c.nome|titulo_pt }}</a>
+            {% if c.descricao %}<span class="glossario__curta">{{ c.descricao }}</span>{% endif %}
+            <span class="glossario__count">{{ c.count }} {{ c.count|pluralize_pt:"documento" }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
     </div>
   </div>
 </section>

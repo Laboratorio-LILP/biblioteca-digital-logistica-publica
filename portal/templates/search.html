@@ -71,7 +71,7 @@
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <details class="side-section"{% if filters.category_id or filters.subcategoria_id or filters.microcategoria_id %} open{% endif %}>
         <summary><h3>Categorias</h3></summary>
-        <p class="side-section__hint">A etapa da contratação em que o material se aplica (categoria processual).</p>
+        <p class="side-section__hint">A etapa da contratação em que o material se aplica (categoria processual). <a class="side-section__link" href="{% url 'catalog:collection_list' %}#categorias">O que significa cada opção?</a></p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias, ex.: PCA, Ciclo Completo, Conteúdos Transversais) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
@@ -106,7 +106,7 @@
 
       <details class="side-section"{% if filters.assunto_id %} open{% endif %}>
         <summary><h3>Assunto</h3></summary>
-        <p class="side-section__hint">O tema tratado no documento (um documento tem um assunto principal).</p>
+        <p class="side-section__hint">O tema tratado no documento (um documento tem um assunto principal). <a class="side-section__link" href="{% url 'catalog:collection_list' %}#assuntos">O que significa cada opção?</a></p>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
       </details>
 

@@ -8,7 +8,9 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from .facets import (
+    assuntos_glossario,
     cards_tematicos_overview,
+    categorias_glossario,
     categorias_overview,
     colecao_v6_overview,
     compute_facets,
@@ -334,11 +336,14 @@ def document_detail(request, code):
 
 
 def collection_list(request):
-    """As 4 coleções v6 (derivadas do Tipo de Informação) com contagem real."""
+    """As 4 coleções v6 (derivadas do Tipo de Informação) com contagem real, e o
+    glossário público de Assuntos e Categorias (definições da curadoria)."""
     colecoes_v6 = colecao_v6_overview()
     return render(request, "collection_list.html", {
         "colecoes_v6": colecoes_v6,
         "cards": [_card_colecao(c) for c in colecoes_v6],
+        "assuntos_glossario": assuntos_glossario(),
+        "categorias_glossario": categorias_glossario(),
     })
 
 

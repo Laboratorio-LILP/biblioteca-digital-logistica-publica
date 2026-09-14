@@ -849,6 +849,34 @@ html.js .btn-apply { display: none; }
 /* Fórmula da classificação (set/2026) sob o título "Classificação BDLP" — mesmo
    corpo/cor dos parágrafos de callout do painel. */
 .classificacao-formula { margin: 12px 0 0; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
+/* Caracterização curta (texto da curadoria) sob o valor do Assunto e da Etapa. */
+.meta-item__desc { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.62); }
+/* Link discreto do hint das facetas para o glossário da página de Coleções. */
+.side-section__link { color: var(--sp-blue); text-decoration: underline; }
+
+/* Glossário de Assuntos e Categorias (página de Coleções, set/2026): nome
+   linkado ao acervo filtrado, caracterização curta e explicação longa num
+   <details> por item; âncoras #assuntos/#categorias com folga para o cabeçalho. */
+.glossario { display: grid; gap: var(--space-6); margin-top: var(--space-6); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .glossario { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.glossario__grupo { min-width: 0; scroll-margin-top: 88px; }
+.glossario__titulo { margin: 0 0 6px; font-family: var(--font-subtitle); font-weight: 600; font-size: 16px; color: var(--sp-black); }
+.glossario__intro { margin: 0 0 12px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); }
+.glossario__lista { list-style: none; margin: 0; padding: 0; }
+.glossario__item { padding: 10px 0; border-top: var(--border); font-size: 14px; line-height: 1.6; }
+.glossario__item:last-child { border-bottom: var(--border); }
+.glossario__nome { font-family: var(--font-subtitle); font-weight: 600; color: var(--sp-blue); }
+.glossario__nome:hover { text-decoration: underline; }
+.glossario__curta { display: block; color: rgb(var(--rgb-black) / 0.72); }
+.glossario__count { display: block; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
+.glossario__mais { margin-top: 4px; }
+.glossario__mais > summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--sp-blue); }
+.glossario__mais > summary::-webkit-details-marker { display: none; }
+.glossario__mais > summary::before { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 150ms ease; }
+.glossario__mais[open] > summary::before { transform: rotate(45deg); }
+.glossario__mais > summary:focus-visible { outline: 3px solid rgb(var(--rgb-blue) / 0.55); outline-offset: 2px; border-radius: 4px; }
+.glossario__mais > p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
+@media (prefers-reduced-motion: reduce) { .glossario__mais > summary::before { transition: none; } }
 .meta-grid { display: grid; gap: 14px; margin-top: 16px; grid-template-columns: 1fr; }
 @media (min-width: 600px) { .meta-grid { grid-template-columns: repeat(2, 1fr); } }
 .meta-item { border-bottom: var(--border); padding-bottom: 12px; }

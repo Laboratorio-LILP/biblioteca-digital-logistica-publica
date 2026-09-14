@@ -5,7 +5,7 @@ from urllib.parse import urlencode, urlparse
 from django import template
 
 from ..models import Assunto, Microcategoria, NrCategory, Subcategoria, Topic, TypeInformation
-from ..taxonomy_v6 import COLECOES_BY_SLUG, colecao_v6_for_tipo
+from ..taxonomy_v6 import COLECOES_BY_SLUG, colecao_v6_for_tipo, descricao_assunto
 
 register = template.Library()
 
@@ -263,6 +263,19 @@ def colecao_visual(doc):
 def assunto_nome(doc):
     """Nome do Assunto do documento via mapa cacheado (evita a query da property)."""
     return _assunto_names().get(getattr(doc, "assunto_id", None), "")
+
+
+@register.filter
+def assunto_curta(nome):
+    """Caracterização (uma frase) do Assunto pelo nome — texto da curadoria em
+    taxonomy_v6.ASSUNTOS_DESCRICAO; '' quando não há."""
+    return descricao_assunto(nome)["curta"]
+
+
+@register.filter
+def assunto_longa(nome):
+    """Explicação (um parágrafo) do Assunto pelo nome; '' quando não há."""
+    return descricao_assunto(nome)["longa"]
 
 
 @register.simple_tag

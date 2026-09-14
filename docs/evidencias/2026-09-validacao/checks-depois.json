@@ -1,14 +1,9 @@
 {
-  "cartao-desktop": {
+  "colecoes": {
     "erros": [],
     "checks": {
-      "rodape_do_cartao": "ok — Etapa: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento"
-    }
-  },
-  "cartao-mobile": {
-    "erros": [],
-    "checks": {
-      "rodape_do_cartao": "ok — Etapa: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento"
+      "glossario_assuntos": "ok — 16 itens",
+      "glossario_categorias": "ok — 6 itens"
     }
   },
   "documento": {

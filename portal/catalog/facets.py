@@ -19,7 +19,7 @@ from .models import (
     TypeInformation,
 )
 from .search import _apply_filters, apply_fulltext, search_documents
-from .taxonomy_v6 import COLECOES_V6, TEMAS_DESTAQUE, colecao_v6_for_tipo
+from .taxonomy_v6 import COLECOES_V6, TEMAS_DESTAQUE, colecao_v6_for_tipo, descricao_assunto
 
 # Dimensões da barra lateral: cada faceta conta EXCLUINDO as chaves da própria
 # dimensão. Coleção e Tipo formam UMA dimensão (a coleção deriva do tipo) —
@@ -194,6 +194,26 @@ def categorias_overview():
     extras = [_row(c) for name, c in by_name.items() if name not in conhecidos]
     nucleo += sorted(extras, key=lambda r: r["id"])
     return {"nucleo": nucleo, "transversal": transversal}
+
+
+def assuntos_glossario():
+    """Todos os Assuntos do banco, na ordem canônica (Meta.ordering), com a
+    caracterização curta e a explicação longa da curadoria
+    (taxonomy_v6.ASSUNTOS_DESCRICAO; vazias quando faltar) — o glossário
+    público da página de Coleções. Não altera contagens nem filtros."""
+    out = []
+    for a in Assunto.objects.all():
+        d = descricao_assunto(a.nome)
+        out.append({"id": a.id, "nome": a.nome, "curta": d["curta"], "longa": d["longa"]})
+    return out
+
+
+def categorias_glossario():
+    """As Categorias processuais na ordem do ciclo (núcleo sequencial + visões
+    transversais), com a descrição do seed (nr_category.description) e a
+    contagem — reusa categorias_overview()."""
+    visao = categorias_overview()
+    return visao["nucleo"] + visao["transversal"]
 
 
 def tema_busca(tema):
