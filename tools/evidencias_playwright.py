@@ -132,6 +132,22 @@ def cena_filtro_desktop_js(page: Page, base: str, out: Path, suffix: str, cena: 
         "(function(){var i=document.querySelector('input[name=assunto_id]:checked'); return !!i})()"
     )
     cena.check("voltar_desmarca_filtro", not marcado)
+    # "Avançar" restaura o filtro; depois, "Limpar tudo" por teclado: o foco vai
+    # para um controle que CONTINUA na ordem de Tab (revisão de 14/09/2026 —
+    # o <summary> não pode receber tabindex="-1").
+    page.go_forward(wait_until="networkidle")
+    page.wait_for_timeout(400)
+    page.locator("a.clear-btn").focus()
+    page.keyboard.press("Enter")
+    page.wait_for_url(lambda u: "assunto_id" not in u, timeout=10000)
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(300)
+    foco_limpar = page.evaluate(
+        "(function(){var a=document.activeElement; return {tag: a.tagName, tabIndex: a.tabIndex, "
+        "texto: (a.textContent||'').trim().slice(0, 30)}})()"
+    )
+    cena.check("limpar_tudo_foco_na_ordem_de_tab", foco_limpar["tabIndex"] >= 0, str(foco_limpar))
+    cena.check("limpar_tudo_sem_chips", page.locator(".applied-filter-chip").count() == 0)
 
 
 def cena_filtro_desktop_semjs(page: Page, base: str, out: Path, suffix: str, cena: Cena) -> None:

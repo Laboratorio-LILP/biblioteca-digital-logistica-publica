@@ -5,7 +5,7 @@
 - **Limites:** desenvolvimento local, sem servidor; nenhum segredo nas saídas; portas em loopback; `deploy/edge/`, `docker/nourau/`, Caddy e compose de produção intocados; layout do protótipo preservado (acréscimos, não redesenho); um commit por tarefa; sem merge, sem push.
 - **Ordem de execução:** T3 → T4 → T1 → T2 → T6 → T5 → T7 (T3 primeiro porque muda seed e vocabulário; T7 é a varredura textual final).
 - **Evidências:** `docs/evidencias/2026-09-validacao/` (capturas antes/depois em desktop 1440×900 e mobile 390×844, saídas de `validate_import` e `--dry-run`, tabela da busca, verificação com CSP). Cenas reproduzíveis: `tools/evidencias_playwright.py`.
-- **Verificação comum a todas as tarefas:** `ruff check portal/` limpo; `cd portal && DJANGO_SECRET_KEY=teste-local-sem-valor python -m pytest -v` (caminho do CI; 128 testes) verde; `make validate` verde com as seções novas; zero erro de console com CSP ligada (`DJANGO_DEBUG=false`).
+- **Verificação comum a todas as tarefas:** `ruff check portal/` limpo; `cd portal && DJANGO_SECRET_KEY=teste-local-sem-valor python -m pytest -v` (caminho do CI; 138 testes) verde; `make validate` verde com as seções novas; zero erro de console com CSP ligada (`DJANGO_DEBUG=false`).
 
 ---
 
@@ -32,9 +32,9 @@
 
 **Arquivos.** `portal/catalog/search.py`; `docker/postgres/init/00-extensions.sql`; seção 1.1 do script de migração; `test_busca_sem_acento.py`.
 
-**Como verificar.** Tabela termo × contagem antes/depois em `docs/evidencias/2026-09-validacao/busca-sem-acento.md`: pregao 0→44, licitacao 0→443, licitações 443→443, sancao 0→7, orgao 0→104, órgãos 104→104, contratacao 0→542, 14.133 184→184, governanca = governança = 130. Tempo de `/busca/?q=`: +≈0,25 s por consulta (abaixo do limite de 0,3 s combinado).
+**Como verificar.** Tabela termo × contagem antes/depois em `docs/evidencias/2026-09-validacao/busca-sem-acento.md`: pregao 0→44, licitacao 0→443, licitações 443→443, sancao 0→7, orgao 0→104, órgãos 104→104, contratacao 0→542, 14.133 184→184, governanca = governança = 130. Tempo de `/busca/?q=`: +≈0,29 s ("pregão") a +≈0,45 s ("licitação", 443 resultados) por consulta — acima do limite de 0,3 s combinado nos termos mais frequentes (o `@@` explícito da revisão recalcula o vetor no WHERE); registrado, sem implementar agora.
 
-**Fora.** Coluna `tsvector` materializada + índice GIN (proposta se o acervo crescer); `unaccent` mid-word em flexões (coberto pela configuração `portuguese_unaccent`).
+**Fora.** Coluna `tsvector` materializada (as duas configurações somadas) + índice GIN — proposta para recuperar o tempo de resposta (tarefa própria); `unaccent` mid-word em flexões (coberto pela configuração `portuguese_unaccent`).
 
 ## T1 — Filtros do Acervo sem voltar ao topo
 
@@ -83,6 +83,23 @@
 **Arquivos.** `base.html`, `about.html`; `test_varredura_textos.py`.
 
 ---
+
+## Revisão adversarial da branch (14/09/2026) — achados confirmados e correções
+
+Sete lentes de revisão (JS/a11y, SQL, importador, busca, templates/CSS, qualidade, escopo/segredos) sobre `git diff main..HEAD`; cada achado foi submetido a um refutador independente que tentou reproduzi-lo. 20 achados brutos, 14 verificados: **8 confirmados** (corrigidos no commit `fix(revisao)`), 6 refutados; dos 6 de severidade baixa não verificados, 4 foram corrigidos por serem baratos.
+
+| # | Sev. | Achado confirmado | Correção |
+|---|---|---|---|
+| 1 | alta | `focar()` punha `tabindex="-1"` no `<summary>` (nativamente focável) após "Limpar tudo"/remoção de chip — o summary saía da ordem de Tab (WCAG 2.1.1). | Só recebe `tabindex="-1"` quem tem `el.tabIndex < 0`; fallback de foco do chip prefere um chip restante antes da primeira faceta. Verificação nova em `evidencias_playwright.py` (`limpar_tudo_foco_na_ordem_de_tab`). |
+| 2 | alta | Busca com mais de uma palavra virou OU: OR entre consultas inteiras deixava a raiz do `tsquery` em OR e o `ts_rank` aceitava documento com só uma das palavras ("pregão eletrônico" 29 → 81; "compras diretas" 13 → 530). | Consulta montada **por token** (OR das configurações e da variante re-acentuada dentro da palavra, E entre palavras) e casamento booleano explícito `vetor @@ consulta` (`filter(busca=…)`); rank só como limiar. Medido: "pregão eletrônico" 29 = `main`; "pregao eletronico" 29. |
+| 3 | média | Resposta em voo sobrescrevia o que o usuário editou (ano digitado, 2º clique em multi-select) enquanto o fetch corria. | Em `trocar()`, pedido vindo do form é descartado e reagendado se houver `timer` pendente ou `urlDoForm() !== url`. |
+| 4 | média | Substring de subcategoria casava nomes de 2–3 letras do banco (`TR` dentro de "OUTROS", "CONTRATAÇÃO DIRETA") e classificava errado em silêncio. | Tamanho mínimo (5) nos DOIS lados do substring; aliases explícitos "Termo de Referência (TR)"/"Estudo Técnico Preliminar (ETP)". |
+| 5 | média | `--allow-new-types` era inócua: `_resolve_topic` recusava o tipo desconhecido antes de `_ensure_type`. | Flag propagada até `_tipo_da_colecao`: tipo desconhecido é aceito e cai na raiz da coleção; tipos retirados continuam recusados (`tipo_retirado`). Help/runbook ajustados. |
+| 6 | média | Banco sem a seção 1 (`portuguese_unaccent` inexistente) derrubava `/busca/` e a home com 500. | `_unaccent_disponivel()` consulta `pg_ts_config` (positivo em cache; negativo reavaliado e avisado uma vez no log) e a busca degrada para `portuguese` + variante re-acentuada. |
+| 7 | média | Links "Veja o que entra em cada um/etapa" nos cards de Coleções herdavam `a { color: inherit; text-decoration: none }` e ficavam invisíveis como link. | `.org-card__nota a { color: var(--sp-blue); text-decoration: underline }`. |
+| 8 | baixa | `popstate`/chips não sincronizavam a caixa `q` do herói com a URL restaurada. | Após a troca, se o pedido não veio do form, a caixa recebe o `q` da URL. |
+
+Corrigidos além dos confirmados (baixa, não verificados): subcategoria/microcategoria preenchidas sem o nível acima resolvido agora recusam a linha; placeholders de DOI/URL ("Não possui", "-", "n/a", "[Acesso restrito]") não viram chave de agrupamento; `RESUMO_RETICENCIAS` reconhece "(...)", "[...]" e reticências seguidas de aspas; `_ROMANO_RE` estrito ("civil", "mil" não são numerais). Higiene no script de migração: 1.5 só vincula usuários a subcoleções sem vínculo nenhum. Refutados (sem ação): revínculo de `topic_users` a cada execução (é o critério do seed), colchetes em URL derrubarem o relatório (tratado junto com os placeholders), `DUPLICATA_DIVERGENTE` comparar grafias cruas no dry-run, seção 2 não limpar `nr_topic_category` (só raízes lá), divergência do tipo `Vídeos` id 55 entre volume novo e migrado (documentado), alias com travessão morto (removido).
 
 ## Divergências entre o briefing e o código encontrado
 

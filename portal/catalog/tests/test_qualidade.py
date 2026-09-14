@@ -71,7 +71,8 @@ def test_duplicata_por_titulo_normalizado():
 
 
 def test_duplicata_por_doi():
-    achados = duplicatas([_reg("L1", "Título A", doi="10.1/x"), _reg("L2", "Título B", doi="https://doi.org/10.1/X")])
+    regs = [_reg("L1", "Título A", doi="10.1590/abc.123"), _reg("L2", "Título B", doi="https://doi.org/10.1590/ABC.123")]
+    achados = duplicatas(regs)
     assert [a.codigo for a in achados] == ["DUPLICATA_DOI"]
 
 
@@ -144,6 +145,31 @@ def test_resumo_de_pagina_scribd():
 def test_um_resumo_acumula_varios_codigos():
     codigos = resumo_suspeito(_reg("L1", "T", resumo="trecho copiado [3]...", url="https://scribd.com/doc/1"))
     assert {"RESUMO_MINUSCULA", "RESUMO_RETICENCIAS", "RESUMO_CITACAO", "RESUMO_CURTO", "RESUMO_SCRIBD"} <= set(codigos)
+
+
+def test_placeholders_de_doi_e_url_nao_viram_chave_de_agrupamento():
+    # Revisão 14/09: "Não possui", "-", "n/a" iguais em várias linhas geravam
+    # DUPLICATA_DOI/ENDERECO_COMPARTILHADO falsos.
+    for placeholder in ("Não possui", "-", "n/a"):
+        assert normalizar_doi(placeholder) == "", placeholder
+    for placeholder in ("Não possui", "-", "[Acesso restrito]", "n/a"):
+        assert normalizar_url(placeholder) == "", placeholder
+    regs = [_reg("L1", "Título um", doi="Não possui", url="n/a"),
+            _reg("L2", "Título dois", doi="Não possui", url="n/a")]
+    assert duplicatas(regs) == [] and enderecos_compartilhados(regs) == []
+
+
+def test_reticencias_entre_parenteses_colchetes_ou_aspas():
+    for fim in (" (...)", " [...]", '..."', "…”"):
+        assert "RESUMO_RETICENCIAS" in resumo_suspeito(_reg("L1", "T", resumo=RESUMO_OK + fim)), fim
+
+
+def test_chave_de_serie_nao_trata_palavras_comuns_como_romano():
+    from catalog.qualidade import _chave_serie
+
+    assert _chave_serie("Manual de Direito Civil 2") == "manual de direito civil"
+    assert _chave_serie("Guia Mil Usos II") == "guia mil usos"
+    assert _chave_serie("Caderno ODS 3: Saúde") == "caderno ods"
 
 
 # --- autoria institucional suspeita ------------------------------------------------------------

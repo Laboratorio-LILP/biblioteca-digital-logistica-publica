@@ -1015,7 +1015,7 @@ Linhas recusadas (todas):
     Tipo de informação fora do vocabulário da coleção Jurisprudência: 7
     Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 3
 
-Possíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, não impedem a carga (447 achados em 982 linhas; semântica em catalog/qualidade.py e tools/db-refresh.md):
+Possíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, não impedem a carga (448 achados em 982 linhas; semântica em catalog/qualidade.py e tools/db-refresh.md):
   RESUMO_CURTO: 391
       L6: A Quick Glance at Sustainable Public Procurement
       L53: Cartilha Nova Lei de Licitações e Contratos
@@ -1051,7 +1051,8 @@ Possíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, n
       L765: Elaboração de termos de referência para contratação de bens e serviços na Nova …
       L766: Estudo Técnico Preliminar( ETP) para elaboração de Termo de Referência/ Projeto…
       L767: Manual de Jurisprudência do TCU
-  RESUMO_RETICENCIAS: 7
+  RESUMO_RETICENCIAS: 8
+      L779: Serviço de Engenharia
       L798: A dispensa de licitação eletrônica é modalidade de licitação disfarçada
       L856: 10 mandamentos do dispute board
       L919: Gamificação e aprendizagem sobre ética e cidadania: um estudo sobre o game da c…

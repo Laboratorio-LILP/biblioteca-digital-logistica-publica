@@ -9,7 +9,9 @@
       "chip_do_assunto": "ok — Assunto: Micro e Pequenas Empresas",
       "anuncio_aria_live": "ok — Resultados atualizados: 19 documentos",
       "voltar_sem_recarregar": "ok — http://localhost:8000/busca/",
-      "voltar_desmarca_filtro": true
+      "voltar_desmarca_filtro": true,
+      "limpar_tudo_foco_na_ordem_de_tab": "ok — {'tag': 'SUMMARY', 'tabIndex': 0, 'texto': 'Coleção'}",
+      "limpar_tudo_sem_chips": true
     }
   },
   "filtro-desktop-semjs": {

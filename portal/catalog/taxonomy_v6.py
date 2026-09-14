@@ -222,6 +222,12 @@ TIPO_V5_TO_V6 = {
 }
 
 
+def tipo_retirado(type_name):
+    """True para os tipos RETIRADOS do vocabulário na v12 (Documentos Normativos,
+    Vídeos, e grafias legadas) — o importador os recusa mesmo com --allow-new-types."""
+    return _norm(type_name) in _TIPOS_LEGADOS_NORM
+
+
 def tipo_canonico(type_name):
     """Grafia canônica v12 de um Tipo de Informação, ou None se fora do vocabulário.
 

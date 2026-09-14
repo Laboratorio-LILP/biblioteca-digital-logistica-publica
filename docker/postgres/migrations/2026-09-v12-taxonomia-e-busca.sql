@@ -91,9 +91,11 @@ WHERE tp.topic_id = s.id
        OR tp.parent_ids IS DISTINCT FROM '0,' || p.id);
 
 -- 1.5 Painel /manager do Nou-Rau filtra topics por topic_users: vincula todos
---     os usuários às subcoleções novas (mesmo critério do seed).
+--     os usuários às subcoleções NOVAS (as que ainda não têm nenhum vínculo),
+--     mesmo critério do seed — sem mexer em vínculos já ajustados à mão.
 INSERT INTO topic_users (users_id, topic_id)
 SELECT u.id, t.id FROM users u CROSS JOIN topic t
+WHERE NOT EXISTS (SELECT 1 FROM topic_users tu WHERE tu.topic_id = t.id)
 ON CONFLICT (users_id, topic_id) DO NOTHING;
 
 -- 1.6 Tipos de informação novos (Enunciados costuma já existir).

@@ -91,6 +91,17 @@ def test_js_preserva_rolagem_foco_details_e_drawer():
     assert "document.title" in JS
 
 
+def test_js_correcoes_da_revisao_adversarial():
+    # 14/09: (1) focar() tirava <summary> da ordem de Tab (tabindex=-1 em elemento
+    # nativamente focável); (2) resposta em voo descartava o que o usuário editou
+    # enquanto o fetch corria; (3) popstate/chips não sincronizavam a caixa q do herói;
+    # (4) fallback de foco do chip preferia o summary mesmo com chips restantes.
+    assert "el.tabIndex < 0" in JS
+    assert "urlDoForm() !== url" in JS
+    assert 'searchParams.get("q")' in JS
+    assert "chipsRestantes" in JS or ".applied-filter-chip__remove\")" in JS
+
+
 def test_js_sem_caminho_chumbado_nem_handler_inline():
     assert "/busca/" not in JS
     assert "/static/" not in JS

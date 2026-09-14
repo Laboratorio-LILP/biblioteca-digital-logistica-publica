@@ -31,7 +31,7 @@ import psycopg2
 from django.core.management.base import BaseCommand, CommandError
 
 from catalog import qualidade
-from catalog.taxonomy_v6 import COLECOES_V6, tipo_canonico, tipos_de_colecao
+from catalog.taxonomy_v6 import COLECOES_V6, tipo_canonico, tipo_retirado, tipos_de_colecao
 
 # Abas de dados na planilha v3.1 (ordem de processamento)
 DATA_SHEETS = ["Eventos", "Livros Digitais", "Trabalhos Acadêmicos", "Materiais Pedagógicos"]
@@ -50,7 +50,20 @@ CATEGORIA_ALIASES = {
 }
 # Prefixo redundante retirado das subcategorias de Planejamento na v12
 # (planilha "PARA CORREÇÃO" ainda traz "FASE PREPARATÓRIA - ETP" etc.).
-SUBCATEGORIA_PREFIXOS_ALIAS = ("fase preparatoria - ", "fase preparatoria – ", "fase preparatoria-")
+SUBCATEGORIA_PREFIXOS_ALIAS = ("fase preparatoria - ", "fase preparatoria-")
+# Grafias por extenso das siglas de Planejamento (o casamento por substring não
+# pode cobrir nomes de 2-3 letras como TR/ETP — ver _resolve_subcategoria).
+SUBCATEGORIA_ALIASES = {
+    "termo de referencia": "tr",
+    "termo de referencia (tr)": "tr",
+    "tr (termo de referencia)": "tr",
+    "estudo tecnico preliminar": "etp",
+    "estudo tecnico preliminar (etp)": "etp",
+    "etp (estudo tecnico preliminar)": "etp",
+}
+# Tamanho mínimo para o casamento por substring (nos DOIS lados): evita que
+# "tr" case dentro de "outros" ou "contratacao direta".
+_SUBSTRING_MIN = 5
 
 # Mapeamento de colunas da planilha v3.1 para campos internos.
 # As chaves são os nomes EXATOS dos cabeçalhos da planilha.
@@ -141,8 +154,10 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--allow-new-types", action="store_true",
-            help="EXCEÇÃO documentada: cria em type_information um tipo fora do vocabulário "
-                 "canônico em vez de recusar a linha (comportamento antigo). Não use em carga normal.",
+            help="EXCEÇÃO documentada: aceita um tipo fora do vocabulário canônico em vez de recusar a "
+                 "linha — cria o tipo em type_information e deixa o documento na raiz da coleção (sem "
+                 "subcoleção). Tipos retirados (Documentos Normativos, Vídeos) continuam recusados. "
+                 "Não use em carga normal.",
         )
 
     def __init__(self, *args, **kwargs):
@@ -310,7 +325,7 @@ class Command(BaseCommand):
                     with conn.cursor() as cur:
                         cur.execute("SAVEPOINT row_sp")
                     try:
-                        topic_id = self._resolve_topic(record, topic_map)
+                        topic_id = self._resolve_topic(record, topic_map, allow_new_types=allow_new_types)
 
                         # === Roteamento v8+ — campos diretos da planilha (sem de-para);
                         # cada resolução recusa a linha (LinhaRecusadaError) quando não casa.
@@ -539,16 +554,20 @@ class Command(BaseCommand):
             raise LinhaRecusadaError(f"Coleção não reconhecida: '{colecao_raw}' (esperado: {esperadas})")
         return root_id, colecao_nome
 
-    def _tipo_da_colecao(self, record, colecao_nome):
+    def _tipo_da_colecao(self, record, colecao_nome, allow_new_types=False):
         """Nome canônico v12 do 'Tipo de informação', validado contra a coleção.
 
         Aceita grafias legadas (taxonomy_v6.tipo_canonico); recusa a linha se o
         tipo estiver fora do vocabulário da coleção resolvida (Documentos
-        Normativos e Vídeos inclusive) ou vazio.
+        Normativos e Vídeos inclusive) ou vazio. Com `allow_new_types`
+        (exceção documentada), um tipo DESCONHECIDO — não retirado — é aceito
+        e devolve None (o documento fica na raiz da coleção).
         """
         tipo_raw = normalize_text(record.get("tipo_informacao", ""))
         aceitos = tipos_de_colecao(colecao_nome)
         canon = tipo_canonico(tipo_raw)
+        if canon is None and allow_new_types and tipo_raw and not tipo_retirado(tipo_raw):
+            return None
         if canon is None or canon not in aceitos:
             raise LinhaRecusadaError(
                 f"Tipo de informação fora do vocabulário da coleção {colecao_nome}: "
@@ -556,12 +575,15 @@ class Command(BaseCommand):
             )
         return canon
 
-    def _resolve_topic(self, record, topic_map):
+    def _resolve_topic(self, record, topic_map, allow_new_types=False):
         """Resolve o topic_id: raiz pela 'Coleção' e subcoleção pelo 'Tipo de
         informação' canônico. Se o banco ainda não tiver a subcoleção (seção 1 do
-        script de migração não aplicada), devolve a raiz."""
+        script de migração não aplicada), ou se o tipo for novo aceito por
+        --allow-new-types, devolve a raiz."""
         root_id, colecao_nome = self._resolve_colecao(record, topic_map)
-        canon = self._tipo_da_colecao(record, colecao_nome)
+        canon = self._tipo_da_colecao(record, colecao_nome, allow_new_types=allow_new_types)
+        if canon is None:
+            return root_id
         sub_id = topic_map.get((root_id, _key(canon)))
         return sub_id if sub_id is not None else root_id
 
@@ -635,46 +657,61 @@ class Command(BaseCommand):
             raise LinhaRecusadaError(f"Assunto não reconhecido: '{str(name).strip()}'")
         return aid
 
-    def _resolve_subcategoria(self, name, category_id, sub_map):
-        """subcategoria_id sob category_id. Alias: tira o prefixo "FASE PREPARATÓRIA - ";
-        depois igualdade normalizada e, por fim, substring (>= 5 chars) se casar
-        UMA única subcategoria da categoria. Preenchido e não resolvido → recusa."""
-        if not name or not str(name).strip() or not category_id:
+    @staticmethod
+    def _substring_unico(key, pai_id, mapa):
+        """Id do único nó do pai cujo nome normalizado contém (ou está contido em)
+        `key`, com tamanho mínimo nos DOIS lados — ou None. Nomes curtos do banco
+        (TR, ETP) nunca casam por substring (revisão de 14/09/2026: 'OUTROS' caía
+        em TR)."""
+        if len(key) < _SUBSTRING_MIN:
             return None
+        candidatos = [
+            nid for (pid, nome_norm), nid in mapa.items()
+            if pid == pai_id and len(nome_norm) >= _SUBSTRING_MIN and (key in nome_norm or nome_norm in key)
+        ]
+        return candidatos[0] if len(candidatos) == 1 else None
+
+    def _resolve_subcategoria(self, name, category_id, sub_map):
+        """subcategoria_id sob category_id. Aliases: tira o prefixo "FASE PREPARATÓRIA - "
+        e aceita as grafias por extenso das siglas (SUBCATEGORIA_ALIASES); depois
+        igualdade normalizada e, por fim, substring (>= 5 chars nos dois lados) se
+        casar UMA única subcategoria da categoria. Preenchido e não resolvido →
+        recusa; preenchido sem Categoria resolvida → recusa (nada some em silêncio)."""
+        if not name or not str(name).strip():
+            return None
+        if not category_id:
+            raise LinhaRecusadaError(f"Subcategoria preenchida sem Categoria resolvida: '{str(name).strip()}'")
         key = _key(name)
+        usou_alias = False
         for prefixo in SUBCATEGORIA_PREFIXOS_ALIAS:
             if key.startswith(prefixo):
                 key = key[len(prefixo):].strip()
-                self.alias_hits["subcategoria"] += 1
+                usou_alias = True
                 break
-        sub_id = sub_map.get((category_id, key))
+        if key in SUBCATEGORIA_ALIASES:
+            key = SUBCATEGORIA_ALIASES[key]
+            usou_alias = True
+        if usou_alias:
+            self.alias_hits["subcategoria"] += 1
+        sub_id = sub_map.get((category_id, key)) or self._substring_unico(key, category_id, sub_map)
         if sub_id:
             return sub_id
-        if len(key) >= 5:
-            candidatos = [
-                sid for (cid, nome_norm), sid in sub_map.items()
-                if cid == category_id and (key in nome_norm or nome_norm in key)
-            ]
-            if len(candidatos) == 1:
-                return candidatos[0]
         raise LinhaRecusadaError(f"Subcategoria não reconhecida na categoria: '{str(name).strip()}'")
 
     def _resolve_microcategoria(self, name, subcategoria_id, mic_map):
         """microcategoria_id sob subcategoria_id (igualdade normalizada; substring
-        >= 5 chars se casar uma única). Preenchido e não resolvido → recusa."""
-        if not name or not str(name).strip() or not subcategoria_id:
+        >= 5 chars nos dois lados se casar uma única). Preenchido e não resolvido →
+        recusa; preenchido sem Subcategoria resolvida → recusa."""
+        if not name or not str(name).strip():
             return None
+        if not subcategoria_id:
+            raise LinhaRecusadaError(
+                f"Microcategoria preenchida sem Subcategoria resolvida: '{str(name).strip()}'"
+            )
         key = _key(name)
-        mic_id = mic_map.get((subcategoria_id, key))
+        mic_id = mic_map.get((subcategoria_id, key)) or self._substring_unico(key, subcategoria_id, mic_map)
         if mic_id:
             return mic_id
-        if len(key) >= 5:
-            candidatos = [
-                mid for (sid, nome_norm), mid in mic_map.items()
-                if sid == subcategoria_id and (key in nome_norm or nome_norm in key)
-            ]
-            if len(candidatos) == 1:
-                return candidatos[0]
         raise LinhaRecusadaError(f"Microcategoria não reconhecida na subcategoria: '{str(name).strip()}'")
 
     def _insert_document(

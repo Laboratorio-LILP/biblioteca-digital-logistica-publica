@@ -20,13 +20,33 @@ MIGRACAO = REPO / "docker" / "postgres" / "migrations" / "2026-09-v12-taxonomia-
 
 
 def test_apply_fulltext_soma_as_duas_configuracoes():
-    src = inspect.getsource(search.apply_fulltext)
+    src = inspect.getsource(search)
     assert 'config="portuguese"' in src            # não perde o stemmer oficial
     assert 'config="portuguese_unaccent"' in src   # e ganha a busca sem acento
-    # Vetor: os mesmos campos (mesmos pesos) nas duas configurações; consulta: OR.
+    # Vetor: os mesmos campos (mesmos pesos) nas duas configurações.
     assert '_vetor("portuguese") + _vetor("portuguese_unaccent")' in src
-    assert 'SearchQuery(query, config="portuguese") | SearchQuery(query, config="portuguese_unaccent")' in src
-    assert "reacentuar(query)" in src
+    assert "reacentuar(" in inspect.getsource(search._consulta)
+
+
+def test_consulta_e_por_token_e_entre_palavras():
+    # Revisão adversarial (14/09): OR entre consultas inteiras virava raiz OR e o
+    # ts_rank passava a aceitar documento com só uma das palavras ("pregão
+    # eletrônico" 29 → 81). A consulta é montada por token — OR das configurações
+    # DENTRO de cada palavra, E entre palavras — e o casamento booleano é explícito (@@).
+    src = inspect.getsource(search._consulta)
+    assert "query.split()" in src or ".split()" in src
+    assert "& " in src or "&=" in src or " & " in src
+    src_apply = inspect.getsource(search.apply_fulltext)
+    assert "filter(busca=" in src_apply           # vetor @@ consulta — semântica booleana garantida
+
+
+def test_degrada_sem_a_configuracao_unaccent_no_banco():
+    # Banco ainda sem a seção 1 do script (homologação antes do SQL): a busca
+    # não pode responder 500 — usa só `portuguese` (+ reacentuar) e avisa no log.
+    src = inspect.getsource(search)
+    assert "pg_ts_config" in src and "portuguese_unaccent" in src
+    assert "_unaccent_disponivel" in inspect.getsource(search.apply_fulltext)
+    assert "logger.warning" in src or "log.warning" in src
 
 
 def test_vetor_usa_os_mesmos_campos_e_pesos_nas_duas_configuracoes():

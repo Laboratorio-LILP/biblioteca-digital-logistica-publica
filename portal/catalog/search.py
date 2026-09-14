@@ -1,10 +1,14 @@
+import logging
 import re
 
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db import DatabaseError, connection
 from django.db.models import F
 
 from .models import Document, TypeInformation
 from .taxonomy_v6 import colecao_v6_for_tipo
+
+logger = logging.getLogger(__name__)
 
 
 def _typeinform_ids_for_colecao(slug):
@@ -168,6 +172,59 @@ def reacentuar(termo):
     return novo if novo != (termo or "") else ""
 
 
+_CONFIG_UNACCENT = "portuguese_unaccent"
+_unaccent_estado = {"ok": False, "avisado": False}
+
+
+def _unaccent_disponivel():
+    """True se a configuração de busca `portuguese_unaccent` existe no banco.
+
+    Positivo fica em cache no processo; negativo é reavaliado a cada chamada
+    (uma consulta a pg_ts_config, custo desprezível) e avisa no log uma vez —
+    um banco ainda sem a seção 1 do script de migração v12 (homologação antes
+    do SQL) degrada a busca sem acento em vez de derrubar a busca e a home.
+    """
+    if _unaccent_estado["ok"]:
+        return True
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT 1 FROM pg_ts_config WHERE cfgname = %s", [_CONFIG_UNACCENT])
+            ok = cur.fetchone() is not None
+    except DatabaseError:
+        ok = False
+    if ok:
+        _unaccent_estado["ok"] = True
+    elif not _unaccent_estado["avisado"]:
+        _unaccent_estado["avisado"] = True
+        logger.warning(
+            "configuração de busca %s ausente: busca sem acento degradada (só `portuguese` + variante "
+            "re-acentuada); aplique a seção 1 de docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql",
+            _CONFIG_UNACCENT,
+        )
+    return ok
+
+
+def _consulta(query, com_unaccent):
+    """tsquery montada POR TOKEN: OR das configurações (e da variante re-acentuada)
+    dentro de cada palavra, E entre as palavras.
+
+    Revisão de 14/09/2026: OR entre consultas inteiras deixava a raiz da árvore
+    em OR e o ts_rank passava a aceitar documento com só uma das palavras
+    ("pregão eletrônico": 29 → 81). Por token, a semântica de plainto_tsquery
+    (todas as palavras) é preservada e cada palavra fica tolerante a acento.
+    """
+    total = None
+    for tok in query.split():
+        q = SearchQuery(tok, config="portuguese")
+        if com_unaccent:
+            q = q | SearchQuery(tok, config="portuguese_unaccent")
+        variante = reacentuar(tok)
+        if variante:
+            q = q | SearchQuery(variante, config="portuguese")
+        total = q if total is None else total & q
+    return total if total is not None else SearchQuery(query, config="portuguese")
+
+
 def apply_fulltext(qs, query):
     """Restringe `qs` aos documentos que casam a busca textual, anotando `rank`.
 
@@ -180,19 +237,27 @@ def apply_fulltext(qs, query):
     Aplicar unaccent ANTES do radicalizador quebra regras do português
     ("licitações" → "licitaco" ≠ "licitação" → "licitaca"), então as duas
     configurações são SOMADAS, não trocadas: vetor = campos em `portuguese`
-    + os mesmos campos (mesmos pesos) em `portuguese_unaccent`; consulta =
-    OR das duas, mais a variante re-acentuada dos sufixos nasais (reacentuar),
-    que fecha o caso plural/singular que o unaccent-antes-do-stemmer não
-    cobre ("licitacao" precisa achar "licitações"). `portuguese_unaccent` é
-    criada em 00-extensions.sql (volume novo) e na seção 1 de
-    docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql.
+    + os mesmos campos (mesmos pesos) em `portuguese_unaccent`; consulta por
+    token (_consulta), com a variante re-acentuada dos sufixos nasais
+    (reacentuar), que fecha o caso plural/singular que o unaccent-antes-do-
+    stemmer não cobre ("licitacao" precisa achar "licitações").
+
+    O casamento booleano é explícito (`vetor @@ consulta`, via filter(busca=…));
+    o rank fica só como limiar (rank__gte=0.01) e ordenação. `portuguese_unaccent`
+    nasce em 00-extensions.sql (volume novo) e na seção 1 do script de
+    migração v12; sem ela, a busca degrada para `portuguese` (ver
+    _unaccent_disponivel) em vez de falhar.
     """
-    vector = _vetor("portuguese") + _vetor("portuguese_unaccent")
-    search_query = SearchQuery(query, config="portuguese") | SearchQuery(query, config="portuguese_unaccent")
-    variante = reacentuar(query)
-    if variante:
-        search_query = search_query | SearchQuery(variante, config="portuguese")
-    return qs.annotate(rank=SearchRank(vector, search_query)).filter(rank__gte=0.01)
+    com_unaccent = _unaccent_disponivel()
+    if com_unaccent:
+        vector = _vetor("portuguese") + _vetor("portuguese_unaccent")
+    else:
+        vector = _vetor("portuguese")
+    consulta = _consulta(query, com_unaccent)
+    return (
+        qs.annotate(busca=vector, rank=SearchRank(vector, consulta))
+        .filter(busca=consulta, rank__gte=0.01)
+    )
 
 
 def search_documents(query, filters=None, sort=None):

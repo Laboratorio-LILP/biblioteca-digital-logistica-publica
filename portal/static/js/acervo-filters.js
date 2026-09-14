@@ -111,12 +111,15 @@
   }
   function focar(el) {
     if (!el) return;
-    if (!el.hasAttribute("tabindex") && !/^(INPUT|SELECT|BUTTON|A|TEXTAREA)$/.test(el.tagName)) {
-      el.setAttribute("tabindex", "-1");
-    }
+    // Só ganha tabindex="-1" quem não é focável por natureza: <summary>, input,
+    // link etc. já têm tabIndex >= 0 e um "-1" os tiraria da ordem de Tab
+    // (revisão de 14/09/2026 — WCAG 2.1.1).
+    if (!el.hasAttribute("tabindex") && el.tabIndex < 0) el.setAttribute("tabindex", "-1");
     try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
   }
-  function restaurarFoco(foco, fallbackSel) {
+  // Devolve o foco ao controle tocado (por id ou name+value) ou, na falta dele,
+  // ao primeiro dos seletores de `fallbacks` que existir — em ordem de prioridade.
+  function restaurarFoco(foco, fallbacks) {
     var el = null;
     if (foco) {
       if (foco.id) el = document.getElementById(foco.id);
@@ -127,7 +130,7 @@
         }
       }
     }
-    if (!el && fallbackSel) el = form.querySelector(fallbackSel);
+    for (var j = 0; !el && fallbacks && j < fallbacks.length; j++) el = form.querySelector(fallbacks[j]);
     focar(el);
   }
 
@@ -164,6 +167,11 @@
         if (!novoSidebar || !novoRes) throw new Error("HTML sem as regiões esperadas");
         var novaPag = doc.getElementById("acervo-paginacao");
 
+        // O usuário mexeu no form enquanto o pedido corria (ano digitado, segundo
+        // clique num multi-select): esta resposta já nasceu velha — descarta e
+        // reagenda com o estado vivo, em vez de sobrescrever o que ele editou.
+        if (opts.doForm && (timer || urlDoForm() !== url)) { agendar(500); return; }
+
         // Nada é alterado antes de o HTML novo ser validado: sem estado meio-trocado.
         // O HTML vem da MESMA view, na mesma origem, renderizado pelos templates
         // (auto-escape do Django) — o mesmo nível de confiança da página inicial;
@@ -197,6 +205,14 @@
         }
         chaveAtual = chaveDe(location.href);
 
+        // A caixa de busca do herói fica fora das regiões trocadas: quando a URL
+        // não veio do form (chip, paginação, voltar/avançar), sincroniza o q.
+        if (!opts.doForm) {
+          var qUrl = new URL(url, location.href).searchParams.get("q") || "";
+          var caixa = form.querySelector('input[name="q"]');
+          if (caixa && caixa.value !== qUrl) caixa.value = qUrl;
+        }
+
         if (opts.focus !== false || opts.focusFallback) {
           restaurarFoco(opts.focus === false ? null : foco, opts.focusFallback);
         }
@@ -221,13 +237,13 @@
   }
 
   function atualizarPeloForm() {
-    trocar(urlDoForm(), { push: true, fallback: envioClassico });
+    trocar(urlDoForm(), { push: true, doForm: true, fallback: envioClassico });
   }
 
   var timer = null;
   function agendar(delay) {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(atualizarPeloForm, delay);
+    timer = setTimeout(function () { timer = null; atualizarPeloForm(); }, delay);
   }
 
   // Valida os campos de Ano: clampa cada um à faixa [min,max] do input e, se De/Até
@@ -316,9 +332,13 @@
     var href = a.href;
     var u = new URL(href, location.href);
     u.hash = "";
-    var foco = chip ? ".applied-filter-chip__remove, #acervo-sidebar details.side-section > summary"
-      : limpar ? "#acervo-sidebar details.side-section > summary"
-      : '.pagination [aria-current="page"]';
+    // Ordem de prioridade do foco: chip removido → outro chip restante; senão
+    // (ou "Limpar tudo") → primeira faceta; paginação → página corrente.
+    var chipsRestantes = ".applied-filter-chip__remove";
+    var primeiraFaceta = "#acervo-sidebar details.side-section > summary";
+    var foco = chip ? [chipsRestantes, primeiraFaceta]
+      : limpar ? [primeiraFaceta]
+      : ['.pagination [aria-current="page"]'];
     trocar(u.href, { push: true, focus: false, focusFallback: foco, fallback: function () { location.assign(href); } });
   });
 

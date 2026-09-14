@@ -88,7 +88,7 @@ docker compose --env-file .env -f docker/docker-compose.yml exec portal python m
     2018: 33
     2017: 29
 
-  Possíveis redundâncias e problemas de qualidade (447 achados em 982 documentos; semântica em catalog/qualidade.py):
+  Possíveis redundâncias e problemas de qualidade (448 achados em 982 documentos; semântica em catalog/qualidade.py):
   RESUMO_CURTO: 391
       bdlp-000003: A Quick Glance at Sustainable Public Procurement
       bdlp-000050: Cartilha Nova Lei de Licitações e Contratos
@@ -110,13 +110,13 @@ docker compose --env-file .env -f docker/docker-compose.yml exec portal python m
       bdlp-000758: Encontro Nacional de Obras Públicas e Serviços de Engenharia - ENEOP
       bdlp-000759: Estágio Setorial Fiscal de Contratos
       … e mais 5
-  RESUMO_RETICENCIAS: 7
+  RESUMO_RETICENCIAS: 8
+      bdlp-000776: Serviço de Engenharia
       bdlp-000795: A dispensa de licitação eletrônica é modalidade de licitação disfarçada
       bdlp-000853: 10 mandamentos do dispute board
       bdlp-000916: Gamificação e aprendizagem sobre ética e cidadania: um estudo sobre o game da c…
       bdlp-000921: Os impactos do fim da escala 6×1 nos contratos de terceirização dos entes públi…
-      bdlp-000940: A subcontratação e a análise de capacidade técnica
-      … e mais 2
+      … e mais 3
   RESUMO_CITACAO: 7
       bdlp-000923: Sanções administrativas em contratações públicas: o que fazer quando o órgão ou…
       bdlp-000929: Portal Nacional de Contratações Públicas (PNCP): por que precisamos falar sobre…

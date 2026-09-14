@@ -853,6 +853,10 @@ html.js .btn-apply { display: none; }
 .meta-item__desc { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.62); }
 /* Link discreto do hint das facetas para o glossário da página de Coleções. */
 .side-section__link { color: var(--sp-blue); text-decoration: underline; }
+/* Links nas notas dos cards de Coleções ("Veja o que entra em cada um"): o reset
+   global `a { color: inherit; text-decoration: none }` os deixava iguais ao texto. */
+.org-card__nota a { color: var(--sp-blue); text-decoration: underline; }
+.org-card__nota a:hover, .org-card__nota a:focus-visible { text-decoration-thickness: 2px; }
 
 /* Glossário de Assuntos e Categorias (página de Coleções, set/2026): nome
    linkado ao acervo filtrado, caracterização curta e explicação longa num

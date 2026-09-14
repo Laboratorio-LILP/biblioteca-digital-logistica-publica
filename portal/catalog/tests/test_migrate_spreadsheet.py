@@ -141,7 +141,40 @@ def test_subcategoria_desconhecida_e_erro(cmd):
     with pytest.raises(LinhaRecusadaError, match="Subcategoria"):
         cmd._resolve_subcategoria("SUB QUE NÃO EXISTE", 3, _sub_map())
     assert cmd._resolve_subcategoria("", 3, _sub_map()) is None
-    assert cmd._resolve_subcategoria("ETP", None, _sub_map()) is None
+
+
+def test_subcategoria_preenchida_sem_categoria_e_erro(cmd):
+    # Preenchida sem o nível acima resolvido não pode sumir em silêncio (revisão 14/09).
+    with pytest.raises(LinhaRecusadaError, match="Subcategoria"):
+        cmd._resolve_subcategoria("ETP", None, _sub_map())
+    with pytest.raises(LinhaRecusadaError, match="Microcategoria"):
+        cmd._resolve_microcategoria("MAPA DE RISCOS", None, {(2, "mapa de riscos"): 2})
+
+
+def test_substring_nao_casa_nomes_curtos_do_banco(cmd):
+    # Revisão 14/09: com "TR"/"ETP" no banco, 'OUTROS' e 'CONTRATAÇÃO DIRETA' casavam
+    # TR por substring ("tr" dentro da chave) e entravam classificados errado.
+    for ruim in ("OUTROS", "CONTRATAÇÃO DIRETA", "MATRIZ DE RISCOS", "OUTRA"):
+        with pytest.raises(LinhaRecusadaError, match="Subcategoria"):
+            cmd._resolve_subcategoria(ruim, 3, _sub_map())
+    # ...mas as grafias por extenso resolvem por alias explícito, contadas no resumo.
+    assert cmd._resolve_subcategoria("Termo de Referência (TR)", 3, _sub_map()) == 3
+    assert cmd._resolve_subcategoria("ESTUDO TÉCNICO PRELIMINAR", 3, _sub_map()) == 4
+    assert cmd._resolve_subcategoria("Termo de Referência", 3, _sub_map()) == 3
+    assert cmd.alias_hits["subcategoria"] == 3
+
+
+def test_allow_new_types_aceita_tipo_novo_na_raiz_mas_nao_tipo_retirado(cmd):
+    # Revisão 14/09: a flag era inócua porque _resolve_topic recusava antes de _ensure_type.
+    tm = _topic_map()
+    rec = {"colecao": "Doutrina e Conteúdo Técnico", "tipo_informacao": "Tipo Novo Qualquer"}
+    with pytest.raises(LinhaRecusadaError, match="Tipo de informação"):
+        cmd._resolve_topic(rec, tm)
+    assert cmd._resolve_topic(rec, tm, allow_new_types=True) == 3          # cai na raiz da coleção
+    # Tipos RETIRADOS continuam recusados mesmo com a flag (não são "novos").
+    with pytest.raises(LinhaRecusadaError, match="Tipo de informação"):
+        cmd._resolve_topic({"colecao": "Instrução e Capacitação", "tipo_informacao": "Vídeos"}, tm,
+                           allow_new_types=True)
 
 
 def test_microcategoria_desconhecida_e_erro(cmd):

@@ -56,7 +56,12 @@ _CAMPOS_CARACTERIZACAO = (
 _CITACAO_RE = re.compile(r"\[\d{1,3}(?:\s*[,;–-]\s*\d{1,3})*\]")
 _SERIE_RE = re.compile(r"\b(caderno|cadernos|manual|manuais|guia|guias)\b")
 _SEPARADOR_SUBTITULO_RE = re.compile(r"\s*[:—–]\s+|\s+-\s+")
-_ROMANO_RE = re.compile(r"^[ivxlcdm]{1,6}$")
+# Numeral romano na gramática estrita (não casa "civil", "mil", "vil").
+_ROMANO_RE = re.compile(r"^(?=[ivxlcdm])m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$")
+# DOI de verdade: prefixo 10.NNNN/… — placeholders ("Não possui", "-", "n/a") não agrupam.
+_DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$")
+# Fechos que podem vir depois das reticências ("...", "…") no fim do resumo.
+_FECHOS_FINAIS = "\"'”’)]»"
 _TOKENS_VOLUME = {"vol", "volume", "volumes", "parte", "n", "no", "num", "numero", "edicao", "ed", "tomo", "fasciculo"}
 
 
@@ -89,22 +94,35 @@ def normalizar_doi(s) -> str:
     """DOI em minúsculas, sem prefixos https://doi.org/, doi.org/ e 'doi:'."""
     d = _texto(s).lower()
     d = re.sub(r"^(https?://)?(dx\.)?doi\.org/", "", d)
-    d = re.sub(r"^doi:\s*", "", d)
-    return d.strip()
+    d = re.sub(r"^doi:\s*", "", d).strip()
+    return d if _DOI_RE.match(d) else ""
 
 
-def normalizar_url(s) -> str:
-    """Chave de endereço: sem esquema, host em caixa baixa, sem #fragmento, sem
-    parâmetros utm_*, sem barra final."""
-    u = _texto(s)
+def _host(u: str) -> str:
+    """Host (caixa baixa, sem www.) de um endereço; '' se não for URL."""
     if not u:
         return ""
     if "://" not in u:
         u = "http://" + u
-    partes = urlsplit(u)
-    host = (partes.hostname or "").lower()
+    try:
+        host = (urlsplit(u).hostname or "").lower()
+    except ValueError:  # ex.: "[Acesso restrito]" (colchetes viram IPv6 inválido)
+        return ""
     if host.startswith("www."):
         host = host[4:]
+    return host if "." in host else ""   # placeholders ("n/a", "-", "Não possui") não são endereço
+
+
+def normalizar_url(s) -> str:
+    """Chave de endereço: sem esquema, host em caixa baixa, sem #fragmento, sem
+    parâmetros utm_*, sem barra final; '' para o que não é URL."""
+    u = _texto(s)
+    host = _host(u)
+    if not host:
+        return ""
+    if "://" not in u:
+        u = "http://" + u
+    partes = urlsplit(u)
     caminho = partes.path.rstrip("/")
     query = [(k, v) for k, v in parse_qsl(partes.query, keep_blank_values=True) if not k.lower().startswith("utm_")]
     chave = host + caminho
@@ -193,7 +211,8 @@ def resumo_suspeito(reg) -> list[str]:
     else:
         if resumo[0].islower():
             codigos.append("RESUMO_MINUSCULA")
-        if resumo.endswith("...") or resumo.endswith("…"):
+        fim = resumo.rstrip(_FECHOS_FINAIS)          # "(...)", "[...]", '..."' também são corte
+        if fim.endswith("...") or fim.endswith("…"):
             codigos.append("RESUMO_RETICENCIAS")
         if _CITACAO_RE.search(resumo):
             codigos.append("RESUMO_CITACAO")
@@ -202,8 +221,8 @@ def resumo_suspeito(reg) -> list[str]:
         t = normalizar_titulo(reg["titulo"])
         if len(t) >= 10 and normalizar_titulo(resumo).startswith(t):
             codigos.append("RESUMO_IGUAL_TITULO")
-    host = (urlsplit(reg["url"] if "://" in reg["url"] else "http://" + reg["url"]).hostname or "").lower()
-    if reg["url"] and (host == "scribd.com" or host.endswith(".scribd.com")):
+    host = _host(reg["url"])
+    if host == "scribd.com" or host.endswith(".scribd.com"):
         codigos.append("RESUMO_SCRIBD")
     return codigos
 

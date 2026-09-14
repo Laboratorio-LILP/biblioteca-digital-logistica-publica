@@ -95,6 +95,15 @@ def test_pagina_de_colecoes_tem_o_glossario():
     assert t.count("sp-section--alt") == 1
 
 
+def test_links_das_notas_dos_cards_sao_visiveis_como_link():
+    # Revisão 14/09: `a { color: inherit; text-decoration: none }` global deixava
+    # "Veja o que entra em cada um" igual ao texto cinza ao redor.
+    css = (TEMPLATES.parent / "static" / "css" / "portal.css").read_text(encoding="utf-8")
+    assert ".org-card__nota a {" in css
+    bloco = css[css.index(".org-card__nota a {"):][:160]
+    assert "var(--sp-blue)" in bloco and "underline" in bloco
+
+
 def test_busca_linka_o_glossario_nas_facetas():
     t = _template("search.html")
     assert t.count("O que significa cada opção?") == 2

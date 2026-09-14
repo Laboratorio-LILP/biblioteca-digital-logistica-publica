@@ -17,10 +17,10 @@ make validate
 Flags úteis:
 - `--skip-red` — pula linhas com fundo vermelho (a curadoria marca assim o que sai do acervo). A planilha "PARA CORREÇÃO" da v12 **exige** esta flag.
 - `--dry-run` — só simula; lista todas as recusas com motivo e conta os aliases de grafia usados.
-- `--allow-new-types` — cria em `type_information` um tipo fora do vocabulário em vez de recusar. **Exceção documentada**: não use em carga normal; se a planilha traz um tipo novo, a decisão é da chefia (vocabulário em `portal/catalog/taxonomy_v6.py`).
+- `--allow-new-types` — aceita um tipo **fora do vocabulário** em vez de recusar a linha: cria o tipo em `type_information` e deixa o documento na **raiz** da coleção (sem subcoleção). Tipos **retirados** (Documentos Normativos, Vídeos) continuam recusados mesmo com a flag. **Exceção documentada**: não use em carga normal; se a planilha traz um tipo novo, a decisão é da chefia (vocabulário em `portal/catalog/taxonomy_v6.py`).
 - `--start-seq N` — primeiro código `bdlp-XXXXXX` em cargas incrementais.
 
-Aliases de grafia aceitos e normalizados (contados no resumo): categoria `PLANO ANUAL DE CONTRATAÇÕES (PCA)` → `PLANO DE CONTRATAÇÕES ANUAL (PCA)` (grafia das listas do template v8); subcategoria `FASE PREPARATÓRIA - X` → `X` (grafia da planilha PARA CORREÇÃO). Grafias legadas de tipo (`Acórdão`, `deliberacao`, `Parecer`, `Enunciado`) viram o nome canônico plural.
+Aliases de grafia aceitos e normalizados (contados no resumo): categoria `PLANO ANUAL DE CONTRATAÇÕES (PCA)` → `PLANO DE CONTRATAÇÕES ANUAL (PCA)` (grafia das listas do template v8); subcategoria `FASE PREPARATÓRIA - X` → `X` (grafia da planilha PARA CORREÇÃO) e as siglas por extenso `Termo de Referência (TR)` → `TR`, `Estudo Técnico Preliminar (ETP)` → `ETP`. Grafias legadas de tipo (`Acórdão`, `deliberacao`, `Parecer`, `Enunciado`) viram o nome canônico plural. O casamento por substring de subcategoria/microcategoria exige 5 caracteres nos dois lados (nomes curtos como `TR` só casam por igualdade ou alias); subcategoria preenchida sem categoria resolvida, ou microcategoria sem subcategoria, recusa a linha.
 
 ## Verificações de qualidade para a curadoria (`validate_import` e `--dry-run`)
 
