@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db.models import F
 
@@ -110,6 +112,62 @@ def _apply_sort(qs, sort, default):
     return qs.order_by(default, "-pk")
 
 
+# Campos e pesos do vetor de busca. Inclui campos LILP (complexidade,
+# uso_futuro, metodo, resultado) além dos clássicos title/keywords/author/abstract.
+_FTS_CAMPOS = (
+    ("title", "A"),
+    ("keywords", "A"),
+    ("author", "B"),
+    ("autor_principal", "B"),
+    ("abstract", "C"),
+    ("uso_futuro", "C"),
+    ("metodo", "D"),
+    ("resultado", "D"),
+    ("complexidade", "D"),
+)
+
+
+def _vetor(config):
+    """Soma dos SearchVector dos campos de _FTS_CAMPOS numa configuração de busca."""
+    vetor = None
+    for campo, peso in _FTS_CAMPOS:
+        sv = SearchVector(campo, weight=peso, config=config)
+        vetor = sv if vetor is None else vetor + sv
+    return vetor
+
+
+# Sufixos nasais do português que o usuário costuma digitar sem acento. O
+# radicalizador `portuguese` depende do "ção"/"ções" para chegar ao mesmo
+# radical de singular e plural ("licitação" e "licitações" → "licit"); sem o
+# acento, "licitacao" → "licitaca" e "licitacoes" → "licitaco" — mesmo com
+# unaccent, que roda ANTES do stemmer. Por isso a consulta ganha uma variante
+# re-acentuada, só nos tokens 100% ASCII, do sufixo mais longo para o mais curto.
+_SUFIXOS_REACENTUACAO = (
+    ("coes", "ções"), ("cao", "ção"), ("aos", "ãos"), ("oes", "ões"), ("aes", "ães"),
+    ("ao", "ão"), ("ae", "ãe"),
+)
+# Token de letras ASCII não colado a outra letra Unicode (senão seria pedaço
+# de uma palavra já acentuada, ex.: "licita" em "licitação").
+_TOKEN_ASCII_RE = re.compile(r"(?<![^\W\d_])[A-Za-z]+(?![^\W\d_])")
+
+
+def reacentuar(termo):
+    """Variante da consulta com os sufixos nasais re-acentuados ("licitacao" →
+    "licitação", "sancoes" → "sanções"); '' quando nada muda. Usada em OR com a
+    consulta original — só acrescenta resultados, nunca tira."""
+
+    def _token(m):
+        palavra = m.group(0)
+        baixa = palavra.lower()
+        for sufixo, acentuado in _SUFIXOS_REACENTUACAO:
+            if baixa.endswith(sufixo) and len(baixa) > len(sufixo) + 1:
+                return baixa[: -len(sufixo)] + acentuado
+        return palavra
+
+    novo = _TOKEN_ASCII_RE.sub(_token, termo or "")
+    return novo if novo != (termo or "") else ""
+
+
 def apply_fulltext(qs, query):
     """Restringe `qs` aos documentos que casam a busca textual, anotando `rank`.
 
@@ -117,21 +175,23 @@ def apply_fulltext(qs, query):
     resultados (search_documents) e pela base das facetas (compute_facets).
     Se divergirem, a contagem da barra lateral não bate com a lista exibida.
 
-    O vetor inclui campos LILP (complexidade, uso_futuro, metodo, resultado)
-    além dos clássicos title/keywords/author/abstract.
+    Busca sem acento (set/2026): "pregao" precisa achar o mesmo que "pregão"
+    SEM perder o que a configuração `portuguese` já casa (plural, flexões).
+    Aplicar unaccent ANTES do radicalizador quebra regras do português
+    ("licitações" → "licitaco" ≠ "licitação" → "licitaca"), então as duas
+    configurações são SOMADAS, não trocadas: vetor = campos em `portuguese`
+    + os mesmos campos (mesmos pesos) em `portuguese_unaccent`; consulta =
+    OR das duas, mais a variante re-acentuada dos sufixos nasais (reacentuar),
+    que fecha o caso plural/singular que o unaccent-antes-do-stemmer não
+    cobre ("licitacao" precisa achar "licitações"). `portuguese_unaccent` é
+    criada em 00-extensions.sql (volume novo) e na seção 1 de
+    docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql.
     """
-    vector = (
-        SearchVector("title", weight="A", config="portuguese")
-        + SearchVector("keywords", weight="A", config="portuguese")
-        + SearchVector("author", weight="B", config="portuguese")
-        + SearchVector("autor_principal", weight="B", config="portuguese")
-        + SearchVector("abstract", weight="C", config="portuguese")
-        + SearchVector("uso_futuro", weight="C", config="portuguese")
-        + SearchVector("metodo", weight="D", config="portuguese")
-        + SearchVector("resultado", weight="D", config="portuguese")
-        + SearchVector("complexidade", weight="D", config="portuguese")
-    )
-    search_query = SearchQuery(query, config="portuguese")
+    vector = _vetor("portuguese") + _vetor("portuguese_unaccent")
+    search_query = SearchQuery(query, config="portuguese") | SearchQuery(query, config="portuguese_unaccent")
+    variante = reacentuar(query)
+    if variante:
+        search_query = search_query | SearchQuery(variante, config="portuguese")
     return qs.annotate(rank=SearchRank(vector, search_query)).filter(rank__gte=0.01)
 
 
