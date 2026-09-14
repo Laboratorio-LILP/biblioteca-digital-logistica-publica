@@ -1015,4 +1015,75 @@ Linhas recusadas (todas):
     Tipo de informação fora do vocabulário da coleção Jurisprudência: 7
     Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 3
 
+Possíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, não impedem a carga (447 achados em 982 linhas; semântica em catalog/qualidade.py e tools/db-refresh.md):
+  RESUMO_CURTO: 391
+      L6: A Quick Glance at Sustainable Public Procurement
+      L53: Cartilha Nova Lei de Licitações e Contratos
+      L56: Manual de Gestão de Riscos do TCU
+      L66: Manual de Sanções Administrativas do TCU
+      L77: Por que o sistema de Registro de Preços?
+      L78: Licitações e Contratos: Principais aspectos da fase preparatória e gestão contr…
+      L86: Compras públicas para inovação na perspectiva do controle
+      L91: Previsibilidade e Segurança Jurídica: a Matriz de Riscos na Nova Lei de Licitaç…
+      L111: A gestão de estoque nas organizações: uma análise crítica entre a iniciativa pú…
+      L114: A Inteligência Artificial e seus impactos nas contratações e aquisições necessá…
+      … e mais 381
+  RESUMO_MINUSCULA: 19
+      L502: Iniciativa compras sustentáveis & grandes eventos: mapeamento e análise das pri…
+      L587: Faroeste Licitatório: planejamento versus simplificação
+      L604: Gestão de riscos nas licitações do CINDACTA l: um estudo de caso
+      L630: Inexigibilidade de licitação para contratação de serviços atuariais nos RPPSS
+      L648: O indispensável planejamento
+      L659: Relatório de Pesquisa: Contratação de Soluções Inovadoras pela Administração Pú…
+      L663: Obras públicas: recomendações básicas para a contratação e fiscalização de obra…
+      L668: Aplicação de Penalidades nos Contratos Administrativos
+      L829: Interesse Público e Planejamento na NLLC
+      L849: A Integração Internacional do Brasil nos Acordos Comerciais sobre Compras Gover…
+      … e mais 9
+  RESUMO_SCRIBD: 10
+      L758: Compêndio de Licitações e Contratos
+      L759: Todas as respostas sobre a nova lei de licitações e contratos
+      L760: Preço de referência em compras públicas (ênfase em medicamentos)
+      L761: Encontro Nacional de Obras Públicas e Serviços de Engenharia - ENEOP
+      L762: Estágio Setorial Fiscal de Contratos
+      L763: Termo de Referência e Projeto Básico para compras e serviços comuns
+      L764: Pareceres parametrizados - CPUC/CFGEP/SUBCONSU/PGF
+      L765: Elaboração de termos de referência para contratação de bens e serviços na Nova …
+      L766: Estudo Técnico Preliminar( ETP) para elaboração de Termo de Referência/ Projeto…
+      L767: Manual de Jurisprudência do TCU
+  RESUMO_RETICENCIAS: 7
+      L798: A dispensa de licitação eletrônica é modalidade de licitação disfarçada
+      L856: 10 mandamentos do dispute board
+      L919: Gamificação e aprendizagem sobre ética e cidadania: um estudo sobre o game da c…
+      L924: Os impactos do fim da escala 6×1 nos contratos de terceirização dos entes públi…
+      L943: A subcontratação e a análise de capacidade técnica
+      L956: Lançamento do ON – Observatório Nacional da Lei de Licitações e Contratos Admin…
+      L971: Contratação de serviços técnicos especializados de natureza predominantemente i…
+  RESUMO_CITACAO: 7
+      L926: Sanções administrativas em contratações públicas: o que fazer quando o órgão ou…
+      L932: Portal Nacional de Contratações Públicas (PNCP): por que precisamos falar sobre…
+      L934: Programas de Integridade na Nova Lei de Licitações e Contratos
+      L936: Reflexões sobre o princípio da segregação de funções na Lei nº 14.133/2021
+      L940: Breve análise acerca da inaplicabilidade do Decreto Federal n.º 7.174/2010 para…
+      L960: Integridade à paulista: análise do Decreto n.º 69.861/2025 sobre as regras de a…
+      L965: Comentários sobre o Enunciado de Orientação Normativa da AGU 87
+  DUPLICATA_TITULO: 4
+      L24, L36: Local employment and economic development — 2 linhas
+      L28, L317: Measuring public procurement transparency with an index: Exploring the role of … — 2 linhas
+      L29, L323: Minipúblicos como possibilidade de participação e deliberação em compras públic… — 2 linhas
+      L274, L296: Inteligência artificial para identificação de indícios de fraude e corrupção em… — 2 linhas
+  RESUMO_IGUAL_TITULO: 4
+      L779: Serviço de Engenharia
+      L811: Bonificação pelo desempenho do contratado: vantagem para administração pública
+      L822: Critérios de sustentabilidade em compras públicas
+      L953: Possibilidades de regulamentação administrativa da Lei n.º 14.133/2021 por part…
+  DUPLICATA_DIVERGENTE: 2
+      L24, L36: Local employment and economic development — duplicidade caracterizada de forma diferente — campos divergentes: Tipo (Notas Técnicas ≠ Relatórios); Assunto (Governança ≠ Sustentabilidade e ODS)
+      L29, L323: Minipúblicos como possibilidade de participação e deliberação em compras públic… — duplicidade caracterizada de forma diferente — campos divergentes: Assunto (Controle, Auditoria e Combate à Corrupção ≠ Transparência)
+  DUPLICATA_DOI: 2
+      L28, L317: Measuring public procurement transparency with an index: Exploring the role of … — 2 linhas
+      L29, L323: Minipúblicos como possibilidade de participação e deliberação em compras públic… — 2 linhas
+  ENDERECO_COMPARTILHADO: 1
+      L762, L763: https://pt.scribd.com/document/613104715/Apostila-ESFC-Modulo-II — 2 títulos diferentes no mesmo endereço — estante/coletânea? confirmar endereço individual
+
 [DRY RUN] Nenhum dado foi inserido.

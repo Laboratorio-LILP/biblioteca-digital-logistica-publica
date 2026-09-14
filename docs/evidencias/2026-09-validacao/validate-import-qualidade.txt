@@ -1,0 +1,146 @@
+docker compose --env-file .env -f docker/docker-compose.yml exec portal python manage.py validate_import
+=== Validação de Importação ===
+  Documentos arquivados: 982
+  Documentos totais: 982
+  Coleções (raiz): 4
+  Subcoleções: 27
+  Categorias: 6
+  Tipos de informação: 98
+  Formatos: 59
+  Assuntos: 16
+  Subcategorias: 9
+  Microcategorias: 15
+  Documentos com assunto: 982
+  Documentos com subcategoria: 180
+  Documentos com microcategoria: 57
+  Documentos com ano: 982
+  Documentos com permissão: 982
+
+  Sem códigos duplicados.
+
+  Documentos por coleção:
+    Jurisprudência: 59
+    Trabalhos Acadêmicos: 299
+    Doutrina e Conteúdo Técnico: 506
+    Instrução e Capacitação: 118
+
+  Tipos de informação em uso fora do vocabulário canônico v12:
+    Documentos Normativos: 7
+    Vídeos: 3
+
+  AVISO v12: 10 documento(s) ativo(s) com tipo retirado da taxonomia (Documentos Normativos/Vídeos) ou em Jurisprudência/Enunciados — recarregue o acervo v12 antes da seção 2 do script de migração.
+
+  Documentos por subcoleção (Jurisprudência e Doutrina):
+    Doutrina e Conteúdo Técnico / Artigos: 404
+    Doutrina e Conteúdo Técnico / Relatórios: 38
+    Doutrina e Conteúdo Técnico / Livros digitais: 35
+    Doutrina e Conteúdo Técnico / Notas Técnicas: 18
+    Doutrina e Conteúdo Técnico / Textos de Discussão: 9
+    Doutrina e Conteúdo Técnico / Resumos: 1
+    Doutrina e Conteúdo Técnico / Resumos expandidos: 1
+    Doutrina e Conteúdo Técnico / Enunciados: 0
+    Doutrina e Conteúdo Técnico / Pareceres: 0
+    Jurisprudência / Boletins: 52
+    Jurisprudência / Documentos Normativos: 7
+    Jurisprudência / Acórdãos: 0
+    Jurisprudência / Deliberações: 0
+    Jurisprudência / Súmulas: 0
+
+  Documentos por categoria:
+    CONTEÚDOS TRANSVERSAIS: 746
+    SELEÇÃO DO FORNECEDOR: 97
+    PLANEJAMENTO/FASE PREPARATÓRIA: 81
+    GESTÃO CONTRATUAL: 46
+    CICLO COMPLETO DA CONTRATAÇÃO: 8
+    PLANO DE CONTRATAÇÕES ANUAL (PCA): 4
+
+  Documentos por assunto (16 assuntos no seed):
+    Aspectos Jurídicos e Regulatórios: 267
+    Catálogo eletrônico de Padronização: 1
+    Compras Centralizadas/compartilhadas: 28
+    Controle, Auditoria e Combate à Corrupção: 73
+    Gestão de Competências: 35
+    Governança: 161
+    Inovação e Tecnologia: 152
+    Integridade: 26
+    Logística e Gestão de Suprimentos: 33
+    Micro e Pequenas Empresas: 19
+    Sanções Administrativas: 12
+    Sustentabilidade e ODS: 135
+    Transparência: 26
+    Uso de Sistemas: 14
+    Gestão Estratégica e Desempenho das Contratações: 0
+    Logística Pública Internacional: 0
+
+  Documentos por permissão:
+    Aberto: 963
+    Restrito: 19
+
+  Documentos por ano (top 10 mais recentes):
+    2026: 64
+    2025: 153
+    2024: 165
+    2023: 127
+    2022: 102
+    2021: 110
+    2020: 52
+    2019: 41
+    2018: 33
+    2017: 29
+
+  Possíveis redundâncias e problemas de qualidade (447 achados em 982 documentos; semântica em catalog/qualidade.py):
+  RESUMO_CURTO: 391
+      bdlp-000003: A Quick Glance at Sustainable Public Procurement
+      bdlp-000050: Cartilha Nova Lei de Licitações e Contratos
+      bdlp-000053: Manual de Gestão de Riscos do TCU
+      bdlp-000063: Manual de Sanções Administrativas do TCU
+      bdlp-000074: Por que o sistema de Registro de Preços?
+      … e mais 386
+  RESUMO_MINUSCULA: 19
+      bdlp-000499: Iniciativa compras sustentáveis & grandes eventos: mapeamento e análise das pri…
+      bdlp-000584: Faroeste Licitatório: planejamento versus simplificação
+      bdlp-000601: Gestão de riscos nas licitações do CINDACTA l: um estudo de caso
+      bdlp-000627: Inexigibilidade de licitação para contratação de serviços atuariais nos RPPSS
+      bdlp-000645: O indispensável planejamento
+      … e mais 14
+  RESUMO_SCRIBD: 10
+      bdlp-000755: Compêndio de Licitações e Contratos
+      bdlp-000756: Todas as respostas sobre a nova lei de licitações e contratos
+      bdlp-000757: Preço de referência em compras públicas (ênfase em medicamentos)
+      bdlp-000758: Encontro Nacional de Obras Públicas e Serviços de Engenharia - ENEOP
+      bdlp-000759: Estágio Setorial Fiscal de Contratos
+      … e mais 5
+  RESUMO_RETICENCIAS: 7
+      bdlp-000795: A dispensa de licitação eletrônica é modalidade de licitação disfarçada
+      bdlp-000853: 10 mandamentos do dispute board
+      bdlp-000916: Gamificação e aprendizagem sobre ética e cidadania: um estudo sobre o game da c…
+      bdlp-000921: Os impactos do fim da escala 6×1 nos contratos de terceirização dos entes públi…
+      bdlp-000940: A subcontratação e a análise de capacidade técnica
+      … e mais 2
+  RESUMO_CITACAO: 7
+      bdlp-000923: Sanções administrativas em contratações públicas: o que fazer quando o órgão ou…
+      bdlp-000929: Portal Nacional de Contratações Públicas (PNCP): por que precisamos falar sobre…
+      bdlp-000931: Programas de Integridade na Nova Lei de Licitações e Contratos
+      bdlp-000933: Reflexões sobre o princípio da segregação de funções na Lei nº 14.133/2021
+      bdlp-000937: Breve análise acerca da inaplicabilidade do Decreto Federal n.º 7.174/2010 para…
+      … e mais 2
+  DUPLICATA_TITULO: 4
+      bdlp-000021, bdlp-000033: Local employment and economic development — 2 linhas
+      bdlp-000025, bdlp-000314: Measuring public procurement transparency with an index: Exploring the role of … — 2 linhas
+      bdlp-000026, bdlp-000320: Minipúblicos como possibilidade de participação e deliberação em compras públic… — 2 linhas
+      bdlp-000271, bdlp-000293: Inteligência artificial para identificação de indícios de fraude e corrupção em… — 2 linhas
+  RESUMO_IGUAL_TITULO: 4
+      bdlp-000776: Serviço de Engenharia
+      bdlp-000808: Bonificação pelo desempenho do contratado: vantagem para administração pública
+      bdlp-000819: Critérios de sustentabilidade em compras públicas
+      bdlp-000950: Possibilidades de regulamentação administrativa da Lei n.º 14.133/2021 por part…
+  DUPLICATA_DIVERGENTE: 2
+      bdlp-000021, bdlp-000033: Local employment and economic development — duplicidade caracterizada de forma diferente — campos divergentes: Tipo (Notas Técnicas ≠ Relatórios); Assunto (Governança ≠ Sustentabilidade e ODS)
+      bdlp-000026, bdlp-000320: Minipúblicos como possibilidade de participação e deliberação em compras públic… — duplicidade caracterizada de forma diferente — campos divergentes: Assunto (Controle, Auditoria e Combate à Corrupção ≠ Transparência)
+  DUPLICATA_DOI: 2
+      bdlp-000025, bdlp-000314: Measuring public procurement transparency with an index: Exploring the role of … — 2 linhas
+      bdlp-000026, bdlp-000320: Minipúblicos como possibilidade de participação e deliberação em compras públic… — 2 linhas
+  ENDERECO_COMPARTILHADO: 1
+      bdlp-000759, bdlp-000760: https://pt.scribd.com/document/613104715/Apostila-ESFC-Modulo-II — 2 títulos diferentes no mesmo endereço — estante/coletânea? confirmar endereço individual
+
+=== Validação concluída ===

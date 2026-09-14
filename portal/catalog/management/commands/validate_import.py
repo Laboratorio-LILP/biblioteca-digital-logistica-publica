@@ -8,6 +8,7 @@ Uso:
 from django.core.management.base import BaseCommand
 from django.db import connection
 
+from catalog import qualidade
 from catalog.taxonomy_v6 import COLECOES_V6, colecao_v6_for_tipo, tipo_canonico
 
 
@@ -228,5 +229,39 @@ class Command(BaseCommand):
             sem_ano = cursor.fetchone()[0]
             if sem_ano:
                 self.stdout.write(self.style.WARNING(f"\n  Documentos sem ano: {sem_ano}"))
+
+            # Possíveis redundâncias e problemas de qualidade (catalog.qualidade,
+            # só relatório): duplicatas, endereços compartilhados, resumos suspeitos,
+            # autoria de série. Insumo da curadoria — nada é alterado.
+            cursor.execute(
+                """
+                SELECT d.code, d.title, d.doi, d.acesso_eletronico, d.abstract,
+                       r.name, ti.name, a.nome, c.name, s.nome, d.author
+                FROM nr_document d
+                LEFT JOIN topic t ON t.id = d.topic_id
+                LEFT JOIN topic r ON r.id = CASE WHEN t.parent_id = 0 THEN t.id ELSE t.parent_id END
+                LEFT JOIN type_information ti ON ti.id = d.typeinform_id
+                LEFT JOIN nr_assunto a ON a.id = d.assunto_id
+                LEFT JOIN nr_category c ON c.id = d.category_id
+                LEFT JOIN nr_subcategoria s ON s.id = d.subcategoria_id
+                WHERE d.status = 'a'
+                ORDER BY d.id
+                """
+            )
+            registros = [
+                qualidade.registro(
+                    code, title, doi=doi, url=url, resumo=resumo, colecao=colecao, tipo=tipo,
+                    assunto=assunto, categoria=categoria, subcategoria=subcategoria, autor=autor,
+                )
+                for code, title, doi, url, resumo, colecao, tipo, assunto, categoria, subcategoria, autor
+                in cursor.fetchall()
+            ]
+            achados = qualidade.analisar(registros)
+            self.stdout.write(
+                f"\n  Possíveis redundâncias e problemas de qualidade "
+                f"({len(achados)} achados em {len(registros)} documentos; semântica em catalog/qualidade.py):"
+            )
+            for linha in qualidade.formatar_relatorio(achados, limite=5):
+                self.stdout.write(linha)
 
         self.stdout.write(self.style.SUCCESS("\n=== Validação concluída ==="))

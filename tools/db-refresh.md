@@ -22,6 +22,27 @@ Flags úteis:
 
 Aliases de grafia aceitos e normalizados (contados no resumo): categoria `PLANO ANUAL DE CONTRATAÇÕES (PCA)` → `PLANO DE CONTRATAÇÕES ANUAL (PCA)` (grafia das listas do template v8); subcategoria `FASE PREPARATÓRIA - X` → `X` (grafia da planilha PARA CORREÇÃO). Grafias legadas de tipo (`Acórdão`, `deliberacao`, `Parecer`, `Enunciado`) viram o nome canônico plural.
 
+## Verificações de qualidade para a curadoria (`validate_import` e `--dry-run`)
+
+O módulo puro `portal/catalog/qualidade.py` aponta possíveis redundâncias e problemas de qualidade — **só relatório**: nada é alterado, nenhuma linha é recusada. Aparece em duas saídas: a seção "Possíveis redundâncias e problemas de qualidade" do `validate_import` (sobre o acervo carregado, referência = `code`) e, como **avisos**, no fim do `migrate_spreadsheet --dry-run` (sobre as linhas da planilha, referência = número da linha). Cada achado tem código, referência(s) e título curto.
+
+| Código | O que aponta |
+|---|---|
+| `DUPLICATA_TITULO` | mesmo título normalizado (sem acento, caixa, pontuação e espaços múltiplos) |
+| `DUPLICATA_DOI` | mesmo DOI normalizado |
+| `DUPLICATA_DIVERGENTE` | duplicata cujas linhas divergem em Coleção, Tipo, Assunto, Categoria ou Subcategoria — "duplicidade caracterizada de forma diferente" (o caso mais perigoso); lista os campos |
+| `ENDERECO_COMPARTILHADO` | mesmo endereço normalizado (sem `#fragmento`, sem `utm_*`, sem barra final, host em caixa baixa) com títulos **diferentes** — "estante/coletânea? confirmar endereço individual". **Não é duplicata** (publicações na mesma estante do fliphtml5) |
+| `RESUMO_VAZIO` | sem resumo |
+| `RESUMO_MINUSCULA` | resumo começa com letra minúscula (trecho copiado do meio do texto) |
+| `RESUMO_RETICENCIAS` | resumo termina com "..." ou "…" (trecho cortado) |
+| `RESUMO_CITACAO` | marcador de citação `[n]`/`[n, m]` no resumo (`[2024]` é ano, não conta) |
+| `RESUMO_CURTO` | menos de 300 caracteres (mínimo da planilha-modelo) |
+| `RESUMO_IGUAL_TITULO` | resumo começa repetindo o título |
+| `RESUMO_SCRIBD` | endereço em scribd.com — a página traz introdução, não resumo: "conferir se é resumo de fato" |
+| `AUTORIA_SERIE` | mesmo autor pessoa em todos os volumes de uma série com "Caderno", "Manual" ou "Guia" no título — aponta, não julga |
+
+Um resumo pode acumular vários códigos. O relatório mostra a contagem por código e alguns exemplos (5 no `validate_import`, 10 no `--dry-run`).
+
 ## Full-refresh (substituir todo o acervo)
 Não exige `down -v` (nenhuma FK referencia `nr_document`). No container do Postgres:
 ```sql

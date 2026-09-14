@@ -30,6 +30,7 @@ import openpyxl
 import psycopg2
 from django.core.management.base import BaseCommand, CommandError
 
+from catalog import qualidade
 from catalog.taxonomy_v6 import COLECOES_V6, tipo_canonico, tipos_de_colecao
 
 # Abas de dados na planilha v3.1 (ordem de processamento)
@@ -226,6 +227,9 @@ class Command(BaseCommand):
             total_inserted = 0
             total_skipped = 0
             total_errors = []
+            # Só no --dry-run: linhas (aceitas e recusadas) para as verificações de
+            # qualidade (catalog.qualidade) — avisos para a curadoria, nunca recusa.
+            registros_qualidade = []
 
             for sheet in sheets_to_process:
                 ws = wb[sheet]
@@ -290,6 +294,14 @@ class Command(BaseCommand):
                     if not record.get("title"):
                         sheet_skipped += 1
                         continue
+                    if dry_run:
+                        registros_qualidade.append(qualidade.registro(
+                            f"L{row_num}", record.get("title"), doi=record.get("doi"),
+                            url=record.get("acesso_eletronico"), resumo=record.get("abstract"),
+                            colecao=record.get("colecao"), tipo=record.get("tipo_informacao"),
+                            assunto=record.get("assunto"), categoria=record.get("categoria"),
+                            subcategoria=record.get("subcategoria"), autor=record.get("author"),
+                        ))
 
                     # Savepoint por linha: um registro com erro não aborta a
                     # transação inteira (sem isto, um erro deixa a transação em
@@ -379,6 +391,14 @@ class Command(BaseCommand):
                 self.stdout.write(f"    {motivo}: {n}")
 
         if dry_run:
+            achados = qualidade.analisar(registros_qualidade)
+            self.stdout.write(self.style.WARNING(
+                f"\nPossíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, "
+                f"não impedem a carga ({len(achados)} achados em {len(registros_qualidade)} linhas; "
+                "semântica em catalog/qualidade.py e tools/db-refresh.md):"
+            ))
+            for linha in qualidade.formatar_relatorio(achados, limite=10):
+                self.stdout.write(linha)
             self.stdout.write(self.style.WARNING("\n[DRY RUN] Nenhum dado foi inserido."))
 
     def _detect_red_rows(self, ws):
