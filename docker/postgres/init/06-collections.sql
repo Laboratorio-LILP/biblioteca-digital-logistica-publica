@@ -1,31 +1,37 @@
 --
 -- Hierarquia de coleções (topics) da Biblioteca Digital de Logística Pública
--- Taxonomia v8 (canônica, §7): 4 Coleções definidas pelo Tipo de Informação.
--- Fonte: aba "Coleção, Assunto e Natureza" de BDLP_Template_Insercao_v8.xlsx.
+-- Taxonomia v12 (set/2026): 4 Coleções definidas pelo Tipo de Informação.
+-- Fonte: e-mail "ALTERAÇÕES BIBLIOTECA" (Lina, 11/09/2026) sobre a aba
+-- "Coleção, Assunto e Natureza" do template. Jurisprudência = Súmulas, Boletins,
+-- Acórdãos e Deliberações (saem Enunciados e Documentos Normativos); Doutrina
+-- ganha Enunciados e Pareceres; Instrução perde Vídeos. Normas, leis, decretos e
+-- portarias saem do acervo pela planilha, não por código.
 -- Cada Tipo de Informação é semeado como subcoleção da sua Coleção, para que o
 -- migrate_spreadsheet._resolve_topic() case a coluna "Coleção" → raiz e refine
--- pela coluna "Tipo de Informação" → subcoleção.
+-- pela coluna "Tipo de Informação" → subcoleção. Bancos EXISTENTES não rodam
+-- este init: use docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql.
+-- Vocabulário espelhado em portal/catalog/taxonomy_v6.py (_TIPOS_POR_COLECAO).
 --
 
--- Coleções principais v8 (parent_id = 0 = raiz)
+-- Coleções principais (parent_id = 0 = raiz)
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Jurisprudência', 'Enunciados, súmulas, boletins e documentos normativos', 0, 's');
+    ('Jurisprudência', 'Acórdãos, deliberações, súmulas e boletins', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
     ('Trabalhos Acadêmicos', 'Teses, dissertações, monografias, TCCs e memoriais docentes', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Doutrina e Conteúdo Técnico', 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão e resumos', 0, 's');
+    ('Doutrina e Conteúdo Técnico', 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos, enunciados e pareceres', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Instrução e Capacitação', 'Manuais, guias, tutoriais, apostilas, aulas, cursos, vídeos e slides', 0, 's');
+    ('Instrução e Capacitação', 'Manuais, guias, tutoriais, apostilas, aulas, cursos e slides', 0, 's');
 
--- Subcoleções = Tipos de Informação v8 (nomes EXATOS do vocabulário controlado)
+-- Subcoleções = Tipos de Informação v12 (nomes EXATOS do vocabulário controlado)
 INSERT INTO topic (name, description, parent_id, archieve)
 SELECT sub.name, sub.description, t.id, 's'
 FROM topic t,
 (VALUES
-    ('Enunciados', 'Enunciados'),
     ('Súmulas', 'Súmulas'),
     ('Boletins', 'Boletins'),
-    ('Documentos Normativos', 'Documentos normativos')
+    ('Acórdãos', 'Acórdãos de tribunais e cortes de contas'),
+    ('Deliberações', 'Deliberações de tribunais e órgãos de controle')
 ) AS sub(name, description)
 WHERE t.name = 'Jurisprudência' AND t.parent_id = 0;
 
@@ -51,7 +57,9 @@ FROM topic t,
     ('Relatórios', 'Relatórios técnicos e de gestão'),
     ('Textos de Discussão', 'Textos para discussão e debate'),
     ('Resumos', 'Resumos'),
-    ('Resumos expandidos', 'Resumos expandidos')
+    ('Resumos expandidos', 'Resumos expandidos'),
+    ('Enunciados', 'Enunciados'),
+    ('Pareceres', 'Pareceres jurídicos e técnicos')
 ) AS sub(name, description)
 WHERE t.name = 'Doutrina e Conteúdo Técnico' AND t.parent_id = 0;
 
@@ -65,7 +73,6 @@ FROM topic t,
     ('Apostilas', 'Apostilas e materiais didáticos'),
     ('Aulas', 'Aulas e apresentações'),
     ('Cursos', 'Cursos e programas de capacitação'),
-    ('Vídeos', 'Vídeos educativos e instrucionais'),
     ('Slides', 'Apresentações em slides')
 ) AS sub(name, description)
 WHERE t.name = 'Instrução e Capacitação' AND t.parent_id = 0;

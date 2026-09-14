@@ -40,8 +40,12 @@ FROM nr_category c, nr_format f
 WHERE f.extension IN ('pdf', 'doc', 'docx', 'html', 'htm', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'odt', 'ods', 'odp', 'epub');
 
 -- =====================================================================
--- Subcategorias e Microcategorias v9 (cascata sob a Categoria)
--- Fonte: aba "Árvore de Classificação" de BDLP_Template_Insercao_v9.xlsx.
+-- Subcategorias e Microcategorias (cascata sob a Categoria) — v12
+-- Fonte: aba "Árvore de Classificação" do template v9, com a alteração de
+-- 11/09/2026 (Lina): as quatro subcategorias de Planejamento perdem o prefixo
+-- redundante com a categoria ("repete a categoria, fica redundante") e passam a
+-- chamar-se ETP, TR, GESTÃO DE RISCOS e PESQUISA DE PREÇOS. Bancos existentes:
+-- docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql (seção 1).
 -- Semeadas aqui (e não em 06-taxonomia.sql) porque dependem de nr_category,
 -- que é populada acima neste mesmo arquivo. As tabelas já existem (criadas
 -- em 06-taxonomia.sql, que roda antes).
@@ -52,10 +56,10 @@ WHERE f.extension IN ('pdf', 'doc', 'docx', 'html', 'htm', 'ppt', 'pptx', 'xls',
 INSERT INTO nr_subcategoria (nome, slug, category_id, ordem)
 SELECT v.nome, v.slug, c.id, v.ordem
 FROM (VALUES
-    ('FASE PREPARATÓRIA - ETP', 'fase-preparatoria-etp', 'PLANEJAMENTO/FASE PREPARATÓRIA', 1),
-    ('FASE PREPARATÓRIA - TR', 'fase-preparatoria-tr', 'PLANEJAMENTO/FASE PREPARATÓRIA', 2),
-    ('FASE PREPARATÓRIA - GESTÃO DE RISCOS', 'fase-preparatoria-gestao-de-riscos', 'PLANEJAMENTO/FASE PREPARATÓRIA', 3),
-    ('FASE PREPARATÓRIA - PESQUISA DE PREÇOS', 'fase-preparatoria-pesquisa-de-precos', 'PLANEJAMENTO/FASE PREPARATÓRIA', 4),
+    ('ETP', 'etp', 'PLANEJAMENTO/FASE PREPARATÓRIA', 1),
+    ('TR', 'tr', 'PLANEJAMENTO/FASE PREPARATÓRIA', 2),
+    ('GESTÃO DE RISCOS', 'gestao-de-riscos', 'PLANEJAMENTO/FASE PREPARATÓRIA', 3),
+    ('PESQUISA DE PREÇOS', 'pesquisa-de-precos', 'PLANEJAMENTO/FASE PREPARATÓRIA', 4),
     ('LICITAÇÃO', 'licitacao', 'SELEÇÃO DO FORNECEDOR', 1),
     ('CONTRATAÇÃO DIRETA', 'contratacao-direta', 'SELEÇÃO DO FORNECEDOR', 2),
     ('PROCEDIMENTOS AUXILIARES', 'procedimentos-auxiliares', 'SELEÇÃO DO FORNECEDOR', 3),
@@ -68,8 +72,8 @@ ON CONFLICT (slug, category_id) DO NOTHING;
 INSERT INTO nr_microcategoria (nome, slug, subcategoria_id, ordem)
 SELECT v.nome, v.slug, s.id, v.ordem
 FROM (VALUES
-    ('MAPA DE RISCOS', 'mapa-de-riscos', 'FASE PREPARATÓRIA - GESTÃO DE RISCOS', 1),
-    ('MATRIZ DE ALOCAÇÃO DE RISCOS', 'matriz-de-alocacao-de-riscos', 'FASE PREPARATÓRIA - GESTÃO DE RISCOS', 2),
+    ('MAPA DE RISCOS', 'mapa-de-riscos', 'GESTÃO DE RISCOS', 1),
+    ('MATRIZ DE ALOCAÇÃO DE RISCOS', 'matriz-de-alocacao-de-riscos', 'GESTÃO DE RISCOS', 2),
     ('CONCORRÊNCIA', 'concorrencia', 'LICITAÇÃO', 1),
     ('PREGÃO', 'pregao', 'LICITAÇÃO', 2),
     ('LEILÃO', 'leilao', 'LICITAÇÃO', 3),

@@ -45,7 +45,22 @@ A borda de produção **depende do ambiente** (ver [adr/0006-borda-canonica.md](
 
 ## 4. Dados / acervo
 
-Carga e full-refresh: ver [../tools/db-refresh.md](../tools/db-refresh.md). Sempre `make backup` antes; `make migrate-dry` deve sair com **0 erros** antes de `make migrate`; `make validate` confere a consistência.
+Carga e full-refresh: ver [../tools/db-refresh.md](../tools/db-refresh.md). Sempre `make backup` antes; `make migrate-dry` deve sair com **0 recusas** antes de `make migrate`; `make validate` confere a consistência. Planilhas com linhas em vermelho (curadoria marca o que sai do acervo) exigem `--skip-red`.
+
+### 4.1 Taxonomia v12 (set/2026) — passo a passo para a TI, em homologação
+
+O volume de homologação já existe: os inits não rodam de novo. A v12 entra pelo script idempotente `docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql` (duas seções; pode ser executado várias vezes). Ordem, dentro da stack (sem host/senha/IP aqui — credenciais no `.env` da VM):
+
+1. `make backup`.
+2. Seção 1 do script (arquivo inteiro; a seção 2 só avisa enquanto houver acervo antigo):
+   `docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psql -U php -d nourau -v ON_ERROR_STOP=1 < docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql`
+3. Subida do código v12 + `up -d --build portal` (+ `manage.py check --deploy --fail-level ERROR`).
+4. Full-refresh com a planilha v12, `--sheet "Inserir Material" --skip-red` (antes, `--dry-run --skip-red` com 0 recusas).
+5. `make validate` — 16 assuntos; "Tipos de informação em uso fora do vocabulário canônico v12: nenhum"; sem "AVISO v12".
+6. Seção 2: o mesmo script de novo (`NOTICE: seção 2: removido ...`).
+7. Smoke-test: `/busca/?q=pregao` = `/busca/?q=pregão` (mesma contagem); `/busca/?typeinform_id=<id de Acórdãos>` lista o acórdão; faceta Assunto com 16 opções.
+
+Detalhes, saídas esperadas e a validação de volume novo: [../tools/db-refresh.md](../tools/db-refresh.md).
 
 ## 5. Hardening obrigatório (antes de expor fora do laptop)
 

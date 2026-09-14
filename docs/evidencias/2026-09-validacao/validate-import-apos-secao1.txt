@@ -1,0 +1,91 @@
+docker compose --env-file .env -f docker/docker-compose.yml exec portal python manage.py validate_import
+=== Validação de Importação ===
+  Documentos arquivados: 982
+  Documentos totais: 982
+  Coleções (raiz): 4
+  Subcoleções: 27
+  Categorias: 6
+  Tipos de informação: 98
+  Formatos: 59
+  Assuntos: 16
+  Subcategorias: 9
+  Microcategorias: 15
+  Documentos com assunto: 982
+  Documentos com subcategoria: 180
+  Documentos com microcategoria: 57
+  Documentos com ano: 982
+  Documentos com permissão: 982
+
+  Sem códigos duplicados.
+
+  Documentos por coleção:
+    Jurisprudência: 59
+    Trabalhos Acadêmicos: 299
+    Doutrina e Conteúdo Técnico: 506
+    Instrução e Capacitação: 118
+
+  Tipos de informação em uso fora do vocabulário canônico v12:
+    Documentos Normativos: 7
+    Vídeos: 3
+
+  AVISO v12: 10 documento(s) ativo(s) com tipo retirado da taxonomia (Documentos Normativos/Vídeos) ou em Jurisprudência/Enunciados — recarregue o acervo v12 antes da seção 2 do script de migração.
+
+  Documentos por subcoleção (Jurisprudência e Doutrina):
+    Doutrina e Conteúdo Técnico / Artigos: 404
+    Doutrina e Conteúdo Técnico / Relatórios: 38
+    Doutrina e Conteúdo Técnico / Livros digitais: 35
+    Doutrina e Conteúdo Técnico / Notas Técnicas: 18
+    Doutrina e Conteúdo Técnico / Textos de Discussão: 9
+    Doutrina e Conteúdo Técnico / Resumos: 1
+    Doutrina e Conteúdo Técnico / Resumos expandidos: 1
+    Doutrina e Conteúdo Técnico / Enunciados: 0
+    Doutrina e Conteúdo Técnico / Pareceres: 0
+    Jurisprudência / Boletins: 52
+    Jurisprudência / Documentos Normativos: 7
+    Jurisprudência / Acórdãos: 0
+    Jurisprudência / Deliberações: 0
+    Jurisprudência / Súmulas: 0
+
+  Documentos por categoria:
+    CONTEÚDOS TRANSVERSAIS: 746
+    SELEÇÃO DO FORNECEDOR: 97
+    PLANEJAMENTO/FASE PREPARATÓRIA: 81
+    GESTÃO CONTRATUAL: 46
+    CICLO COMPLETO DA CONTRATAÇÃO: 8
+    PLANO DE CONTRATAÇÕES ANUAL (PCA): 4
+
+  Documentos por assunto (16 assuntos no seed):
+    Aspectos Jurídicos e Regulatórios: 267
+    Catálogo eletrônico de Padronização: 1
+    Compras Centralizadas/compartilhadas: 28
+    Controle, Auditoria e Combate à Corrupção: 73
+    Gestão de Competências: 35
+    Governança: 161
+    Inovação e Tecnologia: 152
+    Integridade: 26
+    Logística e Gestão de Suprimentos: 33
+    Micro e Pequenas Empresas: 19
+    Sanções Administrativas: 12
+    Sustentabilidade e ODS: 135
+    Transparência: 26
+    Uso de Sistemas: 14
+    Gestão Estratégica e Desempenho das Contratações: 0
+    Logística Pública Internacional: 0
+
+  Documentos por permissão:
+    Aberto: 963
+    Restrito: 19
+
+  Documentos por ano (top 10 mais recentes):
+    2026: 64
+    2025: 153
+    2024: 165
+    2023: 127
+    2022: 102
+    2021: 110
+    2020: 52
+    2019: 41
+    2018: 33
+    2017: 29
+
+=== Validação concluída ===

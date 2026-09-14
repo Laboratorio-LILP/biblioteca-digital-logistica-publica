@@ -141,10 +141,16 @@ def titulo_pt(value):
     return "".join(out)
 
 
-# Rótulos de exibição p/ Subcategorias redundantes com a Categoria pai (camada de
-# UI; a taxonomia v8 canônica permanece intacta no banco e nos filtros). Chave =
-# nome canônico em CAIXA ALTA, espaços colapsados.
+# Rótulos de exibição p/ Subcategorias de Planejamento (camada de UI; o nome
+# canônico segue no banco e nos filtros). Chave = nome canônico em CAIXA ALTA,
+# espaços colapsados. A v12 (11/09/2026) tirou o prefixo "FASE PREPARATÓRIA - "
+# do seed; as chaves antigas ficam por um ciclo, para bancos ainda não migrados.
 SUBCAT_DISPLAY = {
+    "ETP": "Estudo Técnico Preliminar (ETP)",
+    "TR": "Termo de Referência (TR)",
+    "GESTÃO DE RISCOS": "Gestão de Riscos",
+    "PESQUISA DE PREÇOS": "Pesquisa de Preços",
+    # grafia anterior à v12 (um ciclo de transição)
     "FASE PREPARATÓRIA - ETP": "Estudo Técnico Preliminar (ETP)",
     "FASE PREPARATÓRIA - TR": "Termo de Referência (TR)",
     "FASE PREPARATÓRIA - GESTÃO DE RISCOS": "Gestão de Riscos",

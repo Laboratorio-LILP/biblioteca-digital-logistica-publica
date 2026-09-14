@@ -1,11 +1,18 @@
 """
-Coleções v6 (canônicas, §7 / planilha BDLP_Template_Insercao_v6.xlsx) e o de-para
-da classificação v5 → v6.
+Coleções v6 (canônicas, §7) com o vocabulário de Tipos de Informação da
+taxonomia v12 (set/2026) e o de-para de grafias legadas.
 
-A v6 define 4 Coleções pelo *Tipo de Informação*. Os mapas abaixo:
-  - COLECOES_V6 / _TIPOS_POR_COLECAO: vocabulário EXATO da planilha v6.
-  - TIPO_V5_TO_V6: normaliza nomes de tipo do acervo legado para os tipos v8
-    (usado só pelo front, em colecao_v6_for_tipo, p/ resiliência de exibição).
+As 4 Coleções são definidas pelo *Tipo de Informação*. Os mapas abaixo:
+  - COLECOES_V6 / _TIPOS_POR_COLECAO: vocabulário EXATO v12 (e-mail "ALTERAÇÕES
+    BIBLIOTECA", Lina, 11/09/2026): Jurisprudência = Súmulas, Boletins, Acórdãos,
+    Deliberações; Doutrina ganha Enunciados e Pareceres; Instrução perde Vídeos.
+  - TIPO_V5_TO_V6: normaliza grafias legadas (singular, sem acento, nomes do
+    acervo v5) para o tipo canônico — usado pelo front (colecao_v6_for_tipo) e
+    pelo importador (tipo_canonico).
+  - TIPOS_LEGADOS: tipos RETIRADOS do vocabulário (Documentos Normativos, Vídeos)
+    → coleção em que ainda devem ser EXIBIDOS enquanto documentos antigos os
+    referenciarem (janela entre a subida do código e a recarga v12). Só
+    colecao_v6_for_tipo usa; o importador recusa esses tipos.
 Os de-para de Categoria/Assunto v5→v6 foram removidos: a migração v8 lê esses
 campos diretamente da planilha (ver migrate_spreadsheet.py).
 """
@@ -22,11 +29,12 @@ def _norm(s):
 # curta em Linguagem Simples (usada na aba Curadoria e nos cards de coleção).
 COLECOES_V6 = [
     {"nome": "Jurisprudência", "slug": "jurisprudencia", "icon": "fi-shield", "color": "c-petrol",
-     "descricao": "Decisões, súmulas, enunciados e documentos normativos que orientam como aplicar a lei."},
+     "descricao": "Acórdãos, deliberações, súmulas e boletins de tribunais que orientam como aplicar a lei."},
     {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-graduation-cap", "color": "c-blue",
      "descricao": "Teses, dissertações, monografias e TCCs produzidos em universidades."},
     {"nome": "Doutrina e Conteúdo Técnico", "slug": "doutrina", "icon": "fi-book-open", "color": "c-red",
-     "descricao": "Livros, artigos, relatórios e notas técnicas que analisam e explicam o tema."},
+     "descricao": "Livros, artigos, relatórios, notas técnicas, pareceres e enunciados que analisam e "
+                  "explicam o tema."},
     {"nome": "Instrução e Capacitação", "slug": "instrucao", "icon": "fi-file-text", "color": "c-yellow",
      "descricao": "Manuais, guias, cursos e materiais para aprender na prática."},
 ]
@@ -106,26 +114,40 @@ TEMAS_DESTAQUE = [
     },
 ]
 
-# Tipos de Informação EXATOS por coleção (planilha v6, aba "Coleção, Assunto e Natureza")
+# Tipos de Informação EXATOS por coleção — vocabulário v12 (11/09/2026).
 _TIPOS_POR_COLECAO = {
-    "Jurisprudência": ["Enunciados", "Súmulas", "Boletins", "Documentos Normativos"],
+    "Jurisprudência": ["Súmulas", "Boletins", "Acórdãos", "Deliberações"],
     "Trabalhos Acadêmicos": ["Teses", "Dissertações", "Monografias", "TCCs", "Memoriais Docentes"],
     "Doutrina e Conteúdo Técnico": [
         "Livros digitais", "Artigos", "Notas Técnicas", "Relatórios",
-        "Textos de Discussão", "Resumos", "Resumos expandidos",
+        "Textos de Discussão", "Resumos", "Resumos expandidos", "Enunciados", "Pareceres",
     ],
     "Instrução e Capacitação": [
-        "Manuais", "Guias", "Tutoriais", "Apostilas", "Aulas", "Cursos", "Vídeos", "Slides",
+        "Manuais", "Guias", "Tutoriais", "Apostilas", "Aulas", "Cursos", "Slides",
     ],
 }
 
-# nome-normalizado do tipo v6 → coleção
+# nome-normalizado do tipo → coleção; e nome-normalizado → grafia canônica
 TIPO_TO_COLECAO = {}
+_TIPO_CANONICO_POR_NORM = {}
 for _col, _tipos in _TIPOS_POR_COLECAO.items():
     for _t in _tipos:
         TIPO_TO_COLECAO[_norm(_t)] = _col
+        _TIPO_CANONICO_POR_NORM[_norm(_t)] = _t
 
 _FALLBACK = "Doutrina e Conteúdo Técnico"
+
+# Tipos retirados do vocabulário na v12, ainda exibidos na coleção antiga
+# enquanto houver documento carregado com eles (só colecao_v6_for_tipo usa).
+TIPOS_LEGADOS = {
+    "Documentos Normativos": "Jurisprudência",
+    "Vídeos": "Instrução e Capacitação",
+}
+_TIPOS_LEGADOS_NORM = {_norm(k): v for k, v in TIPOS_LEGADOS.items()}
+_TIPOS_LEGADOS_NORM.update({
+    "documento normativo": "Jurisprudência",
+    "video": "Instrução e Capacitação",
+})
 
 # Normalização de tipos do acervo v5 → tipo canônico v6.
 # Chaves = valores REAIS da coluna "Tipo de informação" do v5 (normalizados).
@@ -181,26 +203,51 @@ TIPO_V5_TO_V6 = {
     "aula": "Aulas",
     "cursos": "Cursos",
     "curso": "Cursos",
-    "videos": "Vídeos",
-    "video": "Vídeos",
     "apresentacoes": "Slides",
     "slides": "Slides",
-    # Jurisprudência
-    "documento normativo": "Documentos Normativos",
-    "documentos normativos": "Documentos Normativos",
-    "enunciados": "Enunciados",
+    # Jurisprudência (v12: Acórdãos e Deliberações entram; Enunciados vai p/ Doutrina)
+    "sumula": "Súmulas",
     "sumulas": "Súmulas",
+    "boletim": "Boletins",
     "boletins": "Boletins",
+    "acordao": "Acórdãos",
+    "acordaos": "Acórdãos",
+    "deliberacao": "Deliberações",
+    "deliberacoes": "Deliberações",
+    # Doutrina e Conteúdo Técnico (v12)
+    "enunciado": "Enunciados",
+    "enunciados": "Enunciados",
+    "parecer": "Pareceres",
+    "pareceres": "Pareceres",
 }
 
 
-def colecao_v6_for_tipo(type_name):
-    """Coleção v6 (dict) para um nome de Tipo de Informação (v5 ou v6)."""
+def tipo_canonico(type_name):
+    """Grafia canônica v12 de um Tipo de Informação, ou None se fora do vocabulário.
+
+    Aceita as grafias legadas de TIPO_V5_TO_V6 (singular, sem acento, nomes v5)
+    e devolve o nome EXATO do vocabulário. É o critério do importador estrito:
+    tipos retirados (Documentos Normativos, Vídeos) e tipos desconhecidos → None.
+    """
     key = _norm(type_name)
-    # normaliza nome v5 → v6 antes de buscar a coleção
+    if not key:
+        return None
     v6 = TIPO_V5_TO_V6.get(key)
     lookup = _norm(v6) if v6 else key
-    nome = TIPO_TO_COLECAO.get(lookup, _FALLBACK)
+    return _TIPO_CANONICO_POR_NORM.get(lookup)
+
+
+def colecao_v6_for_tipo(type_name):
+    """Coleção v6 (dict) para um nome de Tipo de Informação (v5, v8 ou v12).
+
+    Tipos retirados na v12 (TIPOS_LEGADOS) continuam exibidos na coleção antiga
+    — um documento carregado antes da recarga não pode "cair" em Doutrina.
+    """
+    key = _norm(type_name)
+    # normaliza grafia legada → canônica antes de buscar a coleção
+    v6 = TIPO_V5_TO_V6.get(key)
+    lookup = _norm(v6) if v6 else key
+    nome = TIPO_TO_COLECAO.get(lookup) or _TIPOS_LEGADOS_NORM.get(lookup) or _FALLBACK
     return COLECOES_BY_NOME[nome]
 
 
