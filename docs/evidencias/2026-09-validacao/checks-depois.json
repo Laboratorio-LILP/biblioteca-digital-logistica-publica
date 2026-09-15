@@ -1,25 +1,28 @@
 {
-  "cartao-desktop": {
+  "filtro-desktop-js": {
     "erros": [],
     "checks": {
-      "rodape_do_cartao": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
-      "rodape_com_categoria_e_assunto": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
-      "sem_badge_de_categoria_no_topo": true
+      "filtro_tocado_nao_se_move": "ok — top antes=761 depois=761",
+      "url_com_assunto_id": "ok — assunto_id=10",
+      "rolagem_preservada": "ok — antes=1143 depois=1143",
+      "sem_recarregar_pagina": true,
+      "foco_no_checkbox": "ok — assunto_id:10:1",
+      "chip_do_assunto": "ok — Assunto: Micro e Pequenas Empresas",
+      "anuncio_aria_live": "ok — Resultados atualizados: 19 documentos",
+      "voltar_sem_recarregar": "ok — http://localhost:8000/busca/",
+      "voltar_desmarca_filtro": true,
+      "limpar_tudo_foco_na_ordem_de_tab": "ok — {'tag': 'SUMMARY', 'tabIndex': 0, 'texto': 'Coleção'}",
+      "limpar_tudo_sem_chips": true
     }
   },
-  "cartao-mobile": {
+  "filtro-mobile-js": {
     "erros": [],
     "checks": {
-      "rodape_do_cartao": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
-      "rodape_com_categoria_e_assunto": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
-      "sem_badge_de_categoria_no_topo": true
-    }
-  },
-  "documento": {
-    "erros": [],
-    "checks": {
-      "badges_do_heroi": "ok — Artigos | Aspectos Jurídicos e Regulatórios | Seleção do Fornecedor › Procedimentos Auxiliares | Aberto",
-      "rotulos_classificacao": "ok — Coleção | Tipo de informação | Assunto | Natureza | Etapa (categoria processual) | Subcategoria | Microcategoria"
+      "filtro_tocado_nao_se_move": "ok — top antes=615 depois=614",
+      "drawer_continua_aberto": "ok — is-open=True aria-expanded=true",
+      "sem_recarregar_pagina": true,
+      "url_com_assunto_id": true,
+      "lista_atualizada_por_tras": "ok — Assunto: Micro e Pequenas Empresas"
     }
   }
 }

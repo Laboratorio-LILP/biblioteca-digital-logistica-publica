@@ -102,6 +102,18 @@ def test_js_correcoes_da_revisao_adversarial():
     assert "chipsRestantes" in JS or ".applied-filter-chip__remove\")" in JS
 
 
+def test_js_compensa_o_deslocamento_da_barra_lateral():
+    # 15/09: ao marcar um filtro, o bloco "Seus filtros" entra (ou sai) acima da
+    # lista dentro da barra e o checkbox tocado descia/subia ~97 px na tela. A troca
+    # ancora o primeiro título de faceta, preserva a rolagem interna da barra e
+    # compensa a diferença em sidebar.scrollTop; a restauração da janela é
+    # instantânea (o html tem scroll-behavior: smooth).
+    assert "ancoraDaBarra" in JS and "compensarAncora" in JS
+    assert "sidebar.scrollTop" in JS
+    assert 'behavior: "instant"' in JS
+    assert "getBoundingClientRect" in JS
+
+
 def test_js_sem_caminho_chumbado_nem_handler_inline():
     assert "/busca/" not in JS
     assert "/static/" not in JS

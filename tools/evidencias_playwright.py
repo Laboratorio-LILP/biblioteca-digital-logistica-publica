@@ -104,12 +104,19 @@ def cena_filtro_desktop_js(page: Page, base: str, out: Path, suffix: str, cena: 
     page.wait_for_timeout(200)
     scroll_antes = page.evaluate("window.scrollY")
     page.evaluate("window.__marcador_sem_reload = true")
-    _label_assunto(page).click()
+    label = _label_assunto(page)
+    top_antes = label.bounding_box()["y"]
+    label.click()
     # Aguarda a atualização: com fetch, a URL muda sem navegação; sem, a página recarrega.
     page.wait_for_url("**/busca/?**assunto_id=**", timeout=10000)
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(300)
     scroll_depois = page.evaluate("window.scrollY")
+    # 15/09: o controle tocado continua no mesmo lugar da tela (o bloco "Seus
+    # filtros" entra acima dele e a barra compensa na rolagem própria).
+    top_depois = _label_assunto(page).bounding_box()["y"]
+    cena.check("filtro_tocado_nao_se_move", abs(top_depois - top_antes) <= 2,
+               f"top antes={top_antes:.0f} depois={top_depois:.0f}")
     sem_reload = page.evaluate("window.__marcador_sem_reload === true")
     foco = page.evaluate(
         "(function(){var a=document.activeElement; return a ? (a.name||'')+':'+(a.value||'')+':'+(a.checked?'1':'0') : ''})()"
@@ -172,10 +179,15 @@ def cena_filtro_mobile_js(page: Page, base: str, out: Path, suffix: str, cena: C
     page.wait_for_timeout(300)
     _abrir_assunto(page)
     page.evaluate("window.__marcador_sem_reload = true")
-    _label_assunto(page).click()
+    label = _label_assunto(page)
+    top_antes = label.bounding_box()["y"]
+    label.click()
     page.wait_for_url("**/busca/?**assunto_id=**", timeout=10000)
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(300)
+    top_depois = _label_assunto(page).bounding_box()["y"]
+    cena.check("filtro_tocado_nao_se_move", abs(top_depois - top_antes) <= 2,
+               f"top antes={top_antes:.0f} depois={top_depois:.0f}")
     aberto = page.evaluate("document.getElementById('acervo-sidebar').classList.contains('is-open')")
     expanded = page.locator(".acervo-mobile-toggle").get_attribute("aria-expanded")
     sem_reload = page.evaluate("window.__marcador_sem_reload === true")

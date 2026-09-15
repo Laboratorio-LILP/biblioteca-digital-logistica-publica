@@ -109,6 +109,26 @@
     if (!a || !form.contains(a)) return null;
     return { id: a.id || "", name: a.getAttribute("name") || "", value: a.value || "", tag: a.tagName };
   }
+  // Âncora visual da barra: o primeiro título de faceta ("Coleção"). O bloco
+  // "Seus filtros" entra/sai/cresce ACIMA dele a cada troca, e a lista inteira se
+  // deslocava ~97 px na tela (o checkbox tocado "descia", ou "subia" ao desmarcar
+  // o último filtro). A diferença de posição da âncora depois da troca é
+  // compensada na rolagem PRÓPRIA da barra (sticky/drawer com overflow), para o
+  // controle continuar sob o cursor — a rolagem da janela não muda.
+  function ancoraDaBarra() {
+    var s = sidebar.querySelector("details.side-section > summary");
+    return s ? { top: s.getBoundingClientRect().top } : null;
+  }
+  function compensarAncora(ancora) {
+    if (!ancora) return;
+    var s = sidebar.querySelector("details.side-section > summary");
+    if (!s) return;
+    var delta = Math.round(s.getBoundingClientRect().top - ancora.top);
+    if (!delta) return;
+    var max = sidebar.scrollHeight - sidebar.clientHeight;
+    if (max <= 0) return;                                   // barra sem rolagem própria: nada a compensar
+    sidebar.scrollTop = Math.max(0, Math.min(max, sidebar.scrollTop + delta));
+  }
   function focar(el) {
     if (!el) return;
     // Só ganha tabindex="-1" quem não é focável por natureza: <summary>, input,
@@ -180,6 +200,8 @@
         var foco = focoAtual();
         var drawerAberto = sidebar.classList.contains("is-open");
         var sx = window.scrollX, sy = window.scrollY;
+        var sbScroll = sidebar.scrollTop;                    // rolagem própria da barra (sticky/drawer)
+        var ancora = ancoraDaBarra();
 
         sidebar.innerHTML = novoSidebar.innerHTML;
         resultados.innerHTML = novoRes.innerHTML;
@@ -195,7 +217,11 @@
         reaplicarDetails(estado);
         var t = mobileToggle();
         if (t) t.setAttribute("aria-expanded", drawerAberto ? "true" : "false");
-        window.scrollTo(sx, sy);                            // o leitor continua onde estava
+        sidebar.scrollTop = sbScroll;                       // innerHTML pode zerar a rolagem da barra
+        // Instantâneo: o html tem scroll-behavior: smooth e um ajuste animado
+        // apareceria como "a página deslizou". O leitor continua onde estava.
+        window.scrollTo({ left: sx, top: sy, behavior: "instant" });
+        compensarAncora(ancora);                            // lista da barra não se desloca sob o cursor
 
         var titulo = doc.querySelector("title");
         if (titulo) document.title = titulo.textContent;
