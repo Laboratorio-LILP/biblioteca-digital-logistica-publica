@@ -161,13 +161,15 @@
         </label>
       </div>
 
-      {% if query %}
-      <p class="query-indicator">Pesquisa por <strong>“{{ query }}”</strong></p>
-      {% endif %}
-      {% if filtros_count %}
-      {% applied_filters request.GET as chips %}
-      <p class="query-indicator">Filtrando por <strong>{% for c in chips %}{{ c.texto }}{% if not forloop.last %} · {% endif %}{% endfor %}</strong></p>
-      {% endif %}
+      {# Linha de estado SEMPRE presente (15/09/2026): quando ela era inserida só com
+         filtro/busca, a grade de resultados descia ~33 px no primeiro filtro e subia ao
+         remover o último — "de vez em quando joga para baixo". Uma única <p> com o
+         estado corrente mantém o topo da grade no lugar. #}
+      <p class="query-indicator">
+        {% if query %}Pesquisa por <strong>“{{ query }}”</strong>{% if filtros_count %} · {% endif %}{% endif %}
+        {% if filtros_count %}{% applied_filters request.GET as chips %}Filtrando por <strong>{% for c in chips %}{{ c.texto }}{% if not forloop.last %} · {% endif %}{% endfor %}</strong>{% endif %}
+        {% if not query and not filtros_count %}Mostrando todo o acervo{% endif %}
+      </p>
 
       {% if page_obj.object_list %}
       <div class="doc-grid">

@@ -114,6 +114,20 @@ def test_js_compensa_o_deslocamento_da_barra_lateral():
     assert "getBoundingClientRect" in JS
 
 
+def test_linha_de_estado_dos_resultados_sempre_presente():
+    # 15/09 ("de vez em quando joga para baixo"): a linha "Filtrando por …" era
+    # inserida entre a barra de resultados e a grade só quando havia filtro, e os
+    # cartões desciam ~33 px no primeiro filtro (subiam ao remover o último). A
+    # linha de estado passa a existir sempre — "Mostrando todo o acervo" sem
+    # filtro nem busca — numa única <p>, para o topo da grade não se mover.
+    t = _template("search.html")
+    assert t.count('class="query-indicator"') == 1
+    bloco = t[t.index('class="query-indicator"') - 200: t.index('class="query-indicator"')]
+    assert "{% if query %}" not in bloco and "{% if filtros_count %}" not in bloco   # a <p> não é condicional
+    assert "Mostrando todo o acervo" in t
+    assert "Pesquisa por" in t and "Filtrando por" in t
+
+
 def test_js_sem_caminho_chumbado_nem_handler_inline():
     assert "/busca/" not in JS
     assert "/static/" not in JS

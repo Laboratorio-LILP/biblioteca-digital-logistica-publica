@@ -2,6 +2,7 @@
   "filtro-desktop-js": {
     "erros": [],
     "checks": {
+      "cartoes_nao_se_movem": "ok — top do 1º cartão antes=-365 depois=-365",
       "filtro_tocado_nao_se_move": "ok — top antes=761 depois=761",
       "url_com_assunto_id": "ok — assunto_id=10",
       "rolagem_preservada": "ok — antes=1143 depois=1143",

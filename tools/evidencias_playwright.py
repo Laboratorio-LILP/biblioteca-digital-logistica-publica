@@ -106,12 +106,18 @@ def cena_filtro_desktop_js(page: Page, base: str, out: Path, suffix: str, cena: 
     page.evaluate("window.__marcador_sem_reload = true")
     label = _label_assunto(page)
     top_antes = label.bounding_box()["y"]
+    card_antes = page.evaluate("document.querySelector('.doc-grid .doc-card').getBoundingClientRect().top")
     label.click()
     # Aguarda a atualização: com fetch, a URL muda sem navegação; sem, a página recarrega.
     page.wait_for_url("**/busca/?**assunto_id=**", timeout=10000)
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(300)
     scroll_depois = page.evaluate("window.scrollY")
+    # 15/09: o topo da grade de resultados também não se move (a linha de estado
+    # "Filtrando por …" existe sempre, em vez de ser inserida no primeiro filtro).
+    card_depois = page.evaluate("document.querySelector('.doc-grid .doc-card').getBoundingClientRect().top")
+    cena.check("cartoes_nao_se_movem", abs(card_depois - card_antes) <= 2,
+               f"top do 1º cartão antes={card_antes:.0f} depois={card_depois:.0f}")
     # 15/09: o controle tocado continua no mesmo lugar da tela (o bloco "Seus
     # filtros" entra acima dele e a barra compensa na rolagem própria).
     top_depois = _label_assunto(page).bounding_box()["y"]
