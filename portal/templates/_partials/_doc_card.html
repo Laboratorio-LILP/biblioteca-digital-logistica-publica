@@ -1,17 +1,22 @@
 {% comment %}
 DocCard — card de documento fiel ao protótipo do Eduardo (Next.js).
 Requer `doc` no contexto. Cor/ícone do badge derivam da Coleção v6 (Tipo de Informação).
-Rodapé (set/2026): os dois eixos da classificação — "Etapa: <categoria › subcategoria>"
-e "Assunto: <assunto>" — resolvidos por classificacao_card (mapas cacheados, zero
-query por cartão). Sem categoria mostra só o Assunto; sem Assunto cai no nome da coleção.
+Os dois eixos da classificação (set/2026), resolvidos por classificacao_card (mapas
+cacheados, zero query por cartão): a categoria processual (› subcategoria) é um badge
+no topo, ao lado do tipo — sem o prefixo Etapa (15/09/2026) —, e o rodapé traz
+"Assunto: <assunto>". Sem categoria não há badge; sem Assunto cai no nome da coleção.
 {% endcomment %}
 {% load catalog_tags %}
 {% colecao_visual doc as cv %}
+{% classificacao_card doc as cl %}
 <a class="sp-card doc-card" href="{% url 'catalog:document_detail' doc.code %}{% if doc_ctx %}?ctx={{ doc_ctx|urlencode }}{% endif %}">
   <div class="doc-card__top">
-    <span class="doc-card__type {{ cv.color }}">
-      <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
-      {% if cv.tipo_nome %}{{ cv.tipo_nome }}{% else %}{{ cv.nome }}{% endif %}
+    <span class="doc-card__badges">
+      <span class="doc-card__type {{ cv.color }}">
+        <svg class="fi" aria-hidden="true"><use href="#{{ cv.icon }}"/></svg>
+        {% if cv.tipo_nome %}{{ cv.tipo_nome }}{% else %}{{ cv.nome }}{% endif %}
+      </span>
+      {% if cl.etapa %}<span class="doc-card__cat"><svg class="fi" aria-hidden="true"><use href="#fi-layers"/></svg><span class="doc-card__cat-txt">{{ cl.etapa }}</span></span>{% endif %}
     </span>
     {% if doc.ano %}<span class="doc-card__year">{{ doc.ano }}</span>{% endif %}
   </div>
@@ -39,8 +44,7 @@ query por cartão). Sem categoria mostra só o Assunto; sem Assunto cai no nome 
     {% endif %}
 
     <div class="doc-card__bottom">
-      {% classificacao_card doc as cl %}
-      <span class="doc-card__assunto doc-card__eixos">{% if cl.etapa %}<span class="doc-card__eixo"><span class="doc-card__eixo-rotulo">Etapa:</span> {{ cl.etapa }} <span class="doc-card__eixo-sep" aria-hidden="true">·</span></span> {% endif %}<span class="doc-card__eixo"><span class="doc-card__eixo-rotulo">Assunto:</span> {% if cl.assunto %}{{ cl.assunto }}{% else %}{{ cv.nome }}{% endif %}</span></span>
+      <span class="doc-card__assunto"><span class="doc-card__eixo-rotulo">Assunto:</span> {% if cl.assunto %}{{ cl.assunto }}{% else %}{{ cv.nome }}{% endif %}</span>
       <span class="doc-card__ver">Ver documento <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></span>
     </div>
   </div>

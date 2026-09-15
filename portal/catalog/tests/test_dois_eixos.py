@@ -63,22 +63,34 @@ def test_classificacao_card_e_pura_nao_toca_propriedades_do_documento():
         assert exigido in nomes, exigido
 
 
-def test_cartao_mostra_etapa_e_assunto():
+def test_cartao_mostra_categoria_como_badge_e_assunto_no_rodape():
+    # 15/09/2026 (Bernardo): a categoria vira um badge no topo do cartão, ao lado
+    # do tipo — sem o prefixo "Etapa:" — e o rodapé fica só com o Assunto.
     t = _template("_partials/_doc_card.html")
     assert "classificacao_card doc as" in t
-    assert "Etapa:" in t and "Assunto:" in t
-    assert "doc-card__eixos" in t and "doc-card__assunto" in t   # mesma tipografia do rodapé
-    assert "cl.etapa" in t and "cl.assunto" in t
-    assert "{{ cv.nome }}" in t                                     # fallback: nome da coleção
+    assert 'class="doc-card__cat"' in t and "fi-layers" in t
+    assert "{{ cl.etapa }}" in t
+    assert "Etapa:" not in t
+    topo = t[t.index('class="doc-card__top"'): t.index('class="doc-card__year"')]
+    assert "doc-card__type" in topo and "doc-card__cat" in topo   # badge de categoria junto do tipo
+    assert "Assunto:" in t and "doc-card__assunto" in t
+    assert "cl.assunto" in t and "{{ cv.nome }}" in t              # fallback: nome da coleção
 
 
-def test_documento_tem_badge_etapa_e_formula():
+def test_documento_tem_badge_de_categoria_sem_prefixo_e_formula():
     t = _template("document_detail.html")
-    assert "Etapa: {{ cl.etapa }}" in t
-    assert "fi-layers" in t
-    assert "Etapa (categoria processual)" in t
+    assert "Etapa: {{ cl.etapa }}" not in t                        # 15/09: sem "Etapa:" no badge
+    assert '<use href="#fi-layers"/></svg>{{ cl.etapa }}' in t
+    assert "Etapa (categoria processual)" in t                     # rótulo do bloco de classificação fica
     assert "Todo material recebe" in t and "coleção" in t and "assunto" in t and "natureza" in t
     assert "classificacao-formula" in t
+
+
+def test_css_do_badge_de_categoria_no_cartao():
+    css = (TEMPLATES.parent / "static" / "css" / "portal.css").read_text(encoding="utf-8")
+    assert ".doc-card__cat {" in css
+    assert ".doc-card__badges {" in css
+    assert ".doc-card__top { display: flex; align-items: flex-start; gap: 12px; }" in css   # regra original intacta
 
 
 def test_hints_das_facetas_amarram_etapa_e_assunto():

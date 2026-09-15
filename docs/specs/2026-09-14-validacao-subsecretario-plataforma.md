@@ -56,6 +56,8 @@
 
 **Fora.** Microcategoria no cartão; mudança de cor/tamanho do rodapé.
 
+**Ajuste de 15/09/2026 (Bernardo).** Na página do material, o badge da categoria perde o prefixo "Etapa:" (confundia); no cartão de resultado do Acervo, a categoria (› subcategoria) passa a ser um **badge** no topo, ao lado do badge de tipo (`.doc-card__cat`, neutro, com o ícone `fi-layers`), e o rodapé fica só com "Assunto: …" — a categoria não se repete no cartão. O rótulo "Etapa (categoria processual)" do bloco Classificação BDLP e os hints das facetas ficam como estavam. Mesma tag `classificacao_card` (zero query).
+
 ## T6 — Definições dos Assuntos e Coleções na interface
 
 **Decisão.** O código publica o texto da curadoria (Lina, 11/09/2026), não escreve rascunho: `taxonomy_v6.ASSUNTOS_DESCRICAO` (16 entradas, `curta` = Caracterização, `longa` = Explicação, verbatim com as correções de digitação autorizadas), no mesmo padrão de `COLECOES_V6["descricao"]` — `nr_assunto` não tem coluna, o portal é somente leitura e não há migrations Django. Categorias reusam `nr_category.description`. Página de Coleções: fórmula + frase multidimensional; glossário `#assuntos`/`#categorias` (nome linkado ao acervo filtrado, curta, longa num `<details>` por item); contagem de assuntos deixa de ser chumbada. Facetas: link "O que significa cada opção?" para as âncoras (sem tooltip). Documento: caracterização curta sob Assunto e Etapa. A "página de metodologia" do Eduardo consumirá o mesmo dado.

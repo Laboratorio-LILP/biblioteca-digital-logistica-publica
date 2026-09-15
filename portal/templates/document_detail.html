@@ -37,7 +37,8 @@
         {% if document.type_info %}{{ document.type_info.name }}{% else %}{{ cv.nome }}{% endif %}
       </span>
       {% with an=document|assunto_nome %}{% if an %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-bookmark"/></svg>{{ an }}</span>{% endif %}{% endwith %}
-      {% if cl.etapa %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-layers"/></svg>Etapa: {{ cl.etapa }}</span>{% endif %}
+      {# Categoria processual (› subcategoria) como badge, sem prefixo — 15/09/2026: "Etapa:" confundia. #}
+      {% if cl.etapa %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-layers"/></svg>{{ cl.etapa }}</span>{% endif %}
       {% if document.permissao %}
       <span class="doc-badge {{ document.permissao|lower }}">
         {% if document.permissao == 'Aberto' %}<svg class="fi" aria-hidden="true"><use href="#fi-unlock"/></svg>{% else %}<svg class="fi" aria-hidden="true"><use href="#fi-lock"/></svg>{% endif %}
