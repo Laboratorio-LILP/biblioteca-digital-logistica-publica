@@ -198,10 +198,11 @@ def cena_cartao(page: Page, base: str, out: Path, suffix: str, cena: Cena, viewp
     page.wait_for_timeout(200)
     rodape = page.locator(".doc-card .doc-card__bottom").first.inner_text()
     cena.check("rodape_do_cartao", bool(rodape.strip()), rodape.replace("\n", " "))
-    # 15/09/2026: a categoria é um badge no topo do cartão (ao lado do tipo), sem "Etapa:".
-    badges = page.locator(".doc-card").first.locator(".doc-card__cat").all_inner_texts()
-    cena.check("badge_categoria_no_cartao", bool(badges) and not badges[0].startswith("Etapa"),
-               " | ".join(b.replace("\n", " ") for b in badges))
+    # 15/09/2026: os dois eixos na linha de baixo ("Categoria: … · Assunto: …"), sem
+    # badge de categoria junto do tipo e sem a palavra "Etapa".
+    plano = rodape.replace("\n", " ")
+    cena.check("rodape_com_categoria_e_assunto", "Categoria:" in plano and "Assunto:" in plano and "Etapa" not in plano, plano)
+    cena.check("sem_badge_de_categoria_no_topo", page.locator(".doc-card .doc-card__cat").count() == 0)
     page.screenshot(path=str(out / f"cartao-dois-eixos-{rotulo}-{suffix}.png"))
 
 

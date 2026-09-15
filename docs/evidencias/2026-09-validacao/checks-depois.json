@@ -2,15 +2,17 @@
   "cartao-desktop": {
     "erros": [],
     "checks": {
-      "rodape_do_cartao": "ok — Assunto: Inovação e Tecnologia Ver documento",
-      "badge_categoria_no_cartao": "ok — Conteúdos Transversais"
+      "rodape_do_cartao": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
+      "rodape_com_categoria_e_assunto": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
+      "sem_badge_de_categoria_no_topo": true
     }
   },
   "cartao-mobile": {
     "erros": [],
     "checks": {
-      "rodape_do_cartao": "ok — Assunto: Inovação e Tecnologia Ver documento",
-      "badge_categoria_no_cartao": "ok — Conteúdos Transversais"
+      "rodape_do_cartao": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
+      "rodape_com_categoria_e_assunto": "ok — Categoria: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento",
+      "sem_badge_de_categoria_no_topo": true
     }
   },
   "documento": {
