@@ -5,7 +5,7 @@ from urllib.parse import urlencode, urlparse
 from django import template
 
 from ..models import Assunto, Microcategoria, NrCategory, Subcategoria, Topic, TypeInformation
-from ..taxonomy_v6 import COLECOES_BY_SLUG, colecao_v6_for_tipo
+from ..taxonomy_v6 import COLECOES_BY_SLUG, colecao_v6_for_tipo, descricao_assunto
 
 register = template.Library()
 
@@ -141,10 +141,16 @@ def titulo_pt(value):
     return "".join(out)
 
 
-# Rótulos de exibição p/ Subcategorias redundantes com a Categoria pai (camada de
-# UI; a taxonomia v8 canônica permanece intacta no banco e nos filtros). Chave =
-# nome canônico em CAIXA ALTA, espaços colapsados.
+# Rótulos de exibição p/ Subcategorias de Planejamento (camada de UI; o nome
+# canônico segue no banco e nos filtros). Chave = nome canônico em CAIXA ALTA,
+# espaços colapsados. A v12 (11/09/2026) tirou o prefixo "FASE PREPARATÓRIA - "
+# do seed; as chaves antigas ficam por um ciclo, para bancos ainda não migrados.
 SUBCAT_DISPLAY = {
+    "ETP": "Estudo Técnico Preliminar (ETP)",
+    "TR": "Termo de Referência (TR)",
+    "GESTÃO DE RISCOS": "Gestão de Riscos",
+    "PESQUISA DE PREÇOS": "Pesquisa de Preços",
+    # grafia anterior à v12 (um ciclo de transição)
     "FASE PREPARATÓRIA - ETP": "Estudo Técnico Preliminar (ETP)",
     "FASE PREPARATÓRIA - TR": "Termo de Referência (TR)",
     "FASE PREPARATÓRIA - GESTÃO DE RISCOS": "Gestão de Riscos",
@@ -161,6 +167,27 @@ def rotulo_sub(nome):
         return nome
     key = " ".join(str(nome).upper().split())
     return SUBCAT_DISPLAY.get(key) or titulo_pt(nome)
+
+
+# Faixas de comprimento do título na página do documento (17/09/2026): o corpo
+# tipográfico encolhe por faixa para o bloco do título ficar em ~200px no desktop
+# qualquer que seja o comprimento — o texto fica íntegro, nunca é cortado.
+# Limiares medidos no acervo v11 (982 docs): ≤110 → 697 docs (corpo padrão, 46px);
+# 111–180 → 265 (36px); >180 → 20 (28px; o maior título tem 270 caracteres).
+_TITULO_FAIXA_MEDIA = 110
+_TITULO_FAIXA_LONGA = 180
+
+
+@register.filter
+def faixa_titulo(titulo):
+    """Modificador do h1 do herói do documento conforme o comprimento do título:
+    'media', 'longa' ou '' (faixa curta, corpo padrão)."""
+    n = len(str(titulo or "").strip())
+    if n > _TITULO_FAIXA_LONGA:
+        return "longa"
+    if n > _TITULO_FAIXA_MEDIA:
+        return "media"
+    return ""
 
 
 @register.filter
@@ -257,6 +284,41 @@ def colecao_visual(doc):
 def assunto_nome(doc):
     """Nome do Assunto do documento via mapa cacheado (evita a query da property)."""
     return _assunto_names().get(getattr(doc, "assunto_id", None), "")
+
+
+@register.filter
+def assunto_curta(nome):
+    """Caracterização (uma frase) do Assunto pelo nome — texto da curadoria em
+    taxonomy_v6.ASSUNTOS_DESCRICAO; '' quando não há."""
+    return descricao_assunto(nome)["curta"]
+
+
+@register.filter
+def assunto_longa(nome):
+    """Explicação (um parágrafo) do Assunto pelo nome; '' quando não há."""
+    return descricao_assunto(nome)["longa"]
+
+
+@register.simple_tag
+def classificacao_card(doc):
+    """Os dois eixos do rodapé do cartão — e do badge de categoria do documento —
+    resolvidos SÓ pelos mapas cacheados (zero query por cartão; nada de
+    doc.category/doc.subcategoria, que disparam uma consulta cada).
+
+    Devolve {"etapa": "Seleção do Fornecedor › Licitação" | "", "assunto":
+    "Governança" | ""}. A etapa é a Categoria processual em Title Case
+    (titulo_pt) seguida da Subcategoria no rótulo curado (rotulo_sub), quando
+    houver; a microcategoria não vai ao cartão. Sem categoria → etapa vazia
+    (o cartão mostra só o Assunto); sem assunto → assunto vazio (o cartão cai
+    no nome da coleção).
+    """
+    cat = _category_names().get(getattr(doc, "category_id", None))
+    etapa = titulo_pt(cat) if cat else ""
+    if etapa:
+        sub = _subcategoria_names().get(getattr(doc, "subcategoria_id", None))
+        if sub:
+            etapa += " › " + rotulo_sub(sub)
+    return {"etapa": etapa, "assunto": _assunto_names().get(getattr(doc, "assunto_id", None), "")}
 
 
 @register.filter

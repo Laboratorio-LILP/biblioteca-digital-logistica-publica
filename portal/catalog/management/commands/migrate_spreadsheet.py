@@ -1,22 +1,69 @@
 """
-Management command para migrar a planilha v3.1 (504 estudos, 4 abas BDU) para o Nou-Rau.
+Management command para carregar a planilha do acervo (template "Inserir
+Material", v8+) no Nou-Rau. Mantém compatibilidade com a planilha v3.1 (abas BDU).
 
 Uso:
-    python manage.py migrate_spreadsheet /caminho/para/planilha.xlsx
-    python manage.py migrate_spreadsheet /caminho/para/planilha.xlsx --dry-run
+    python manage.py migrate_spreadsheet /caminho/para/planilha.xlsx --sheet "Inserir Material"
+    python manage.py migrate_spreadsheet /caminho/para/planilha.xlsx --sheet "Inserir Material" --dry-run --skip-red
     python manage.py migrate_spreadsheet /caminho/para/planilha.xlsx --sheet "Eventos"
+
+Importador ESTRITO (taxonomia v12, set/2026) — cada linha é recusada (erro de
+linha, savepoint desfeito, as demais seguem) quando:
+  - a "Coleção" não casa uma coleção raiz (nunca cai na primeira raiz);
+  - o "Tipo de informação" está fora do vocabulário canônico da coleção
+    (Documentos Normativos e Vídeos passam a ser recusados; grafias legadas
+    como "Acórdão"/"deliberacao" são normalizadas por taxonomy_v6.tipo_canonico);
+  - Categoria, Subcategoria, Microcategoria ou Assunto preenchidos não resolvem.
+Tipo novo NÃO é criado por padrão: `--allow-new-types` restaura o comportamento
+antigo, só como exceção documentada. Aliases de grafia (contados no resumo):
+"PLANO ANUAL DE CONTRATAÇÕES (PCA)" → "PLANO DE CONTRATAÇÕES ANUAL (PCA)" e
+"FASE PREPARATÓRIA - X" → "X". Em `--dry-run`, TODAS as linhas recusadas são
+listadas com motivo (insumo para a curadoria).
 """
 
 import os
 import re
 import unicodedata
+from collections import Counter
 
 import openpyxl
 import psycopg2
 from django.core.management.base import BaseCommand, CommandError
 
+from catalog import qualidade
+from catalog.taxonomy_v6 import COLECOES_V6, tipo_canonico, tipo_retirado, tipos_de_colecao
+
 # Abas de dados na planilha v3.1 (ordem de processamento)
 DATA_SHEETS = ["Eventos", "Livros Digitais", "Trabalhos Acadêmicos", "Materiais Pedagógicos"]
+
+
+class LinhaRecusadaError(ValueError):
+    """Linha da planilha recusada pelo importador estrito (o motivo é a mensagem)."""
+
+
+# Aliases de grafia — chaves e valores NORMALIZADOS (sem acento, minúsculas,
+# espaços colapsados). Usados antes de casar com o banco; cada uso é contado
+# em Command.alias_hits e sai no resumo final.
+CATEGORIA_ALIASES = {
+    # grafia das listas de apoio do template v8 (BDLP_Template_Insercao_v8 ...)
+    "plano anual de contratacoes (pca)": "plano de contratacoes anual (pca)",
+}
+# Prefixo redundante retirado das subcategorias de Planejamento na v12
+# (planilha "PARA CORREÇÃO" ainda traz "FASE PREPARATÓRIA - ETP" etc.).
+SUBCATEGORIA_PREFIXOS_ALIAS = ("fase preparatoria - ", "fase preparatoria-")
+# Grafias por extenso das siglas de Planejamento (o casamento por substring não
+# pode cobrir nomes de 2-3 letras como TR/ETP — ver _resolve_subcategoria).
+SUBCATEGORIA_ALIASES = {
+    "termo de referencia": "tr",
+    "termo de referencia (tr)": "tr",
+    "tr (termo de referencia)": "tr",
+    "estudo tecnico preliminar": "etp",
+    "estudo tecnico preliminar (etp)": "etp",
+    "etp (estudo tecnico preliminar)": "etp",
+}
+# Tamanho mínimo para o casamento por substring (nos DOIS lados): evita que
+# "tr" case dentro de "outros" ou "contratacao direta".
+_SUBSTRING_MIN = 5
 
 # Mapeamento de colunas da planilha v3.1 para campos internos.
 # As chaves são os nomes EXATOS dos cabeçalhos da planilha.
@@ -69,6 +116,14 @@ def normalize_text(val):
     return str(val).strip()
 
 
+def _key(val):
+    """Chave de comparação: sem acento, minúsculas, espaços colapsados."""
+    return " ".join(strip_accents(normalize_text(val)).lower().split())
+
+
+_COLECAO_POR_KEY = {_key(c["nome"]): c["nome"] for c in COLECOES_V6}
+
+
 def extract_year(val):
     """Extrai ano de um valor."""
     val = normalize_text(val)
@@ -97,6 +152,21 @@ class Command(BaseCommand):
             help="Sequência inicial dos códigos bdlp-XXXXXX (default 1). "
                  "Use para imports incrementais sem colidir com códigos existentes.",
         )
+        parser.add_argument(
+            "--allow-new-types", action="store_true",
+            help="EXCEÇÃO documentada: aceita um tipo fora do vocabulário canônico em vez de recusar a "
+                 "linha — cria o tipo em type_information e deixa o documento na raiz da coleção (sem "
+                 "subcoleção). Tipos retirados (Documentos Normativos, Vídeos) continuam recusados. "
+                 "Não use em carga normal.",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alias_hits = Counter()
+
+    def reset_alias_hits(self):
+        """Zera o contador de aliases usados (uma carga = uma contagem)."""
+        self.alias_hits = Counter()
 
     def _get_write_connection(self):
         """Cria conexão de escrita usando o usuário php (não o portal_reader)."""
@@ -114,6 +184,12 @@ class Command(BaseCommand):
         sheet_name = options.get("sheet")
         skip_red = options.get("skip_red", False)
         start_seq = options.get("start_seq", 1)
+        allow_new_types = options.get("allow_new_types", False)
+        self.reset_alias_hits()
+        if allow_new_types:
+            self.stdout.write(self.style.WARNING(
+                "--allow-new-types: tipos fora do vocabulário canônico serão CRIADOS (exceção documentada)."
+            ))
 
         # read_only=False para ter acesso a fill (cor de fundo) — só carrega
         # com formatting quando precisamos detectar células vermelhas.
@@ -153,7 +229,7 @@ class Command(BaseCommand):
             subcategoria_map = self._load_subcategoria_map(conn)
             microcategoria_map = self._load_microcategoria_map(conn)
 
-            self.stdout.write(f"Coleções raiz: {[k for k, v in topic_map.items() if v['parent_id'] == 0]}")
+            self.stdout.write(f"Coleções raiz: {sorted(nome for (parent, nome) in topic_map if parent == 0)}")
             self.stdout.write(f"Categorias: {len(category_map)}")
             self.stdout.write(f"Tipos de informação: {len(type_info_map)}")
             self.stdout.write(
@@ -166,6 +242,9 @@ class Command(BaseCommand):
             total_inserted = 0
             total_skipped = 0
             total_errors = []
+            # Só no --dry-run: linhas (aceitas e recusadas) para as verificações de
+            # qualidade (catalog.qualidade) — avisos para a curadoria, nunca recusa.
+            registros_qualidade = []
 
             for sheet in sheets_to_process:
                 ws = wb[sheet]
@@ -230,6 +309,14 @@ class Command(BaseCommand):
                     if not record.get("title"):
                         sheet_skipped += 1
                         continue
+                    if dry_run:
+                        registros_qualidade.append(qualidade.registro(
+                            f"L{row_num}", record.get("title"), doi=record.get("doi"),
+                            url=record.get("acesso_eletronico"), resumo=record.get("abstract"),
+                            colecao=record.get("colecao"), tipo=record.get("tipo_informacao"),
+                            assunto=record.get("assunto"), categoria=record.get("categoria"),
+                            subcategoria=record.get("subcategoria"), autor=record.get("author"),
+                        ))
 
                     # Savepoint por linha: um registro com erro não aborta a
                     # transação inteira (sem isto, um erro deixa a transação em
@@ -238,21 +325,16 @@ class Command(BaseCommand):
                     with conn.cursor() as cur:
                         cur.execute("SAVEPOINT row_sp")
                     try:
-                        topic_id = self._resolve_topic(record, topic_map)
+                        topic_id = self._resolve_topic(record, topic_map, allow_new_types=allow_new_types)
 
-                        # === Roteamento v8 — campos diretos da planilha (sem de-para) ===
+                        # === Roteamento v8+ — campos diretos da planilha (sem de-para);
+                        # cada resolução recusa a linha (LinhaRecusadaError) quando não casa.
                         type_info_id = self._ensure_type(
                             conn, record.get("tipo_informacao", ""), type_info_map,
-                            allow_create=not dry_run,
+                            allow_create=allow_new_types, dry_run=dry_run,
                         )
-                        categoria_v8 = record.get("categoria", "").strip()
-                        category_id = (
-                            self._resolve_category(categoria_v8, category_map) if categoria_v8 else None
-                        )
-                        assunto_v8 = record.get("assunto", "").strip()
-                        assunto_id = (
-                            self._resolve_assunto(assunto_v8, assunto_map) if assunto_v8 else None
-                        )
+                        category_id = self._resolve_category(record.get("categoria", ""), category_map)
+                        assunto_id = self._resolve_assunto(record.get("assunto", ""), assunto_map)
                         subcategoria_id = self._resolve_subcategoria(
                             record.get("subcategoria", ""), category_id, subcategoria_map
                         )
@@ -279,9 +361,12 @@ class Command(BaseCommand):
                         with conn.cursor() as cur:
                             cur.execute("ROLLBACK TO SAVEPOINT row_sp")
                             cur.execute("RELEASE SAVEPOINT row_sp")
-                        sheet_errors.append((sheet, row_num, str(e)))
-                        if len(sheet_errors) <= 5:
-                            self.stdout.write(self.style.ERROR(f"  ERRO {sheet}/L{row_num}: {e}"))
+                        titulo = (record.get("title") or "")[:60]
+                        sheet_errors.append((sheet, row_num, f"{e} | {titulo}"))
+                        # Em --dry-run, TODAS as recusas saem (insumo da curadoria); na
+                        # carga real, as 5 primeiras aqui e as 20 primeiras no resumo.
+                        if dry_run or len(sheet_errors) <= 5:
+                            self.stdout.write(self.style.ERROR(f"  RECUSADA {sheet}/L{row_num}: {e} | {titulo}"))
 
                 self.stdout.write(
                     f"  [{sheet}] Inseridos: {sheet_inserted}, "
@@ -302,14 +387,33 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("\n=== Resultado Final ==="))
         self.stdout.write(f"  Total inseridos: {total_inserted}")
         self.stdout.write(f"  Total ignorados: {total_skipped}")
-        self.stdout.write(f"  Total erros: {len(total_errors)}")
+        self.stdout.write(f"  Total recusados (erros de linha): {len(total_errors)}")
+        self.stdout.write(
+            "  Linhas que usaram alias de grafia: "
+            f"categoria {self.alias_hits.get('categoria', 0)}, "
+            f"subcategoria {self.alias_hits.get('subcategoria', 0)}"
+        )
 
         if total_errors:
-            self.stdout.write(self.style.ERROR("\nPrimeiros 20 erros:"))
-            for sheet, row_num, err in total_errors[:20]:
+            limite = None if dry_run else 20
+            rotulo = "Linhas recusadas (todas)" if dry_run else "Primeiras 20 linhas recusadas"
+            self.stdout.write(self.style.ERROR(f"\n{rotulo}:"))
+            for sheet, row_num, err in total_errors[:limite]:
                 self.stdout.write(self.style.ERROR(f"  {sheet}/L{row_num}: {err}"))
+            motivos = Counter(err.split(":", 1)[0] for _, _, err in total_errors)
+            self.stdout.write("\n  Recusas por motivo:")
+            for motivo, n in motivos.most_common():
+                self.stdout.write(f"    {motivo}: {n}")
 
         if dry_run:
+            achados = qualidade.analisar(registros_qualidade)
+            self.stdout.write(self.style.WARNING(
+                f"\nPossíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, "
+                f"não impedem a carga ({len(achados)} achados em {len(registros_qualidade)} linhas; "
+                "semântica em catalog/qualidade.py e tools/db-refresh.md):"
+            ))
+            for linha in qualidade.formatar_relatorio(achados, limite=10):
+                self.stdout.write(linha)
             self.stdout.write(self.style.WARNING("\n[DRY RUN] Nenhum dado foi inserido."))
 
     def _detect_red_rows(self, ws):
@@ -377,11 +481,16 @@ class Command(BaseCommand):
         return record
 
     def _load_topic_map(self, conn):
-        """Carrega mapeamento nome→id de tópicos do banco."""
+        """Carrega os tópicos do banco como {(parent_id, nome normalizado): id}.
+
+        A chave composta preserva subcoleções homônimas sob raízes diferentes
+        (na janela da v12, "Enunciados" existe sob Jurisprudência e sob Doutrina).
+        Raízes têm parent_id 0.
+        """
         with conn.cursor() as cursor:
             cursor.execute("SELECT id, name, parent_id FROM topic")
             rows = cursor.fetchall()
-        return {row[1].strip().lower(): {"id": row[0], "parent_id": row[2], "name": row[1]} for row in rows}
+        return {(row[2], _key(row[1])): row[0] for row in rows if row[1]}
 
     def _load_category_map(self, conn):
         """Carrega mapeamento nome→id de categorias do banco."""
@@ -428,156 +537,182 @@ class Command(BaseCommand):
             for r in rows if r[1]
         }
 
-    def _resolve_topic(self, record, topic_map):
-        """Resolve o topic_id em duas etapas:
-        1) Coleção raiz pela coluna 'Coleção' (parent_id == 0).
-        2) Subcoleção sob a raiz, casando 'Tipo de informação' com o nome da
-           subcoleção (normalização de acento + tolerância a plural).
+    def _resolve_colecao(self, record, topic_map):
+        """(id da raiz, nome canônico da coleção) pela coluna 'Coleção'.
 
-        Se não houver subcoleção compatível, retorna o ID da raiz.
+        Estrito: coleção vazia ou que não casa uma raiz do banco (e do vocabulário
+        v12) recusa a linha — nunca cai na primeira raiz.
         """
-        # 1) Resolve raiz
-        colecao_nome = record.get("colecao", "").strip().lower()
-        root_id = None
-        if colecao_nome and colecao_nome in topic_map:
-            info = topic_map[colecao_nome]
-            if info["parent_id"] == 0:
-                root_id = info["id"]
+        colecao_raw = normalize_text(record.get("colecao", ""))
+        key = _key(colecao_raw)
+        esperadas = ", ".join(c["nome"] for c in COLECOES_V6)
+        if not key:
+            raise LinhaRecusadaError(f"Coleção obrigatória vazia (esperado: {esperadas})")
+        root_id = topic_map.get((0, key))
+        colecao_nome = _COLECAO_POR_KEY.get(key)
+        if root_id is None or colecao_nome is None:
+            raise LinhaRecusadaError(f"Coleção não reconhecida: '{colecao_raw}' (esperado: {esperadas})")
+        return root_id, colecao_nome
 
-        if root_id is None:
-            # Fallback: primeira coleção raiz disponível
-            for info in topic_map.values():
-                if info["parent_id"] == 0:
-                    root_id = info["id"]
-                    break
-            if root_id is None:
-                return None
+    def _tipo_da_colecao(self, record, colecao_nome, allow_new_types=False):
+        """Nome canônico v12 do 'Tipo de informação', validado contra a coleção.
 
-        # 2) Tenta refinar para subcoleção via Tipo de informação
-        tipo_info = record.get("tipo_informacao", "").strip()
-        if tipo_info:
-            sub_id = self._match_subcollection(tipo_info, root_id, topic_map)
-            if sub_id is not None:
-                return sub_id
-
-        return root_id
-
-    def _match_subcollection(self, tipo_info_nome, root_id, topic_map):
-        """Acha subcoleção sob root_id cujo nome casa com tipo_info_nome.
-
-        Estratégias em ordem (primeira que casar vence):
-          a) match exato normalizado (sem acento, lowercase)
-          b) plural-tolerante (compara strip('s') dos dois lados)
-          c) substring com >= 5 chars (para casos como "Capítulo de livro" → "Livro")
+        Aceita grafias legadas (taxonomy_v6.tipo_canonico); recusa a linha se o
+        tipo estiver fora do vocabulário da coleção resolvida (Documentos
+        Normativos e Vídeos inclusive) ou vazio. Com `allow_new_types`
+        (exceção documentada), um tipo DESCONHECIDO — não retirado — é aceito
+        e devolve None (o documento fica na raiz da coleção).
         """
-        target = strip_accents(tipo_info_nome.lower()).strip()
-        if not target:
+        tipo_raw = normalize_text(record.get("tipo_informacao", ""))
+        aceitos = tipos_de_colecao(colecao_nome)
+        canon = tipo_canonico(tipo_raw)
+        if canon is None and allow_new_types and tipo_raw and not tipo_retirado(tipo_raw):
             return None
+        if canon is None or canon not in aceitos:
+            raise LinhaRecusadaError(
+                f"Tipo de informação fora do vocabulário da coleção {colecao_nome}: "
+                f"'{tipo_raw}' (aceitos: {', '.join(aceitos)})"
+            )
+        return canon
 
-        target_singular = target.rstrip("s")
+    def _resolve_topic(self, record, topic_map, allow_new_types=False):
+        """Resolve o topic_id: raiz pela 'Coleção' e subcoleção pelo 'Tipo de
+        informação' canônico. Se o banco ainda não tiver a subcoleção (seção 1 do
+        script de migração não aplicada), ou se o tipo for novo aceito por
+        --allow-new-types, devolve a raiz."""
+        root_id, colecao_nome = self._resolve_colecao(record, topic_map)
+        canon = self._tipo_da_colecao(record, colecao_nome, allow_new_types=allow_new_types)
+        if canon is None:
+            return root_id
+        sub_id = topic_map.get((root_id, _key(canon)))
+        return sub_id if sub_id is not None else root_id
 
-        candidates = [
-            (info["id"], strip_accents(info["name"].lower()).strip())
-            for info in topic_map.values()
-            if info["parent_id"] == root_id
-        ]
+    def _ensure_type(self, conn, name, type_info_map, allow_create=False, dry_run=False):
+        """Id do Tipo de Informação canônico v12 para o nome da planilha.
 
-        # a) Match exato
-        for tid, name in candidates:
-            if name == target:
-                return tid
-
-        # b) Plural-tolerante
-        for tid, name in candidates:
-            if name.rstrip("s") == target_singular:
-                return tid
-
-        # c) Substring (mín. 5 chars do candidato)
-        for tid, name in candidates:
-            if len(name) >= 5 and (name in target or target in name):
-                return tid
-
-        return None
-
-    def _ensure_type(self, conn, name, type_info_map, allow_create=True):
-        """Resolve o id do Tipo de Informação v8; cria em type_information se faltar.
-
-        Em --dry-run passa-se allow_create=False: faz apenas lookup, sem escrever
-        no banco. Com os tipos v8 já semeados (08-type-information.sql), a criação
-        é só rede de segurança para vocabulário fora do padrão.
+        - grafia legada → canônica (tipo_canonico); fora do vocabulário → recusa;
+        - tipo canônico ausente do banco → recusa (falta a seção 1 do script);
+        - `allow_create=True` (--allow-new-types) restaura a criação de tipo novo,
+          como exceção documentada; em --dry-run só avisa (nada é escrito).
         """
         if not name or not name.strip():
             return None
-        key = strip_accents(name.strip().lower())
+        canon = tipo_canonico(name)
+        if canon is None:
+            if not allow_create:
+                raise LinhaRecusadaError(
+                    f"Tipo de informação fora do vocabulário canônico v12: '{name.strip()}' "
+                    "(recusado; --allow-new-types só como exceção documentada)"
+                )
+            nome_final = name.strip()
+        else:
+            nome_final = canon
+        key = _key(nome_final)
         if key in type_info_map:
             return type_info_map[key]
         if not allow_create:
+            raise LinhaRecusadaError(
+                f"Tipo de informação canônico ainda não existe no banco: '{nome_final}' "
+                "(aplique a seção 1 de docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql; "
+                "--allow-new-types só como exceção documentada)"
+            )
+        if dry_run:
+            self.stdout.write(self.style.WARNING(f"  [DRY] tipo novo seria criado: {nome_final}"))
             return None
         with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO type_information (name) VALUES (%s) RETURNING id", [name.strip()]
-            )
+            cur.execute("INSERT INTO type_information (name) VALUES (%s) RETURNING id", [nome_final])
             new_id = cur.fetchone()[0]
         type_info_map[key] = new_id
         return new_id
 
     def _resolve_category(self, categoria_name, category_map):
-        """Resolve o category_id baseado no nome da categoria.
-        Retorna None quando não encontra — evita assignar a documentos uma
-        categoria-fallback "lixo" (ex.: id 7 antigo) que polui as facetas.
-        """
-        if not categoria_name:
+        """category_id pelo nome (alias de grafia → igualdade normalizada →
+        substring >= 8 chars). Vazio → None; preenchido e não resolvido → recusa
+        (nunca uma categoria-fallback que polua as facetas)."""
+        if not categoria_name or not str(categoria_name).strip():
             return None
-        key = strip_accents(categoria_name.strip().lower())
+        key = _key(categoria_name)
+        if key in CATEGORIA_ALIASES:
+            key = CATEGORIA_ALIASES[key]
+            self.alias_hits["categoria"] += 1
         for cat_key, cat_id in category_map.items():
-            if strip_accents(cat_key) == key:
+            if _key(cat_key) == key:
                 return cat_id
         # Busca parcial — só se substring é >= 8 chars para evitar
         # falsos positivos como "PCA" matching "PCA EM ANEXO".
         if len(key) >= 8:
             for cat_key, cat_id in category_map.items():
-                cat_norm = strip_accents(cat_key)
+                cat_norm = _key(cat_key)
                 if key in cat_norm or cat_norm in key:
                     return cat_id
-        return None
+        raise LinhaRecusadaError(f"Categoria não reconhecida: '{str(categoria_name).strip()}'")
 
     def _resolve_assunto(self, name, assunto_map):
-        """Resolve assunto_id por nome (case e accent insensitive)."""
-        if not name:
+        """assunto_id por nome (sem acento/caixa). Vazio → None; não resolvido → recusa."""
+        if not name or not str(name).strip():
             return None
-        key = strip_accents(name.strip().lower())
-        return assunto_map.get(key)
+        key = _key(name)
+        aid = assunto_map.get(key)
+        if aid is None:
+            raise LinhaRecusadaError(f"Assunto não reconhecido: '{str(name).strip()}'")
+        return aid
+
+    @staticmethod
+    def _substring_unico(key, pai_id, mapa):
+        """Id do único nó do pai cujo nome normalizado contém (ou está contido em)
+        `key`, com tamanho mínimo nos DOIS lados — ou None. Nomes curtos do banco
+        (TR, ETP) nunca casam por substring (revisão de 14/09/2026: 'OUTROS' caía
+        em TR)."""
+        if len(key) < _SUBSTRING_MIN:
+            return None
+        candidatos = [
+            nid for (pid, nome_norm), nid in mapa.items()
+            if pid == pai_id and len(nome_norm) >= _SUBSTRING_MIN and (key in nome_norm or nome_norm in key)
+        ]
+        return candidatos[0] if len(candidatos) == 1 else None
 
     def _resolve_subcategoria(self, name, category_id, sub_map):
-        """Resolve subcategoria_id sob category_id; faz match parcial se necessário."""
-        if not name or not category_id:
+        """subcategoria_id sob category_id. Aliases: tira o prefixo "FASE PREPARATÓRIA - "
+        e aceita as grafias por extenso das siglas (SUBCATEGORIA_ALIASES); depois
+        igualdade normalizada e, por fim, substring (>= 5 chars nos dois lados) se
+        casar UMA única subcategoria da categoria. Preenchido e não resolvido →
+        recusa; preenchido sem Categoria resolvida → recusa (nada some em silêncio)."""
+        if not name or not str(name).strip():
             return None
-        key = strip_accents(name.strip().lower())
-        sub_id = sub_map.get((category_id, key))
+        if not category_id:
+            raise LinhaRecusadaError(f"Subcategoria preenchida sem Categoria resolvida: '{str(name).strip()}'")
+        key = _key(name)
+        usou_alias = False
+        for prefixo in SUBCATEGORIA_PREFIXOS_ALIAS:
+            if key.startswith(prefixo):
+                key = key[len(prefixo):].strip()
+                usou_alias = True
+                break
+        if key in SUBCATEGORIA_ALIASES:
+            key = SUBCATEGORIA_ALIASES[key]
+            usou_alias = True
+        if usou_alias:
+            self.alias_hits["subcategoria"] += 1
+        sub_id = sub_map.get((category_id, key)) or self._substring_unico(key, category_id, sub_map)
         if sub_id:
             return sub_id
-        # Match parcial dentro da mesma categoria
-        for (cid, nome_norm), sid in sub_map.items():
-            if cid != category_id:
-                continue
-            if key in nome_norm or nome_norm in key:
-                return sid
-        return None
+        raise LinhaRecusadaError(f"Subcategoria não reconhecida na categoria: '{str(name).strip()}'")
 
     def _resolve_microcategoria(self, name, subcategoria_id, mic_map):
-        """Resolve microcategoria_id sob subcategoria_id."""
-        if not name or not subcategoria_id:
+        """microcategoria_id sob subcategoria_id (igualdade normalizada; substring
+        >= 5 chars nos dois lados se casar uma única). Preenchido e não resolvido →
+        recusa; preenchido sem Subcategoria resolvida → recusa."""
+        if not name or not str(name).strip():
             return None
-        key = strip_accents(name.strip().lower())
-        mic_id = mic_map.get((subcategoria_id, key))
+        if not subcategoria_id:
+            raise LinhaRecusadaError(
+                f"Microcategoria preenchida sem Subcategoria resolvida: '{str(name).strip()}'"
+            )
+        key = _key(name)
+        mic_id = mic_map.get((subcategoria_id, key)) or self._substring_unico(key, subcategoria_id, mic_map)
         if mic_id:
             return mic_id
-        for (sid, nome_norm), mid in mic_map.items():
-            if sid != subcategoria_id:
-                continue
-            if key in nome_norm or nome_norm in key:
-                return mid
-        return None
+        raise LinhaRecusadaError(f"Microcategoria não reconhecida na subcategoria: '{str(name).strip()}'")
 
     def _insert_document(
         self, conn, record, code,

@@ -11,6 +11,7 @@ import unicodedata
 from django.db.models import Count, Max, Min
 
 from .models import (
+    NATUREZA_CHOICES,
     Assunto,
     Document,
     Microcategoria,
@@ -19,7 +20,15 @@ from .models import (
     TypeInformation,
 )
 from .search import _apply_filters, apply_fulltext, search_documents
-from .taxonomy_v6 import COLECOES_V6, TEMAS_DESTAQUE, colecao_v6_for_tipo
+from .taxonomy_v6 import (
+    COLECOES_V6,
+    TEMAS_DESTAQUE,
+    colecao_v6_for_tipo,
+    descricao_arvore,
+    descricao_assunto,
+    tipo_canonico,
+    tipos_de_colecao,
+)
 
 # Dimensões da barra lateral: cada faceta conta EXCLUINDO as chaves da própria
 # dimensão. Coleção e Tipo formam UMA dimensão (a coleção deriva do tipo) —
@@ -91,6 +100,39 @@ def _string_facet(base, filters, exclude, field):
     # `id` espelha `value` para uniformizar com as facetas de modelo
     # (o template usa sempre opt.id como valor do checkbox). Ordem alfabética.
     out = [{"id": r[field], "value": r[field], "nome": r[field], "count": r["count"]} for r in rows]
+    out.sort(key=lambda o: _sort_key(o["nome"]))
+    return out
+
+
+def _assuntos_facet(base, filters):
+    """Assunto: a taxonomia INTEIRA (nr_assunto, 16 na v12), com contagem
+    faceta-aware; um Assunto sem documento no conjunto atual aparece `disabled`
+    — o mesmo tratamento da cascata de Categorias. Antes a faceta nascia das
+    contagens, e um Assunto sem material (os dois novos da v12, até a recarga
+    da planilha) simplesmente não existia na barra lateral (17/09/2026)."""
+    counts = {
+        r["assunto_id"]: r["count"]
+        for r in _facet_counts(base, filters, ("assunto_id",), "assunto_id")
+    }
+    out = [
+        {"id": a.id, "nome": a.nome, "count": counts.get(a.id, 0), "disabled": a.id not in counts}
+        for a in Assunto.objects.all()
+    ]
+    out.sort(key=lambda o: _sort_key(o["nome"]))
+    return out
+
+
+def _naturezas_facet(base, filters):
+    """Natureza: os valores canônicos (NATUREZA_CHOICES) sempre visíveis, com
+    contagem faceta-aware e `disabled` quando 0; um valor gravado fora do
+    vocabulário só entra enquanto tiver documento (nada some em silêncio)."""
+    counts = {r["value"]: r["count"] for r in _string_facet(base, filters, ("natureza",), "natureza")}
+    canonicos = [v for v, _ in NATUREZA_CHOICES]
+    valores = canonicos + sorted(v for v in counts if v not in canonicos)
+    out = [
+        {"id": v, "value": v, "nome": v, "count": counts.get(v, 0), "disabled": v not in counts}
+        for v in valores
+    ]
     out.sort(key=lambda o: _sort_key(o["nome"]))
     return out
 
@@ -196,6 +238,54 @@ def categorias_overview():
     return {"nucleo": nucleo, "transversal": transversal}
 
 
+def assuntos_glossario():
+    """Todos os Assuntos do banco, na ordem canônica (Meta.ordering), com a
+    caracterização curta e a explicação longa da curadoria
+    (taxonomy_v6.ASSUNTOS_DESCRICAO; vazias quando faltar) e a contagem de
+    documentos ativos — o glossário público da página de Coleções. A contagem
+    usa o mesmo critério da faceta de Assunto (documentos com aquele
+    assunto_id); não altera filtros."""
+    counts = dict(
+        Document.objects.filter(status="a")
+        .exclude(assunto_id__isnull=True)
+        .values_list("assunto_id")
+        .annotate(c=Count("id"))
+        .values_list("assunto_id", "c")
+    )
+    out = []
+    for a in Assunto.objects.all():
+        d = descricao_assunto(a.nome)
+        out.append({
+            "id": a.id, "nome": a.nome, "curta": d["curta"], "longa": d["longa"],
+            "count": counts.get(a.id, 0),
+        })
+    return out
+
+
+def categorias_glossario():
+    """As Categorias processuais na ordem do ciclo (núcleo sequencial + visões
+    transversais), com a descrição do seed (nr_category.description), a
+    contagem — reusa categorias_overview() — e a árvore de subcategorias e
+    microcategorias de cada uma (nr_subcategoria / nr_microcategoria, na ordem
+    canônica), para o "Saiba mais" do glossário da página de Coleções."""
+    visao = categorias_overview()
+    micros = {}
+    for m in Microcategoria.objects.all():
+        micros.setdefault(m.subcategoria_id, []).append({
+            "id": m.id, "nome": m.nome, "descricao": descricao_arvore(m.nome),
+        })
+    subs = {}
+    for sub in Subcategoria.objects.all():
+        subs.setdefault(sub.category_id, []).append({
+            "id": sub.id, "nome": sub.nome, "descricao": descricao_arvore(sub.nome),
+            "microcategorias": micros.get(sub.id, []),
+        })
+    out = visao["nucleo"] + visao["transversal"]
+    for c in out:
+        c["subcategorias"] = subs.get(c["id"], [])
+    return out
+
+
 def tema_busca(tema):
     """Filtro de busca de um tema em destaque: devolve (params_querystring, count).
 
@@ -246,8 +336,23 @@ def _tipos_por_colecao_facet(base, filters):
     )
     by_col = {c["nome"]: [] for c in COLECOES_V6}
     for t in flat:
-        nome = colecao_v6_for_tipo(t["nome"])["nome"]
-        by_col[nome].append(t)
+        t["disabled"] = False
+        by_col[colecao_v6_for_tipo(t["nome"])["nome"]].append(t)
+    # Vocabulário v12 inteiro: os tipos canônicos sem documento no conjunto atual
+    # entram `disabled` (a taxonomia fica visível, como nas Categorias). Uma linha
+    # de type_information por tipo canônico — a de grafia exata, senão a primeira
+    # que normaliza para ele. Tipos retirados (Documentos Normativos, Vídeos) só
+    # aparecem enquanto ainda tiverem documento (acervo pré-recarga).
+    id_por_canonico = {}
+    for ti in TypeInformation.objects.all():
+        canon = tipo_canonico(ti.name)
+        if canon and (canon not in id_por_canonico or ti.name == canon):
+            id_por_canonico[canon] = ti.id
+    for c in COLECOES_V6:
+        presentes = {tipo_canonico(t["nome"]) for t in by_col[c["nome"]]}
+        for nome in tipos_de_colecao(c["slug"]):
+            if nome not in presentes and nome in id_por_canonico:
+                by_col[c["nome"]].append({"id": id_por_canonico[nome], "nome": nome, "count": 0, "disabled": True})
     for tipos in by_col.values():  # ordem alfabética dentro de cada coleção
         tipos.sort(key=lambda t: _sort_key(t["nome"]))
 
@@ -355,15 +460,10 @@ def compute_facets(filters, query=None):
     facets["tipos_por_colecao"] = _tipos_por_colecao_facet(base, filters)
     # Categorias em cascata (accordion <details>): Categoria → Sub → Micro
     facets["categorias_hierarquia"] = _categorias_hierarquia_facet(base, filters)
-    # Assunto (eixo transversal, multi-select)
-    facets["assuntos"] = sorted(
-        _attach_names(
-            list(_facet_counts(base, filters, ("assunto_id",), "assunto_id")), "assunto_id", Assunto
-        ),
-        key=lambda a: _sort_key(a["nome"]),
-    )
-    # Natureza (objeto da contratação, v6)
-    facets["naturezas"] = _string_facet(base, filters, ("natureza",), "natureza")
+    # Assunto (eixo transversal, multi-select) — taxonomia inteira, 0 → disabled
+    facets["assuntos"] = _assuntos_facet(base, filters)
+    # Natureza (objeto da contratação, v6) — valores canônicos, 0 → disabled
+    facets["naturezas"] = _naturezas_facet(base, filters)
 
     # Ano: limites ESTÁVEIS sobre o acervo inteiro (NÃO o conjunto filtrado), para
     # os campos De/Até não "pularem" ao aplicar outros filtros (evita o salto).

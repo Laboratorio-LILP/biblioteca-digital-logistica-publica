@@ -1,0 +1,29 @@
+{
+  "filtro-desktop-js": {
+    "erros": [],
+    "checks": {
+      "cartoes_nao_se_movem": "ok — top do 1º cartão antes=-365 depois=-365",
+      "filtro_tocado_nao_se_move": "ok — top antes=761 depois=761",
+      "url_com_assunto_id": "ok — assunto_id=10",
+      "rolagem_preservada": "ok — antes=1143 depois=1143",
+      "sem_recarregar_pagina": true,
+      "foco_no_checkbox": "ok — assunto_id:10:1",
+      "chip_do_assunto": "ok — Assunto: Micro e Pequenas Empresas",
+      "anuncio_aria_live": "ok — Resultados atualizados: 19 documentos",
+      "voltar_sem_recarregar": "ok — http://localhost:8000/busca/",
+      "voltar_desmarca_filtro": true,
+      "limpar_tudo_foco_na_ordem_de_tab": "ok — {'tag': 'SUMMARY', 'tabIndex': 0, 'texto': 'Coleção'}",
+      "limpar_tudo_sem_chips": true
+    }
+  },
+  "filtro-mobile-js": {
+    "erros": [],
+    "checks": {
+      "filtro_tocado_nao_se_move": "ok — top antes=615 depois=614",
+      "drawer_continua_aberto": "ok — is-open=True aria-expanded=true",
+      "sem_recarregar_pagina": true,
+      "url_com_assunto_id": true,
+      "lista_atualizada_por_tras": "ok — Assunto: Micro e Pequenas Empresas"
+    }
+  }
+}

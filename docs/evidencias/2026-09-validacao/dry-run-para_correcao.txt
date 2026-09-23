@@ -1,0 +1,1090 @@
+Abas a processar: ['Inserir Material']
+Detectando linhas vermelhas (curadoria)...
+  [Inserir Material] 1 linhas vermelhas serão puladas
+Coleções raiz: ['doutrina e conteudo tecnico', 'instrucao e capacitacao', 'jurisprudencia', 'trabalhos academicos']
+Categorias: 6
+Tipos de informação: 97
+Taxonomia: 16 assuntos, 9 subcategorias, 15 microcategorias
+
+[Inserir Material] Colunas mapeadas: 29/33
+  Colunas não encontradas: {'description'}
+  Registros com dados: 982 (+ 1 vermelhos pulados)
+  [DRY] #1 Inserir Material/4: Early Detection of Fraud and Corruption in Public Procurement through Technology
+  [DRY] #2 Inserir Material/5: Work of UNCITRAL on government procurement: purpose, objectives, and complementa
+  [DRY] #3 Inserir Material/6: A Quick Glance at Sustainable Public Procurement
+  [DRY] #4 Inserir Material/7: A Retomada da Agenda Perdida das Compras Públicas: Notas Sobre o Novo Projeto de
+  RECUSADA Inserir Material/L8: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Acórdão 2450/2024-TCU-Plenário
+  [DRY] #5 Inserir Material/9: Análise comparada sobre medidas de favorecimento de micro e pequenas empresas (M
+  [DRY] #6 Inserir Material/10: Análise do princípio da eficiência administrativa nas compras públicas sustentáv
+  [DRY] #7 Inserir Material/11: Brazil's Federal Court of Accounts Insight and Foresight for Better Governance
+  RECUSADA Inserir Material/L12: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Directive 2014/24/EU of the European Parliament and of the C
+  [DRY] #8 Inserir Material/13: Global Public Procurement Database: Share, Compare, Improve!
+  [DRY] #9 Inserir Material/14: A Global Procurement Partnership for Sustainable Development: An International S
+  [DRY] #10 Inserir Material/15: GovTech e a transformação digital no setor público: Caminhos para a Eficiência e
+  [DRY] #11 Inserir Material/16: GovTech Projects
+  [DRY] #12 Inserir Material/17: Implementing public procurement of green innovations: Does structural alignment 
+  [DRY] #13 Inserir Material/18: Implementing the OECD Recommendation on Public Procurement in OECD and Partner C
+  [DRY] #14 Inserir Material/19: Independent Oversight
+  [DRY] #15 Inserir Material/20: Innovation procurement - European Commission
+  [DRY] #16 Inserir Material/21: Innovation Procurement Platform
+  [DRY] #17 Inserir Material/22: Internal control and audit in the public sector
+  [DRY] #18 Inserir Material/23: Licitações & Contratos: Orientações e Jurisprudência do TCU (5ª ed., 2024)
+  [DRY] #19 Inserir Material/24: Local employment and economic development
+  [DRY] #20 Inserir Material/25: Manual de Auditoria de Conformidade do TCE-ES (v.2.0)
+  [DRY] #21 Inserir Material/26: Manual de Auditoria Operacional (4ª edição)
+  [DRY] #22 Inserir Material/27: Manual de Orientações e Boas Práticas na Nova Lei de Licitações e Contratos Admi
+  [DRY] #23 Inserir Material/28: Measuring public procurement transparency with an index: Exploring the role of e
+  [DRY] #24 Inserir Material/29: Minipúblicos como possibilidade de participação e deliberação em compras pública
+  [DRY] #25 Inserir Material/30: Nova Lei de Licitações: Visão Geral (curso EAD)
+  [DRY] #26 Inserir Material/31: OGP Global Report: Open Contracting
+  [DRY] #27 Inserir Material/32: Open Contracting – A New Frontier for Transparency and Accountability
+  [DRY] #28 Inserir Material/33: Open Contracting Global Principles (OCP)
+  [DRY] #29 Inserir Material/34: Participação dos pequenos nas compras governamentais foi de R$ 42 bi
+  [DRY] #30 Inserir Material/35: Governo lança plataforma que facilita participação de MEIs nas compras públicas
+  [DRY] #31 Inserir Material/36: Local employment and economic development
+  [DRY] #32 Inserir Material/37: Preventing Corruption in Public Procurement
+  [DRY] #33 Inserir Material/38: Procurement for Development
+  [DRY] #34 Inserir Material/39: Public procurement - European Commission
+  [DRY] #35 Inserir Material/40: The Public Procurement Data Space (PPDS)
+  [DRY] #36 Inserir Material/41: Public Procurement for Innovation: Good Practices and Strategies
+  [DRY] #37 Inserir Material/42: Public Procurement of Innovative solutions
+  [DRY] #38 Inserir Material/43: Referencial de Combate à Fraude e Corrupção (2ª edição)
+  [DRY] #39 Inserir Material/44: Relatório técnico com plano de ação para capacitação na Nova Lei de Licitações e
+  [DRY] #40 Inserir Material/45: Supreme Audit Institutions and Good Governance: Oversight, Insight and Foresight
+  [DRY] #41 Inserir Material/46: Sustainable Public Procurement: How to Wake the Sleeping Giant! Introducing the 
+  [DRY] #42 Inserir Material/47: The heterogeneous impact of green public procurement on corporate green innovati
+  [DRY] #43 Inserir Material/48: The World Bank Group and Public Procurement
+  RECUSADA Inserir Material/L49: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | UNCITRAL Model Law on Public Procurement (2011)
+  [DRY] #44 Inserir Material/50: WTO - Government Procurement Agreement Knowledge Series
+  [DRY] #45 Inserir Material/51: Boletim de Atualização de Licitações e Contratos
+  [DRY] #46 Inserir Material/52: Observatório do Futuro: Núcleo do TCESP para divulgação e acompanhamento dos ODS
+  [DRY] #47 Inserir Material/53: Cartilha Nova Lei de Licitações e Contratos
+  [DRY] #48 Inserir Material/54: Relatório ODS: O Tribunal de Contas do Estado de São Paulo e os Objetivos de Des
+  [DRY] #49 Inserir Material/55: Jornada de Compras Públicas de Inovação
+  [DRY] #50 Inserir Material/56: Manual de Gestão de Riscos do TCU
+  [DRY] #51 Inserir Material/57: O TCU e os Objetivos de Desenvolvimento Sustentável: Objetivos para Transformar 
+  [DRY] #52 Inserir Material/58: 10 Passos para a Boa Gestão de Riscos
+  [DRY] #53 Inserir Material/59: Licitações e Contratos: Orientações e Jurisprudência do TCU
+  [DRY] #54 Inserir Material/60: Inovamos: Modelo de Apoio a Compras Públicas de Inovação
+  [DRY] #55 Inserir Material/61: Auditing Procurement in the Public Sector
+  [DRY] #56 Inserir Material/62: Contratação semi-integrada
+  [DRY] #57 Inserir Material/63: Guia Referencial para Identificação, Quantificação e Mitigação de Superfaturamen
+  [DRY] #58 Inserir Material/64: Ata de registro de preços: até onde vai a “carona” permitida pela legislação?
+  [DRY] #59 Inserir Material/65: Isenção de ICMS em compras públicas: a informação estratégica no contexto da ges
+  [DRY] #60 Inserir Material/66: Manual de Sanções Administrativas do TCU
+  [DRY] #61 Inserir Material/67: A reforma da Lei 8.666/93 e do arcabouço legal de compras públicas no Brasil: co
+  [DRY] #62 Inserir Material/68: An analysis of SMEs’ needs in public procurement
+  [DRY] #63 Inserir Material/69: Compras públicas de inovações segundo o texto final do PL n° 4.253/2020
+  [DRY] #64 Inserir Material/70: EU policy initiatives on Innovation Procurement
+  [DRY] #65 Inserir Material/71: Greening Public Procurement: Leveraging Fiscal Policy to Accelerate Sustainable 
+  [DRY] #66 Inserir Material/72: Project Procurement - Policies, Guidelines, Documents for Projects Before July 2
+  [DRY] #67 Inserir Material/73: Promotion of SMEs/Local Content in Public Procurement Laws and Regulation
+  [DRY] #68 Inserir Material/74: Revisão do arranjo das compras públicas a partir de um contexto de crise
+  [DRY] #69 Inserir Material/75: World Bank Project Procurement Framework (overview)
+  RECUSADA Inserir Material/L76: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | WTO Agreement on Government Procurement (GPA 2012)
+  [DRY] #70 Inserir Material/77: Por que o sistema de Registro de Preços?
+  [DRY] #71 Inserir Material/78: Licitações e Contratos: Principais aspectos da fase preparatória e gestão contra
+  [DRY] #72 Inserir Material/79: Orientações para Aquisições Públicas de Medicamentos
+  [DRY] #73 Inserir Material/80: Elaboração do orçamento estimado de contratações públicas de bens e serviços de 
+  [DRY] #74 Inserir Material/81: Capacite‑se (Cursos e Webinars Compras.gov.br)
+  [DRY] #75 Inserir Material/82: Boletim de Jurisprudência
+  [DRY] #76 Inserir Material/83: Lei de Licitações: preparação da habilitação
+  [DRY] #77 Inserir Material/84: Encomenda Tecnológica (ETEC)
+  [DRY] #78 Inserir Material/85: Cidades inovadoras: compras públicas como motor de inovação
+  [DRY] #79 Inserir Material/86: Compras públicas para inovação na perspectiva do controle
+  [DRY] #80 Inserir Material/87: Compras públicas para inovação no Brasil: novas possibilidades legais
+  [DRY] #81 Inserir Material/88: Compras públicas para inovação no Brasil: o poder da demanda pública
+  [DRY] #82 Inserir Material/89: Gestão por competências em organizações de governo
+  [DRY] #83 Inserir Material/90: Poder de compra estatal como instrumento de políticas públicas
+  [DRY] #84 Inserir Material/91: Previsibilidade e Segurança Jurídica: a Matriz de Riscos na Nova Lei de Licitaçõ
+  [DRY] #85 Inserir Material/92: Public Procurement for Innovation
+  [DRY] #86 Inserir Material/93: Public Procurement Policy and Purchasing Strategy
+  [DRY] #87 Inserir Material/94: Reflexões Sobre a Nova Lei de Licitações
+  [DRY] #88 Inserir Material/95: Análise do gerenciamento de riscos em contratos de obras públicas pela elaboraçã
+  [DRY] #89 Inserir Material/96: As compras públicas e a fase preparatória do processo licitatório da lei nº 14.1
+  [DRY] #90 Inserir Material/97: Causas de custos adicionais e impacto financeiro em obras públicas sob a perspec
+  [DRY] #91 Inserir Material/98: Configurações explicativas do desenvolvimento da resiliência nas redes de suprim
+  [DRY] #92 Inserir Material/99: Gestão da cadeia de suprimento do setor público: uma alternativa para controle d
+  [DRY] #93 Inserir Material/100: LICITAÇÕES PÚBLICAS E A MODALIDADE PREGÃO NA VERSÃO DO NOVO MARCO NORMATIVO
+  [DRY] #94 Inserir Material/101: Modelo de Maturidade para Avaliar a Gestão da Integridade nas Contratações Públi
+  [DRY] #95 Inserir Material/102: A modelagem das licitações como medida de combate a cartéis: uma análise sob o e
+  [DRY] #96 Inserir Material/103: A atuação do Observatório Social no monitoramento das compras públicas no enfren
+  [DRY] #97 Inserir Material/104: A certificação ambiental como requisito de sustentabilidade e ecoeficiência nas 
+  [DRY] #98 Inserir Material/105: A concepção de compras públicas do Programa Nacional de Alimentação Escolar e a 
+  [DRY] #99 Inserir Material/106: A contratação pública como instrumento para a transparência e concorrência das c
+  [DRY] #100 Inserir Material/107: A eficiência do controle social nas licitações e contratos administrativos
+  [DRY] #101 Inserir Material/108: A fiscalização dos contratos administrativos na nova Lei de Licitações: dos cari
+  [DRY] #102 Inserir Material/109: A capacidade institucional na gestão das compras públicas em saúde: uma análise 
+  [DRY] #103 Inserir Material/110: A Gestão de Compras Públicas: um Estudo de Caso da Central de Compras do Distrit
+  [DRY] #104 Inserir Material/111: A gestão de estoque nas organizações: uma análise crítica entre a iniciativa púb
+  [DRY] #105 Inserir Material/112: A inocuidade da segregação de funções nas organizações públicas
+  [DRY] #106 Inserir Material/113: A inovação como um vetor de mudança no processo de compra pública da agricultura
+  [DRY] #107 Inserir Material/114: A Inteligência Artificial e seus impactos nas contratações e aquisições necessár
+  [DRY] #108 Inserir Material/115: A Inteligência Artificial no combate à corrupção em licitações públicas: Projeto
+  [DRY] #109 Inserir Material/116: A inteligência artificial nos órgãos constitucionais de controle de contas da ad
+  [DRY] #110 Inserir Material/117: A introdução da circularidade nas compras públicas através da nova lei de licita
+  [DRY] #111 Inserir Material/118: A lei de licitações brasileira e a responsabilização dos agentes fraudadores
+  [DRY] #112 Inserir Material/119: A natureza jurídica dos dispute boards nos contratos administrativos
+  [DRY] #113 Inserir Material/120: A nova lei de licitações como promotora da maldição do vencedor
+  [DRY] #114 Inserir Material/121: A nova lei de licitações e contratos administrativos e o controle externo: análi
+  [DRY] #115 Inserir Material/122: A nova lei de licitações: análise do estudo técnico preliminar como pilar estrat
+  [DRY] #116 Inserir Material/123: A política de compras de entidades públicas como instrumento de capacitação tecn
+  [DRY] #117 Inserir Material/124: A Política Pública de Compras Sustentáveis no Governo do Ceará
+  [DRY] #118 Inserir Material/125: A Regulamentação da Nova Lei de Licitações: Definição da Lógica Institucional Pr
+  [DRY] #119 Inserir Material/126: A renovação dos quantitativos em casos de prorrogação de vigência de ata de regi
+  [DRY] #120 Inserir Material/127: A responsabilidade do ordenador de despesas diante da Lei Federal nº 14.133/21: 
+  [DRY] #121 Inserir Material/128: A transparência intraorganizacional como princípio da governança pública: aplica
+  [DRY] #122 Inserir Material/129: Previsão de Demanda para o Planejamento de Aquisições de Alimentos nas Organizaç
+  [DRY] #123 Inserir Material/130: Abordagem multicritério para apoiar compras públicas sustentáveis.
+  [DRY] #124 Inserir Material/131: AI Procurement Checklists: Revisiting Implementation in the Age of AI Governance
+  [DRY] #125 Inserir Material/132: Algunas implicaciones de los instrumentos de soft law de la Agencia Nacional de 
+  [DRY] #126 Inserir Material/133: Alocação de riscos e equilíbrio econômico-financeiro nas contratações públicas
+  [DRY] #127 Inserir Material/134: An AI-Driven Data Mesh Architecture Enhancing Decision-Making in Infrastructure 
+  [DRY] #128 Inserir Material/135: Análise comparativa da legislação brasileira com o modelo europeu de compras púb
+  [DRY] #129 Inserir Material/136: Análise da implementação da política de compras sustentáveis: um estudo de caso
+  [DRY] #130 Inserir Material/137: Análise dos aditivos de prazo e valor dos contratos de obras da UFRRJ
+  [DRY] #131 Inserir Material/138: Análise dos padrões de descontos nas modalidades de contratações públicas no Est
+  [DRY] #132 Inserir Material/139: Análise dos resultados das contratações públicas sustentáveis
+  [DRY] #133 Inserir Material/140: Application of machine learning methods for risk analysis of unfavorable outcome
+  [DRY] #134 Inserir Material/141: AS IMPLICAÇÕES GERADAS ÀS COMPRAS PÚBLICAS COM A APROVAÇÃO DA NOVA LEI DE LICITA
+  [DRY] #135 Inserir Material/142: As licitações públicas financiadas pelo BID no Brasil
+  [DRY] #136 Inserir Material/143: As micro e pequenas empresas (MPE s) e a função social da licitação
+  [DRY] #137 Inserir Material/144: As modalidades de licitação da Lei 14.133/2021
+  [DRY] #138 Inserir Material/145: As prestações extracontratuais e a manutenção do equilíbrio econômico-financeiro
+  [DRY] #139 Inserir Material/146: Assessing the value of artificial intelligence (AI) in governmental public procu
+  [DRY] #140 Inserir Material/147: Auditing and compliance in public procurement – an empirical assessment
+  [DRY] #141 Inserir Material/148: Enhancing transparency in public procurement: A data-driven analytics approach
+  [DRY] #142 Inserir Material/149: Avaliação da celeridade dos processos de licitação, via pregão eletrônico, de um
+  [DRY] #143 Inserir Material/150: Avaliação da gestão de compras públicas de tecnologia da informação na Universid
+  [DRY] #144 Inserir Material/151: Avaliação da implementação: o contexto e a capacidade operacional e de aprendiza
+  [DRY] #145 Inserir Material/152: Avaliação de competências na fase preparatória das compras compartilhadas do IFR
+  [DRY] #146 Inserir Material/153: Barreiras às compras públicas sustentáveis: um survey exploratório no Brasil com
+  [DRY] #147 Inserir Material/154: Barreiras às contratações públicas sustentáveis: A condução do processo de mudan
+  [DRY] #148 Inserir Material/155: Blockchain in public supply chain management: advantages and risks
+  [DRY] #149 Inserir Material/156: Calculando contingências em orçamentos de obras públicas utilizando simulações d
+  [DRY] #150 Inserir Material/157: Caso para ensino: governança, gestão de riscos e conformidade na gestão dos cont
+  [DRY] #151 Inserir Material/158: Centralização das compras públicas: vantagens e desafios de implementação
+  [DRY] #152 Inserir Material/159: Centralização de compras públicas: as regulamentações à nova lei de licitações e
+  [DRY] #153 Inserir Material/160: Centralização de compras públicas: uma proposta para o Instituto Federal Sul-rio
+  [DRY] #154 Inserir Material/161: Classificação de fraudes em licitações públicas através do agrupamento de empres
+  [DRY] #155 Inserir Material/162: Comparative Analysis of the European Centralised Public Procurement
+  [DRY] #156 Inserir Material/163: COMPARTILHAMENTO DE INFORMAÇÕES DE ESTOQUE EM UM POSTO DE SAÚDE
+  [DRY] #157 Inserir Material/164: Compliance como instrumento de integridade e combate à corrupção nas contrataçõe
+  [DRY] #158 Inserir Material/165: Compliance na administração pública: avaliação do processo inicial de implementa
+  [DRY] #159 Inserir Material/166: Compra pública como ferramenta do desenvolvimento sustentável: análise da susten
+  [DRY] #160 Inserir Material/167: Compras e contratações públicas no exterior: uma proposta de mudança para o Depa
+  [DRY] #161 Inserir Material/168: Compras eletrônicas e incentivos à eficiência no setor público: evidências do Es
+  [DRY] #162 Inserir Material/169: Compras governamentais dos municípios do estado de São Paulo: comportamento das 
+  [DRY] #163 Inserir Material/170: Compras governamentais na administração pública 4.0: uma revisão sistemática
+  [DRY] #164 Inserir Material/171: Compras Governamentais nos Municípios do Estado de Mato Grosso do Sul: Proposta 
+  [DRY] #165 Inserir Material/172: COMPRAS GOVERNAMENTAIS: A IMPORTÂNCIA DAS MICRO E PEQUENAS EMPRESAS PARA O DESEN
+  [DRY] #166 Inserir Material/173: Compras públicas alimentares em São Luís (Maranhão) e a construção de sistemas a
+  [DRY] #167 Inserir Material/174: Compras Públicas como vetor de Desenvolvimento Sustentável
+  [DRY] #168 Inserir Material/175: Compras públicas compartilhadas: a prática das licitações sustentáveis
+  [DRY] #169 Inserir Material/176: Compras públicas compartilhadas: um estudo de caso comparando modelos de compras
+  [DRY] #170 Inserir Material/177: Compras públicas compartilhadas: uma análise sobre os principais antecedentes ao
+  [DRY] #171 Inserir Material/178: Compras públicas da agricultura familiar como indutoras do desenvolvimento rural
+  [DRY] #172 Inserir Material/179: Compras públicas de alimentos da agricultura familiar enquanto instrumento de in
+  [DRY] #173 Inserir Material/180: Compras públicas como política para o desenvolvimento sustentável
+  [DRY] #174 Inserir Material/181: Compras públicas de inovação como instrumento de implementação de política públi
+  [DRY] #175 Inserir Material/182: Compras públicas de inovação pelo governo federal: uma análise das diferenças en
+  [DRY] #176 Inserir Material/183: Compras públicas de inovação: desafios dos gestores públicos
+  [DRY] #177 Inserir Material/184: Compras públicas de P&D no Brasil [Recurso eletrônico]: o uso do artigo 20 da Le
+  [DRY] #178 Inserir Material/185: Compras Públicas e Desenvolvimento Local: Micro e Pequenas Empresas Locais nas L
+  [DRY] #179 Inserir Material/186: Compras públicas e promoção do desenvolvimento local
+  [DRY] #180 Inserir Material/187: Compras públicas e inovação: notas iniciais sobre a experiência da União Europei
+  [DRY] #181 Inserir Material/188: Compras públicas e o fomento ao desenvolvimento econômico local: uma análise par
+  [DRY] #182 Inserir Material/189: Compras públicas em tempos de pandemia: uma análise dos entes subnacionais estad
+  [DRY] #183 Inserir Material/190: Compras públicas inteligentes: um modelo de análise estratégica para a gestão da
+  [DRY] #184 Inserir Material/191: Compras públicas municipais: uma proposta de modelo de gestão para municípios de
+  [DRY] #185 Inserir Material/192: Compras públicas para inovação e o desenvolvimento: um diagnóstico jurídico-inst
+  [DRY] #186 Inserir Material/193: Compras públicas para inovação e offset na aeronáutica militar: o caso C-390
+  [DRY] #187 Inserir Material/194: Compras públicas sostenibles en América Latina: análisis comparativo y normativo
+  [DRY] #188 Inserir Material/195: Compras públicas sustentáveis na Advocacia Geral da União: uma análise sob a óti
+  [DRY] #189 Inserir Material/196: Compras públicas sustentáveis no Brasil: um estudo multi-caso em organizações go
+  [DRY] #190 Inserir Material/197: Compras públicas sustentáveis: a influência do cenário de consumo sobre as prefe
+  [DRY] #191 Inserir Material/198: Compras públicas sustentáveis: análise dos stakeholders de uma instituição feder
+  [DRY] #192 Inserir Material/199: Compras públicas sustentáveis: o Estado induz sustentabilidade com seu poder de 
+  [DRY] #193 Inserir Material/200: Compras públicas sustentáveis: um estudo dos critérios de sustentabilidade utili
+  [DRY] #194 Inserir Material/201: Compras públicas sustentáveis: uma análise do desempenho da Advocacia-Geral da U
+  [DRY] #195 Inserir Material/202: Compras públicas sustentáveis: Uma análise dos editais de licitação de cidades b
+  [DRY] #196 Inserir Material/203: Compras públicas sustentáveis: uma análise sob a ótica da teoria da prática numa
+  [DRY] #197 Inserir Material/204: Compras públicas sustentáveis: uma revisão acerca da aquisição de alimentos
+  [DRY] #198 Inserir Material/205: Compras Públicas Sustentáveis: Uma Revisão Bibliométrica
+  [DRY] #199 Inserir Material/206: Compras públicas: estratégia e instrumento para a gestão do desenvolvimento loca
+  [DRY] #200 Inserir Material/207: Compras públicas: estrutura organizacional, atibutos transacionais e comportamen
+  [DRY] #201 Inserir Material/208: Compras sustentáveis nas instituições federais de ensino do Estado do Rio de Jan
+  [DRY] #202 Inserir Material/209: COMPRAS SUSTENTÁVEIS: UM DESAFIO A SER ENCARADO COM INOVAÇÃO
+  [DRY] #203 Inserir Material/210: Conduta ética e boas práticas no processo licitatório
+  [DRY] #204 Inserir Material/211: Consumo e produção responsáveis na agenda 2030 e o urgente compromisso em adequá
+  [DRY] #205 Inserir Material/212: Contratação de eventos públicos no Brasil: um estudo sobre instrumentos contratu
+  [DRY] #206 Inserir Material/213: Contratações públicas no cenário de governança pela internet: o pregão eletrônic
+  [DRY] #207 Inserir Material/214: Contratos públicos de inovação: uma análise da implementação nos estados brasile
+  [DRY] #208 Inserir Material/215: Contribuição da Tecnologia Blockchain em Processos de Compras Públicas sob a Óti
+  [DRY] #209 Inserir Material/216: Contribuições das práticas de compras públicas para a sustentabilidade: um estud
+  [DRY] #210 Inserir Material/217: Controle das compras públicas, inovação tecnológica e inteligência artificial: o
+  [DRY] #211 Inserir Material/218: Controle do TCU e políticas públicas de infraestrutura
+  [DRY] #212 Inserir Material/219: Controle interno da administração pública sob a constituição de 1988 e sua efici
+  [DRY] #213 Inserir Material/220: Coordenação de planejamento estratégico de compras da Fiocruz: uma proposta de g
+  [DRY] #214 Inserir Material/221: Corruption in Public Procurement Market
+  [DRY] #215 Inserir Material/222: Corruption in Public Procurement: Finding the Right Indicators
+  [DRY] #216 Inserir Material/223: El compliance penal: un mecanismo que ayuda a la prevención de la corrupción en 
+  [DRY] #217 Inserir Material/224: Cualificación, acreditación y certificación de la Contratación Pública en Améric
+  [DRY] #218 Inserir Material/225: Cultura digital na administração pública: o trabalho remoto e as novas competênc
+  [DRY] #219 Inserir Material/226: Declaração de inidoneidade prevista na Lei nº 14.133/2021 como sanção regida pel
+  [DRY] #220 Inserir Material/227: Desafios e perspectivas para a centralização das contratações públicas no govern
+  [DRY] #221 Inserir Material/228: Desempenho em processos de compras e contratações públicas: um estudo a partir d
+  [DRY] #222 Inserir Material/229: Desenvolvimento de um framework para compras públicas inovadoras a partir de uma
+  [DRY] #223 Inserir Material/230: Desenvolvimento de um Painel Integrado Inteligente para Auxílio na Identificação
+  [DRY] #224 Inserir Material/231: Desenvolvimento de um plano de melhorias para o processo de compras de uma empre
+  [DRY] #225 Inserir Material/232: Desenvolvimento sustentável nas compras públicas: análise comparativa entre a Di
+  [DRY] #226 Inserir Material/233: Detecção de conluio em licitações utilizando algoritmos de machine learning
+  [DRY] #227 Inserir Material/234: Detection of fraud in public procurement using data-driven methods: a systematic
+  [DRY] #228 Inserir Material/235: Determinantes da participação e sucesso das micro e pequenas empresas em compras
+  [DRY] #229 Inserir Material/236: Licitações públicas: um estudo de caso no município de Acari/RN
+  [DRY] #230 Inserir Material/237: Difusão da informação em processos de compras públicas sustentáveis: um estudo n
+  [DRY] #231 Inserir Material/238: Digital Transformation in Public Procurement: Blockchain Solutions and Legal Fra
+  [DRY] #232 Inserir Material/239: Diretrizes para a concepção de indicadores de desempenho nas compras públicas de
+  [DRY] #233 Inserir Material/240: Diretrizes para a gestão das compras públicas sustentáveis: a contribuição da UT
+  [DRY] #234 Inserir Material/241: Discricionariedade da burocracia em áreas-meio: compras na saúde na prefeitura d
+  [DRY] #235 Inserir Material/242: Efetividade das compras públicas: atos e exigências adequados à contratação.
+  [DRY] #236 Inserir Material/243: EFETIVIDADE NA FASE PREPARATÓRIA DAS LICITAÇÕES: DESAFIOS E SOLUÇÕES PARA A IMPL
+  [DRY] #237 Inserir Material/244: Eficiência nas compras públicas: análise nos requisitos de contratação a partir 
+  [DRY] #238 Inserir Material/245: El nuevo reto de la contratación pública para afianzar la integridad y el contro
+  [DRY] #239 Inserir Material/246: Em direção aos processos sustentáveis em compras públicas: uma investigação no c
+  [DRY] #240 Inserir Material/247: Enhancing BIM implementation in Spanish public procurement: A framework approach
+  [DRY] #241 Inserir Material/248: Enhancing transparency and accountability in public procurement: exploring block
+  [DRY] #242 Inserir Material/249: Essays in public food procurement: the case of PNAE in Brazil
+  [DRY] #243 Inserir Material/250: Essays on Political Corruption
+  [DRY] #244 Inserir Material/251: Evaluating Corruption-Prone Public Procurement Stages for Blockchain Integration
+  [DRY] #245 Inserir Material/252: Evaluation of sustainable public procurement in Spanish Universties. A focus on 
+  [DRY] #246 Inserir Material/253: Fatores críticos no comportamento do gestor público responsável por compras sust
+  [DRY] #247 Inserir Material/254: Local favoritism in China's public procurement: Information frictions or incenti
+  [DRY] #248 Inserir Material/255: Fiscalização contratual na Lei 14.133/2021: Governança e resultado na execução d
+  [DRY] #249 Inserir Material/256: Formulação de problemas complexos em compras públicas de inovação: (des) problem
+  [DRY] #250 Inserir Material/257: Fraud, corruption, and collusion in public procurement activities, a systematic 
+  [DRY] #251 Inserir Material/258: Fundamentos jurídicos da matriz de risco dos contratos administrativos de obra p
+  [DRY] #252 Inserir Material/259: European funds and green public procurement
+  [DRY] #253 Inserir Material/260: Gestão de Compras Públicas: Uma avaliação dos critérios de sustentabilidade nas 
+  [DRY] #254 Inserir Material/261: Gestão de compras públicas: uma proposta para melhorar o processo de compras em 
+  [DRY] #255 Inserir Material/262: Gestão de materiais médico-hospitalares numa rede hospitalar pública utilizando 
+  [DRY] #256 Inserir Material/263: Gestão de riscos em compras públicas: um estudo na Central de Compras do Estado 
+  [DRY] #257 Inserir Material/264: A Gestão de Riscos no Setor Público e nas Compras Públicas à luz da Nova Lei de 
+  [DRY] #258 Inserir Material/265: Gestão do processo de compras públicas: aquisição de alimentos da agricultura fa
+  [DRY] #259 Inserir Material/266: Gestão do conhecimento no planejamento das compras públicas do Instituto Naciona
+  [DRY] #260 Inserir Material/267: Global Contract-level Public Procurement Dataset
+  [DRY] #261 Inserir Material/268: Governança das aquisições: a implementação de um plano de gestão de riscos em um
+  [DRY] #262 Inserir Material/269: Governança de contratos públicos: a materialização dos princípios da eficiência 
+  [DRY] #263 Inserir Material/270: Governança em compras públicas: um estudo na Secretaria Municipal do Planejament
+  [DRY] #264 Inserir Material/271: Governança na segurança pública: um estudo de caso das compras públicas na inter
+  [DRY] #265 Inserir Material/272: Green public procurement and corporate environmental performance: An empirical a
+  [DRY] #266 Inserir Material/273: Green public procurement, external pressures and enterprise green transition: Ev
+  [DRY] #267 Inserir Material/274: Inteligência artificial para identificação de indícios de fraude e corrupção em 
+  [DRY] #268 Inserir Material/275: Identificação Automática de Conluio em Pregões do Comprasnet com Aprendizado de 
+  [DRY] #269 Inserir Material/276: Impactos da Nova Lei de Licitações nos Contratos Administrativos do Setor Públic
+  [DRY] #270 Inserir Material/277: Impacts of policy-driven public procurement: a methodological review
+  [DRY] #271 Inserir Material/278: Implantação de consórcios públicos de saúde e policlínicas regionais na Bahia, B
+  [DRY] #272 Inserir Material/279: Implantação de um plano de ação para a melhoria da performance do setor de licit
+  [DRY] #273 Inserir Material/280: Implicações práticas da nova Lei de Licitações em um Hospital Federal
+  [DRY] #274 Inserir Material/281: Improving public sector procurement methods in international practices: a compar
+  [DRY] #275 Inserir Material/282: Incorporação de critérios de sustentabilidade nas compras públicas da Universida
+  [DRY] #276 Inserir Material/283: Incorporación de valor social a la contratación pública en España: Situación y p
+  [DRY] #277 Inserir Material/284: Influência das estruturas e dos processos de governança e gestão de aquisições n
+  [DRY] #278 Inserir Material/285: Inovação em compras públicas: análise e proposições para a etapa preliminar do p
+  [DRY] #279 Inserir Material/286: Inovação em compras públicas: utilização de soluções low-code como facilitador d
+  [DRY] #280 Inserir Material/287: INOVAÇÃO NAS CONTRATAÇÕES PÚBLICAS: UMA ANÁLISE DAS VANTAGENS E DESAFIOS DA IMPL
+  [DRY] #281 Inserir Material/288: Inovação no processo de compras dos municípios: estudo de caso da implementação 
+  [DRY] #282 Inserir Material/289: Inovação organizacional em compras públicas: análise da acurácia do planejamento
+  [DRY] #283 Inserir Material/290: Inovações em contratações públicas: uma revisão sistemática sobre o e-marketplac
+  [DRY] #284 Inserir Material/291: Insatisfacción con el sistema nacional de contratación pública: una visión del c
+  [DRY] #285 Inserir Material/292: Insights into auditor public oversight boards: Whether, how, and why they "work"
+  [DRY] #286 Inserir Material/293: Institucionalização de compras públicas sustentáveis: uma análise da experiência
+  [DRY] #287 Inserir Material/294: Instrumentalização das compras públicas da merenda escolar para o desenvolviment
+  [DRY] #288 Inserir Material/295: Instrumentos do Estado para estimular a ecoinovação: uma revisão sistemática
+  [DRY] #289 Inserir Material/296: Inteligência artificial para identificação de indícios de fraude e corrupção em 
+  [DRY] #290 Inserir Material/297: Intelligent Methodologies for Preparing Reference Prices in Brazilian Public Bid
+  [DRY] #291 Inserir Material/298: Internationalizing Public Procurement Law: Conflicting Global Standards for Publ
+  [DRY] #292 Inserir Material/299: La inteligencia artificial: una herramienta que revoluciona la compra pública Ar
+  [DRY] #293 Inserir Material/300: Análise da nova sistemática de concessão de diárias e passagens: desafios aos ge
+  [DRY] #294 Inserir Material/301: Leilão aberto versus leilão selado: evidência com dados brasileiros de compras g
+  [DRY] #295 Inserir Material/302: Leveraging Artificial Intelligence and Machine Learning for Predictive Bid Analy
+  [DRY] #296 Inserir Material/303: Leveraging Artificial Intelligence in Contracting: A Digital Transformation for 
+  [DRY] #297 Inserir Material/304: Licitação pública: aspectos que influenciam no processo licitatório
+  [DRY] #298 Inserir Material/305: Licitações públicas na perspectiva do desenvolvimento sustentável municipal: o c
+  [DRY] #299 Inserir Material/306: Licitações públicas e sustentabilidade: uma análise da aplicação de critérios am
+  [DRY] #300 Inserir Material/307: Licitações sustentáveis: os parâmetros do desenvolvimento nacional e o controle 
+  [DRY] #301 Inserir Material/308: Limite temporal ao pedido de restabelecimento do equilíbrio econômico-financeiro
+  [DRY] #302 Inserir Material/309: Los Bonos con Impacto Social en el contexto de la reforma a la ley de contrataci
+  [DRY] #303 Inserir Material/310: Machine Learning Applied to Open Government Data for the Detection of Impropriet
+  [DRY] #304 Inserir Material/311: MAPEAMENTO DE PROCESSO E ANÁLISE DE RISCOS DE FRAUDE NA DISPENSA DE LICITAÇÃO EM
+  [DRY] #305 Inserir Material/312: Mapeamento de processos de contratação de serviços terceirizados e aprendizagem 
+  [DRY] #306 Inserir Material/313: Mapeamento do processo de compras públicas: uma ferramenta para gestão de materi
+  [DRY] #307 Inserir Material/314: Mapeamento internacional de compras públicas: estratégias nacionais e desenvolvi
+  [DRY] #308 Inserir Material/315: Measuring Corruption Risk in Public Procurement over Emergency Periods
+  [DRY] #309 Inserir Material/316: MECANISMOS ELETRÔNICOS DE COMPRAS E DE EVIDENCIAÇÃO E O DESEMPENHO NA GESTÃO DE 
+  [DRY] #310 Inserir Material/317: Measuring public procurement transparency with an index: Exploring the role of e
+  [DRY] #311 Inserir Material/318: Mercados para a inovação: compras públicas e regulação/normatização no Brasil
+  [DRY] #312 Inserir Material/319: Método simplificado para implementação de um sistema de gestão do conhecimento n
+  [DRY] #313 Inserir Material/320: Metodologia ETECS: desenvolvendo soluções inovadoras nas compras públicas
+  [DRY] #314 Inserir Material/321: Métodos de classificação supervisionados aplicados à identificação de fraudes de
+  [DRY] #315 Inserir Material/322: Minimização de custos através da gestão de estoques: um estudo de caso em uma in
+  [DRY] #316 Inserir Material/323: Minipúblicos como possibilidade de participação e deliberação em compras pública
+  [DRY] #317 Inserir Material/324: Modelagem do gerenciamento de contrato da construção civil na administração públ
+  [DRY] #318 Inserir Material/325: Modelo de maturidade para avaliar a gestão de integridade nas contratações públi
+  [DRY] #319 Inserir Material/326: Contratação Pública Agregada no Sector da Saúde: Proposta de metodologia de afer
+  [DRY] #320 Inserir Material/327: O Acórdão 598/2018 - TCU-Plenário: promovendo transparência, eficiência e compet
+  [DRY] #321 Inserir Material/328: O combate ao desperdício no gasto público: uma reflexão baseada na comparação en
+  [DRY] #322 Inserir Material/329: O controle exercido pelo Tribunal de Contas da União em matéria de contratações 
+  [DRY] #323 Inserir Material/330: O controle externo de licitações exercido pelo Tribunal de Contas da União à luz
+  [DRY] #324 Inserir Material/331: O dever de transparência no Tribunal de Contas da União
+  [DRY] #325 Inserir Material/332: O espaço de negociação do gestor público em contratações públicas flexíveis
+  [DRY] #326 Inserir Material/333: O modelo centralizado de compras como potencializador da melhoria dos processos 
+  [DRY] #327 Inserir Material/334: O papel do comprador no processo de compras em instituições públicas de ciência 
+  [DRY] #328 Inserir Material/335: O papel dos processos de compras públicas nos projetos de PD&I: um estudo de cas
+  [DRY] #329 Inserir Material/336: O poder de compras e o desenvolvimento econômico local: a avaliação da política 
+  [DRY] #330 Inserir Material/337: O potencial das compras públicas no desenvolvimento local: uma análise dos munic
+  [DRY] #331 Inserir Material/338: O uso da inteligência artificial na atividade de compliance: riscos e benefícios
+  [DRY] #332 Inserir Material/339: Uso da tecnologia blockchain nas contratações públicas sustentáveis de obras rod
+  [DRY] #333 Inserir Material/340: Objetivos do desenvolvimento sustentável e os desafios das compras públicas sust
+  [DRY] #334 Inserir Material/341: Objetivos e desafios da política de compras públicas sustentáveis no Brasil: a o
+  [DRY] #335 Inserir Material/342: Diretrizes para a promoção de políticas públicas através das compras públicas
+  [DRY] #336 Inserir Material/343: Os programas de integridade pública no Brasil: indicadores e desafios
+  [DRY] #337 Inserir Material/344: Padrão de Dados Abertos em Compras e Contratações Públicas: Uma Construção Colab
+  [DRY] #338 Inserir Material/345: Pagamento por serviços ambientais para catadores de materiais recicláveis.
+  [DRY] #339 Inserir Material/346: Panorama da Produção Científica sobre Compras Públicas no Brasil: Agenda de Pesq
+  [DRY] #340 Inserir Material/347: Participação de pequenas empresas locais nas compras públicas
+  [DRY] #341 Inserir Material/348: Policy instruments for public procurement of innovation: Choice, design and asse
+  [DRY] #342 Inserir Material/349: Política de inclusão de microempresas e empresas de pequeno porte: avaliação das
+  [DRY] #343 Inserir Material/350: Política pública de fomento às micro e pequenas empresas pelo poder das compras 
+  [DRY] #344 Inserir Material/351: Possibilidades de uso das compras públicas para alavancar a inovação entre empre
+  [DRY] #345 Inserir Material/352: Possibilidades e limitações para as compras públicas sustentáveis na Universidad
+  [DRY] #346 Inserir Material/353: Possíveis Implicações da Aplicação Combinada da Blockchain, Smart Contract e Int
+  [DRY] #347 Inserir Material/354: Práticas anticoncorrenciais no Brasil: verificação analítica, empírica e sistêmi
+  [DRY] #348 Inserir Material/355: Pregões eletrônicos de bens e serviços administrativos: uma análise das causas d
+  [DRY] #349 Inserir Material/356: Pregões eletrônicos: a experiência brasileira e o estudo de caso de uma universi
+  [DRY] #350 Inserir Material/357: Previsão de fraude em licitações no Brasil
+  [DRY] #351 Inserir Material/358: Procurement for sustainable local economic development
+  [DRY] #352 Inserir Material/359: Proposta de modelo conceitual de critérios ambientais para contratação pública d
+  [DRY] #353 Inserir Material/360: Proposta e aplicação de uma sistemática baseada na gestão do conhecimento para a
+  [DRY] #354 Inserir Material/361: Extensão de prazo de vigência de patentes farmacêuticas por ações judiciais: efe
+  [DRY] #355 Inserir Material/362: Public Procurement and Innovation for Human-Centered Artificial Intelligence
+  [DRY] #356 Inserir Material/363: Public procurement as an innovation policy: Where do we stand?
+  [DRY] #357 Inserir Material/364: QUANDO O GOVERNO É O MERCADO: COMPRAS GOVERNAMENTAIS E INOVAÇÃO EM SERVIÇOS DE S
+  [DRY] #358 Inserir Material/365: Reflexos da lei brasileira de inclusão das pessoas com deficiência nas licitaçõe
+  [DRY] #359 Inserir Material/366: Regime Jurídico de Contratações Públicas: por que insistir em um modelo único e 
+  [DRY] #360 Inserir Material/367: Regulamentação da IA (Inteligência Artificial) na administração pública brasilei
+  [DRY] #361 Inserir Material/368: Relações entre doações de campanha, denúncias de corrupção e variação de preço n
+  [DRY] #362 Inserir Material/369: Responsabilidade por pesquisa de preços em licitações na visão do Tribunal de Co
+  [DRY] #363 Inserir Material/370: Responsabilização por desempenho e controle externo da administração pública
+  [DRY] #364 Inserir Material/371: Retos de la contratación pública local para garantizar la calidad y la innovació
+  [DRY] #365 Inserir Material/372: Revisitação do mecanismo da repactuação de preços nos contratos de serviços de n
+  [DRY] #366 Inserir Material/373: Risk Management in Public Procurement Process
+  [DRY] #367 Inserir Material/374: Robotic Process Automation in purchasing and supply management: A multiple case 
+  [DRY] #368 Inserir Material/375: Robust relation between public procurement for innovation and economic developme
+  [DRY] #369 Inserir Material/376: Strengthening the Efficiency of Public Procurement
+  [DRY] #370 Inserir Material/377: Sustainable procurement in the public sector: An international comparative study
+  [DRY] #371 Inserir Material/378: Sustainable Public Procurement — MAPS Module
+  [DRY] #372 Inserir Material/379: Sustainable Public Procurement: Integrating Environmental Standards into Global 
+  [DRY] #373 Inserir Material/380: Sustentabilidade nas licitações públicas e o princípio da economicidade: desafio
+  [DRY] #374 Inserir Material/381: TECNOLOGIA, GOVERNO DIGITAL E A NOVA LEI DE LICITAÇÕES
+  [DRY] #375 Inserir Material/382: Tecnologías de información para lucha anticorrupción: análisis de la contratació
+  [DRY] #376 Inserir Material/383: The Choice of Innovation Policy Instruments
+  [DRY] #377 Inserir Material/384: The impact of public procurement on the adoption of circular economy practices
+  [DRY] #378 Inserir Material/385: The risk of corruption in public pharmaceutical procurement: how anti-corruption
+  [DRY] #379 Inserir Material/386: The role of artificial intelligence in the procurement process: State of the art
+  [DRY] #380 Inserir Material/387: The Role of Brazil's Federal Court of Accounts in Managing Social and Environmen
+  [DRY] #381 Inserir Material/388: The WTO Agreement on Government Procurement and the UNCITRAL Model Procurement L
+  [DRY] #382 Inserir Material/389: Transformação digital aplicada no planejamento de demanda baseado em inteligênci
+  [DRY] #383 Inserir Material/390: Transição sustentável das compras públicas de alimentos: o caso dos restaurantes
+  [DRY] #384 Inserir Material/391: Transparência e accountability em serviços públicos digitais
+  [DRY] #385 Inserir Material/392: Transparência em compras públicas: proposta de um índice da transparência na ges
+  [DRY] #386 Inserir Material/393: Transparency and E-Government in Electronic Public Procurement as Sustainable De
+  [DRY] #387 Inserir Material/394: Transparency in Tender Waivers in Local Governments During Emergency Situations
+  [DRY] #388 Inserir Material/395: Turning Tenders into Tinder: How AI and Open Data can spark Bidding Matches
+  [DRY] #389 Inserir Material/396: Um modelo de e-marketplace para compras públicas eficazes com o uso de inteligên
+  [DRY] #390 Inserir Material/397: Uma análise do registro de oportunidade nas licitações de tecnologia da informaç
+  [DRY] #391 Inserir Material/398: Uma proposta de arquitetura para gestão de Atas de Registro de Preços
+  [DRY] #392 Inserir Material/399: Usando Inteligência Artificial (IA) na classificação de licitações: um caso prát
+  [DRY] #393 Inserir Material/400: Aventureiros em Licitações: Entre a falta de Planejamento e o abuso de Direito
+  [DRY] #394 Inserir Material/401: O Sistema de Registro de Preços para obras e serviços de engenharia: Limites e r
+  [DRY] #395 Inserir Material/402: Inexigibilidade de licitação, um instrumento de gestão sob o olhar do controle
+  [DRY] #396 Inserir Material/403: A alocação de riscos no contexto da Nova Lei de Licitações
+  [DRY] #397 Inserir Material/404: A importância dos instrumentos auxiliares
+  [DRY] #398 Inserir Material/405: Os Tribunais de Contas e o sancionamento de quem contrata com a administração
+  [DRY] #399 Inserir Material/406: As práticas ESG e a Gestão Pública
+  [DRY] #400 Inserir Material/407: Nova Lei de Licitações e controle externo: avanço ou retrocesso?
+  [DRY] #401 Inserir Material/408: A nova Lei de Licitações e inovações jurisprudenciais
+  [DRY] #402 Inserir Material/409: Rol Objetivo de Algumas das Principais Mudanças Promovidas pela Nova Lei de Lici
+  [DRY] #403 Inserir Material/410: Panorama das compras públicas do Governo Federal: análise a partir dos dados do 
+  [DRY] #404 Inserir Material/411: Manual de Compras Baseadas na Relação Custo-Benefício
+  [DRY] #405 Inserir Material/412: Guia de Compras Públicas Sustentáveis
+  [DRY] #406 Inserir Material/413: Elaboração de estudo técnico preliminar nas compras públicas
+  [DRY] #407 Inserir Material/414: Manual de orientações da Lei 14.133/2021
+  [DRY] #408 Inserir Material/415: Inovações trazidas pela Lei 14.133/21 para o planejamento estratégico e uso efic
+  [DRY] #409 Inserir Material/416: Nova Lei de licitações e contratos administrativos: Lei 14.133, de 1º de abril d
+  [DRY] #410 Inserir Material/417: A Lei nº 14.133/21 e a implementação do Planejamento das Contratações Anual
+  [DRY] #411 Inserir Material/418: Nova Lei de Licitações e Contratos Administrativos
+  [DRY] #412 Inserir Material/419: Contratos, controle e procedimentos: ensaios sobre a Lei de licitações e contrat
+  [DRY] #413 Inserir Material/420: As compras públicas na OCDE
+  [DRY] #414 Inserir Material/421: Plataforma de Compras Públicas para Inovação (CPIN)
+  [DRY] #415 Inserir Material/422: Compras públicas centralizadas: vantagens e desvantagens à luz dos critérios de 
+  [DRY] #416 Inserir Material/423: Desperdício de recursos públicos no Brasil representa prejuízo de US$ 68 bilhões
+  [DRY] #417 Inserir Material/424: Agente de contratação
+  [DRY] #418 Inserir Material/425: Plano de ação para implantar a nova Lei de Licitações
+  [DRY] #419 Inserir Material/426: Como diferenciar o Programa de Integridade de um programa de fachada e os limite
+  [DRY] #420 Inserir Material/427: Governança e prevenção: como enfrentar o agente oportunista e garantir a integri
+  [DRY] #421 Inserir Material/428: Guia de boas práticas em contratações públicas de serviços de publicidade (comen
+  [DRY] #422 Inserir Material/429: A contratação direta por dispensa em caso de licitações para Sistema de Registro
+  [DRY] #423 Inserir Material/430: Compras públicas centralizadas em situações de emergência e calamidade pública
+  [DRY] #424 Inserir Material/431: Compras públicas sustentáveis: um estudo bibliométrico baseado na Web of Science
+  [DRY] #425 Inserir Material/432: Marketplace nas compras pelo poder público no Brasil
+  [DRY] #426 Inserir Material/433: Marketplaces: um estudo comparativo do portal de compras do Governo Federal com 
+  [DRY] #427 Inserir Material/434: Marketplace digital para compras públicas
+  [DRY] #428 Inserir Material/435: Guia de compras públicas sustentáveis: uso do poder de compra do governo para a 
+  [DRY] #429 Inserir Material/436: Guia Nacional de Contratações Sustentáveis
+  [DRY] #430 Inserir Material/437: Compras Sustentáveis
+  [DRY] #431 Inserir Material/438: Going Green: Best Practices for Sustainable Procurement
+  [DRY] #432 Inserir Material/439: Sustainable Public Procurement: 2022 Global Review
+  [DRY] #433 Inserir Material/440: Green Public Procurement
+  [DRY] #434 Inserir Material/441: Green Public Procurement: An Overview of Green Reforms in Country Procurement Sy
+  [DRY] #435 Inserir Material/442: Drawbacks and opportunities of green public procurement: an effective tool for s
+  [DRY] #436 Inserir Material/443: Sustainable procurement in the United Kingdom public sector
+  RECUSADA Inserir Material/L444: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Lei nº 14.133, de 1º de abril de 2021
+  [DRY] #437 Inserir Material/445: Comentários à Lei de Licitações e Contratos Administrativos: Lei nº 14.133/21
+  [DRY] #438 Inserir Material/446: Audiências públicas nas contratações públicas: diferenças entre a Lei 8.666/93 e
+  [DRY] #439 Inserir Material/447: O controle interno das licitações e contratos na Lei Federal nº 14.133/2021
+  [DRY] #440 Inserir Material/448: Estudos sobre a Lei 14.133/2021: Nova Lei de Licitações e Contratos Administrati
+  [DRY] #441 Inserir Material/449: Comentários à Nova Lei de Licitações Públicas e Contratos Administrativos: Lei n
+  [DRY] #442 Inserir Material/450: Contratos administrativos e nulidades: uma análise a partir das leis nº 8.666/93
+  [DRY] #443 Inserir Material/451: Tratado da Nova Lei de Licitações e Contratos Administrativos: Lei 14.133/21 com
+  [DRY] #444 Inserir Material/452: Lei de Licitações e Contratos Administrativos Comentada: Lei 14.133/21
+  [DRY] #445 Inserir Material/453: The Law of Public and Utilities Procurement
+  [DRY] #446 Inserir Material/454: OECD Public Procurement Toolbox
+  [DRY] #447 Inserir Material/455: Lei de licitações e contratos administrativos: Lei nº 14.133/2021
+  [DRY] #448 Inserir Material/456: Lei nº 14.133, de 1º de abril de 2021: Lei de licitações e contratos administrat
+  [DRY] #449 Inserir Material/457: Contratação direta na Lei nº 14.133/2021
+  [DRY] #450 Inserir Material/458: Lei nº 14.133/2021: estrutura, inovações, aplicabilidade e vigência
+  [DRY] #451 Inserir Material/459: Lei nº 14.133/21 por Tema
+  RECUSADA Inserir Material/L460: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Portaria SEGES/ME nº 8.678, de 19 de julho de 2021
+  RECUSADA Inserir Material/L461: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Decreto nº 11.246, de 27 de outubro de 2022
+  [DRY] #452 Inserir Material/462: Lei de Licitações e Contratos Administrativos (Lei 14.133/2021): o diálogo compe
+  [DRY] #453 Inserir Material/463: Ministério da Gestão regulamenta licitação por diálogo competitivo e amplia ferr
+  [DRY] #454 Inserir Material/464: Licitações e Contratos Administrativos na Lei 14.133/21: aspectos gerais
+  [DRY] #455 Inserir Material/465: Da Lei nº 8.666/1993 à Lei nº 14.133/2021: o desenvolvimento nacional sustentáve
+  [DRY] #456 Inserir Material/466: A implementação da Nova Lei de Licitações e Contratos (NLLC) no Brasil
+  [DRY] #457 Inserir Material/467: Utilização de IA nas Compras Públicas: oportunidades, desafios e apreensões
+  [DRY] #458 Inserir Material/468: Compras públicas sustentáveis: ponderações necessárias
+  [DRY] #459 Inserir Material/469: Contratações das organizações públicas e os desafios de greenwashing
+  [DRY] #460 Inserir Material/470: Qualidade e eficiência dos gastos públicos no Brasil
+  [DRY] #461 Inserir Material/471: Lei Anticorrupção Empresarial e o impedimento de contratar com o governo
+  [DRY] #462 Inserir Material/472: Maturidade e qualificação da etapa de planejamento das contratações públicas
+  [DRY] #463 Inserir Material/473: Aspectos Relevantes do Pregão
+  [DRY] #464 Inserir Material/474: O Planejamento e o Plano de Contratação Anual (PCA) como Ferramenta Estratégica
+  [DRY] #465 Inserir Material/475: Gestão de materiais
+  [DRY] #466 Inserir Material/476: Compras públicas: para além da economicidade
+  [DRY] #467 Inserir Material/477: O estudo da cultura organizacional por meio das práticas: uma proposta à luz do 
+  [DRY] #468 Inserir Material/478: Corrupção nas licitações e contratações públicas: sinais de alerta segundo a Tra
+  [DRY] #469 Inserir Material/479: Orientações Consolidadas: Nova Lei de Licitações e Contratos (Lei 14.133/2021)
+  [DRY] #470 Inserir Material/480: Licitações e Contratos: Manual básico
+  [DRY] #471 Inserir Material/481: Guia de Boas Práticas em Contratações Públicas de Serviços de Publicidade
+  [DRY] #472 Inserir Material/482: Referencial Básico de Governança Organizacional para organizações públicas e out
+  [DRY] #473 Inserir Material/483: Informativo de Licitações e Contratos nº 463 - TCU
+  [DRY] #474 Inserir Material/484: Informativo de Licitações e Contratos nº 471 - TCU
+  [DRY] #475 Inserir Material/485: Caderno de Logística: Pesquisa de Preços
+  [DRY] #476 Inserir Material/486: Inovação tecnológica na Polícia Federal : análise do papel das compras de inovaç
+  [DRY] #477 Inserir Material/487: Planejamento anual de contratações de tecnologia da informação e comunicação : u
+  [DRY] #478 Inserir Material/488: Fatores inibidores e facilitadores à implementação da gestão de riscos no depart
+  [DRY] #479 Inserir Material/489: Maturidade em gestão de riscos nas contratações de uma unidade de compras : um e
+  [DRY] #480 Inserir Material/490: Análise das contratações integradas de obras públicas sob a perspectiva da gestã
+  [DRY] #481 Inserir Material/491: Governança nas contratações públicas : um estudo sobre a gestão de riscos no met
+  [DRY] #482 Inserir Material/492: A gestão de riscos do Programa Nacional de Reestruturação e Aquisição de Equipam
+  [DRY] #483 Inserir Material/493: Gestão de riscos como apoio à melhoria do processo seleção de startups em contra
+  [DRY] #484 Inserir Material/494: Inadimplemento contratual no Setor Público Brasileiro : Índice de (des)confiança
+  [DRY] #485 Inserir Material/495: Gerenciamento de riscos e a geração de valor em contratações públicas : a percep
+  [DRY] #486 Inserir Material/496: Modelo de gestão de riscos de TI aplicado ao Consórcio Nacional em Educação, Ciê
+  [DRY] #487 Inserir Material/497: Os instrumentos de planejamento na fase interna das contratações públicas: efeit
+  [DRY] #488 Inserir Material/498: Os desafios na implementação da gestão de riscos nas compras e contratações no â
+  [DRY] #489 Inserir Material/499: Repercussões da centralização em contratações de serviços essenciais: um estudo 
+  [DRY] #490 Inserir Material/500: Contratações públicas: custos ocultos no planejamento de processos centralizados
+  [DRY] #491 Inserir Material/501: Análise sobre os desafios impostos à governança das contratações, a partir da ap
+  [DRY] #492 Inserir Material/502: Iniciativa compras sustentáveis & grandes eventos: mapeamento e análise das prin
+  [DRY] #493 Inserir Material/503: Reputação e eficiência: a inovação da Lei de Licitações e Contratos Administrati
+  [DRY] #494 Inserir Material/504: Governança em contratos administrativos: perspectivas e desafios dos agentes res
+  [DRY] #495 Inserir Material/505: BDI : uma análise dos valores de referência para as aquisições complexas do exér
+  [DRY] #496 Inserir Material/506: Desafios e oportunidades da lei 14.133/2021: uma análise a partir da perspectiva
+  [DRY] #497 Inserir Material/507: A Nova Lei de Licitações e a Estratégia Nacional de Combate à Corrupção no Brasi
+  [DRY] #498 Inserir Material/508: Boletim de Jurisprudência - Edição 25
+  [DRY] #499 Inserir Material/509: Boletim de Jurisprudência - Edição 26
+  [DRY] #500 Inserir Material/510: Boletim de Jurisprudência - Edição 27
+  [DRY] #501 Inserir Material/511: Boletim de Jurisprudência - Edição 28
+  [DRY] #502 Inserir Material/512: Boletim de Jurisprudência - Edição 29
+  [DRY] #503 Inserir Material/513: Boletim de Jurisprudência - Edição 30
+  [DRY] #504 Inserir Material/514: Boletim de Jurisprudência - Edição 31
+  [DRY] #505 Inserir Material/515: Boletim de Jurisprudência - Edição 32
+  [DRY] #506 Inserir Material/516: Boletim de Jurisprudência - Edição 33
+  [DRY] #507 Inserir Material/517: Boletim de Jurisprudência - Edição 34
+  [DRY] #508 Inserir Material/518: Boletim de Jurisprudência - Edição 35
+  [DRY] #509 Inserir Material/519: Boletim de Jurisprudência - Edição 36
+  [DRY] #510 Inserir Material/520: Boletim de Jurisprudência - Edição 37
+  [DRY] #511 Inserir Material/521: Boletim de Jurisprudência - Edição 38
+  [DRY] #512 Inserir Material/522: Boletim de Jurisprudência - Edição 39
+  [DRY] #513 Inserir Material/523: Boletim de Jurisprudência - Edição 40
+  [DRY] #514 Inserir Material/524: Boletim de Jurisprudência - Edição 41
+  [DRY] #515 Inserir Material/525: Boletim de Jurisprudência - Edição 42
+  [DRY] #516 Inserir Material/526: Boletim de Jurisprudência - Edição 43
+  [DRY] #517 Inserir Material/527: Boletim de Jurisprudência - Edição 44
+  [DRY] #518 Inserir Material/528: Boletim de Jurisprudência - Edição 45
+  [DRY] #519 Inserir Material/529: Boletim de Jurisprudência - Edição 46
+  [DRY] #520 Inserir Material/530: Boletim de Jurisprudência - Edição 47
+  [DRY] #521 Inserir Material/531: Boletim de Jurisprudência - Edição 48
+  [DRY] #522 Inserir Material/532: Boletim de Jurisprudência - Edição 49
+  [DRY] #523 Inserir Material/533: Boletim de Jurisprudência - Edição 50
+  [DRY] #524 Inserir Material/534: Boletim de Atualização de Licitações e Contratos – Março/2026
+  [DRY] #525 Inserir Material/535: Boletim de Atualização de Licitações e Contratos – Fevereiro/2026
+  [DRY] #526 Inserir Material/536: Boletim de Atualização de Licitações e Contratos – Janeiro/2026
+  [DRY] #527 Inserir Material/537: Boletim de Atualização de Licitações e Contratos – Dezembro/2025
+  [DRY] #528 Inserir Material/538: Boletim de Atualização de Licitações e Contratos – Novembro/2025
+  [DRY] #529 Inserir Material/539: Boletim de Atualização de Licitações e Contratos – Outubro/2025
+  [DRY] #530 Inserir Material/540: Boletim de Atualização de Licitações e Contratos – Setembro/2025
+  [DRY] #531 Inserir Material/541: Boletim de Atualização de Licitações e Contratos – Agosto/2025
+  [DRY] #532 Inserir Material/542: Boletim de Atualização de Licitações e Contratos – Julho/2025
+  [DRY] #533 Inserir Material/543: Boletim de Atualização de Licitações e Contratos – Junho/2025
+  [DRY] #534 Inserir Material/544: Boletim de Atualização de Licitações e Contratos – Maio/2025
+  [DRY] #535 Inserir Material/545: Boletim de Atualização de Licitações e Contratos – Abril/2025
+  [DRY] #536 Inserir Material/546: Boletim de Atualização de Licitações e Contratos – Março/2025
+  [DRY] #537 Inserir Material/547: Boletim de Atualização de Licitações e Contratos – Fevereiro/2025
+  [DRY] #538 Inserir Material/548: Boletim de Atualização de Licitações e Contratos – Janeiro/2025
+  [DRY] #539 Inserir Material/549: Boletim de Atualização de Licitações e Contratos – Dezembro/2024
+  [DRY] #540 Inserir Material/550: Boletim de Atualização de Licitações e Contratos – Novembro/2024
+  [DRY] #541 Inserir Material/551: Boletim de Atualização de Licitações e Contratos – Outubro/2024
+  [DRY] #542 Inserir Material/552: Boletim de Atualização de Licitações e Contratos – Setembro/2024
+  [DRY] #543 Inserir Material/553: Boletim de Atualização de Licitações e Contratos – Agosto/2024
+  [DRY] #544 Inserir Material/554: Boletim de Atualização de Licitações e Contratos – Julho/2024
+  [DRY] #545 Inserir Material/555: Boletim de Atualização de Licitações e Contratos – Maio/Junho/2024
+  [DRY] #546 Inserir Material/556: Aspectos Jurídicos
+  [DRY] #547 Inserir Material/557: Função compras no setor público: desafios para o alcance da celeridade dos pregõ
+  [DRY] #548 Inserir Material/558: A contribuição da logística integrada às decisões de gestão das políticas públic
+  [DRY] #549 Inserir Material/559: Participatory Approaches to Attacking Extreme Poverty
+  [DRY] #550 Inserir Material/560: Blockchain technology and its relationships to sustainable supply chain manageme
+  [DRY] #551 Inserir Material/561: Exponential and power laws in public procurement markets
+  [DRY] #552 Inserir Material/562: Practices of public procurement and the risk of corrupt behavior before and afte
+  [DRY] #553 Inserir Material/563: Scaling Behavior of Public Procurement Activity
+  [DRY] #554 Inserir Material/564: Conceptual Modeling of a Procurement Process: Case study of RFP for Public Key I
+  [DRY] #555 Inserir Material/565: A eficiência e celeridade nas compras públicas: um estudo sobre os fatores que i
+  [DRY] #556 Inserir Material/566: Sustentabilidade nas compras e contratações públicas: estudo de caso em uma inst
+  [DRY] #557 Inserir Material/567: Compras governamentais como instrumento de políticas públicas para o desenvolvim
+  [DRY] #558 Inserir Material/568: Análise do sistema eletrônico de compras do governo federal brasileiro sob a per
+  [DRY] #559 Inserir Material/569: Compras públicas na pandemia: experiências estaduais no enfrentamento à Covid-19
+  [DRY] #560 Inserir Material/570: Explorando a toca do leão: dimensões da estrutura de compras e sua associação co
+  [DRY] #561 Inserir Material/571: Resiliência nos valores públicos e sua permanência: uma análise dos contratos ad
+  [DRY] #562 Inserir Material/572: Fundamentos da gestão da logística pública e teoria geral de licitação e contrat
+  [DRY] #563 Inserir Material/573: Compras públicas inteligentes: uma proposta para a melhoria da gestão das compra
+  [DRY] #564 Inserir Material/574: SME suppliers and the challenge of public procurement: Evidence revealed by a UK
+  [DRY] #565 Inserir Material/575: A melhoria na execução orçamentária como consequência da centralização das compr
+  [DRY] #566 Inserir Material/576: Compras Públicas Centralizadas: uma análise de sua implementação no Governo do E
+  [DRY] #567 Inserir Material/577: Compras governamentais: análise dos modelos centralizado e descentralizado no âm
+  [DRY] #568 Inserir Material/578: A centralização das compras públicas como ferramenta de gestão estratégica: a ex
+  [DRY] #569 Inserir Material/579: Vantagens e Desvantagens das Compras Públicas Centralizadas: uma Revisão Bibliog
+  [DRY] #570 Inserir Material/580: Compras governamentais e práticas sustentáveis nas instituições públicas federai
+  [DRY] #571 Inserir Material/581: Proposta de metodologia para qualificação de prestadores de serviços ambientais,
+  [DRY] #572 Inserir Material/582: Análise do processo de compras com relação à promoção da sustentabilidade nas un
+  [DRY] #573 Inserir Material/583: Diagnóstico da sustentabilidade do município de Tucuruí-PA: uma aplicação do bar
+  [DRY] #574 Inserir Material/584: Compras públicas sustentáveis: estudo nas instituições federais de ensino superi
+  [DRY] #575 Inserir Material/585: Modelagem do processo de compras públicas sustentáveis à luz da Lei 14.133/2021 
+  [DRY] #576 Inserir Material/586: Fatores determinantes da eficiência no processo de compras públicas
+  [DRY] #577 Inserir Material/587: Faroeste Licitatório: planejamento versus simplificação
+  [DRY] #578 Inserir Material/588: Inovações da nova lei geral de licitações : um estudo sobre os impactos da Lei n
+  [DRY] #579 Inserir Material/589: Análise da eficácia das compras públicas sustentáveis do governo federal
+  [DRY] #580 Inserir Material/590: Compras sustentáveis no setor hospitalar: benefícios e dificuldades de implement
+  [DRY] #581 Inserir Material/591: Compras públicas sustentáveis: barreiras e oportunidades de melhoria no âmbito d
+  [DRY] #582 Inserir Material/592: Avaliação da implementação de indicadores de desempenho no Programa Gestão de co
+  [DRY] #583 Inserir Material/593: Atuação estratégica da função de compras : a percepção dos profissionais da admi
+  [DRY] #584 Inserir Material/594: Estrutura de compras governamentais do DF: análise comparativa entre centralizaç
+  [DRY] #585 Inserir Material/595: Ciclo de vida do objeto licitado: uma análise das contratações na Lei nº 14.133/
+  [DRY] #586 Inserir Material/596: Um olhar da Lei 14.133/2021 sob o enfoque da inovação em licitações e contrataçõ
+  [DRY] #587 Inserir Material/597: O seguro-garantia com cláusula de retomada à luz da lei n.º 14.133/2021
+  [DRY] #588 Inserir Material/598: Avaliação de competências e aplicação da segregação de função na fase de planeja
+  [DRY] #589 Inserir Material/599: Gestão de riscos em licitações de tecnologia da informação: um estudo de caso no
+  [DRY] #590 Inserir Material/600: Gestão da Ti Bimodal na administração pública federal brasileira - proposta de f
+  [DRY] #591 Inserir Material/601: Efeitos da realização de licitações exclusivas às micro e pequenas empresas sobr
+  [DRY] #592 Inserir Material/602: A política de micro e pequena empresa: potencialidades para a prática de equidad
+  [DRY] #593 Inserir Material/603: Compras públicas da agricultura familiar: análise da execução do programa de aqu
+  [DRY] #594 Inserir Material/604: Gestão de riscos nas licitações do CINDACTA l: um estudo de caso
+  [DRY] #595 Inserir Material/605: Implementação do Plano de Contratações Anual e demais instrumentos de Governança
+  [DRY] #596 Inserir Material/606: Governança das contratações no setor público: uma análise do iGovContratações no
+  [DRY] #597 Inserir Material/607: Fatores que contribuem para o cancelamento de itens dos pregões eletrônicos: aná
+  [DRY] #598 Inserir Material/608: A sustentabilidade no processo de compras em instituições federais de ensino sup
+  [DRY] #599 Inserir Material/609: Contratações públicas sustentáveis: análise da aplicação da Instrução Normativa 
+  [DRY] #600 Inserir Material/610: Proposta de desenvolvimento de critérios para práticas de gestão sustentável nas
+  [DRY] #601 Inserir Material/611: Análise de barreiras para adoção de critérios sustentáveis na fase de planejamen
+  [DRY] #602 Inserir Material/612: Uma visão multidimensional das deficiências relacionadas as compras públicas mun
+  [DRY] #603 Inserir Material/613: Centralização x descentralização: uma análise do arranjo organizacional da funçã
+  [DRY] #604 Inserir Material/614: A eficiência nas contratações públicas : uma análise da fase interna das licitaç
+  [DRY] #605 Inserir Material/615: A busca da eficiência nas licitações públicas : o efeito da regulamentação da pe
+  [DRY] #606 Inserir Material/616: Pregão eletrônico e negociação : fatores determinantes na busca do menor preço
+  [DRY] #607 Inserir Material/617: Eficiência na alocação de recursos públicos no Instituto Federal do Amazonas, co
+  [DRY] #608 Inserir Material/618: Dispensa de licitação por emergência: uma proposta gerencial
+  [DRY] #609 Inserir Material/619: Compras compartilhadas de insumos laboratoriais para o diagnóstico da Tuberculos
+  [DRY] #610 Inserir Material/620: A institucionalização da política de compras centralizadas em Minas Gerais : do 
+  [DRY] #611 Inserir Material/621: Gestão de riscos em compras governamentais: estudo de caso na Central de Compras
+  [DRY] #612 Inserir Material/622: Cadeias curtas e qualidade : análise das aquisições da agricultura familiar para
+  [DRY] #613 Inserir Material/623: Heterogeneidade dos preços das compras públicas hospitalares e seus fatores asso
+  [DRY] #614 Inserir Material/624: Comportamento informacional na licitação : pregão eletrônico
+  [DRY] #615 Inserir Material/625: Desafios para obtenção de melhores resultados no processo de compras em organiza
+  [DRY] #616 Inserir Material/626: Dispensa da intenção de registro de preços é incompatível com 'carona'
+  [DRY] #617 Inserir Material/627: Consórcios intermunicipais precisam seguir a lei
+  [DRY] #618 Inserir Material/628: A obrigatoriedade da publicação de extrato do edital de licitação em jornal de g
+  [DRY] #619 Inserir Material/629: Redução do Parque de Impressoras no Tribunal de Contas do Estado de São Paulo: U
+  [DRY] #620 Inserir Material/630: Inexigibilidade de licitação para contratação de serviços atuariais nos RPPSS
+  [DRY] #621 Inserir Material/631: O problema “carona interestadual” nas adesões de Ata de Registro de Preços
+  [DRY] #622 Inserir Material/632: Plano de Logística Sustentável: um instrumento de planejamento para promoção da 
+  [DRY] #623 Inserir Material/633: Uma visita à Lei nº 14.133, de 2021
+  [DRY] #624 Inserir Material/634: A responsabilização do agente de contratação perante a Nova Lei de Licitações
+  [DRY] #625 Inserir Material/635: Análise dos efeitos da nova lei de licitações e contratos nas micro e pequenas e
+  [DRY] #626 Inserir Material/636: Análise dos principais determinantes da inovação em micro e pequenas empresas: u
+  [DRY] #627 Inserir Material/637: Barreiras para a implementação de práticas sustentáveis em projetos de construçã
+  [DRY] #628 Inserir Material/638: Gestão de RH no contexto da gestão da inovação: análise da difusão de práticas d
+  [DRY] #629 Inserir Material/639: Integração holística da sustentabilidade ao planejamento estratégico das institu
+  [DRY] #630 Inserir Material/640: Manual de Obras e Serviços de Engenharia
+  [DRY] #631 Inserir Material/641: As naturezas jurídicas do Registro de Preços e da Carona e suas consequências pr
+  [DRY] #632 Inserir Material/642: Sobrepreço e superfaturamento de obras públicas na Nova Lei de Licitações
+  [DRY] #633 Inserir Material/643: Sustentabilidade na Administração Pública
+  [DRY] #634 Inserir Material/644: Prova jurídica da aptidão técnica, súmula do TCESP e a nova lei de licitações
+  [DRY] #635 Inserir Material/645: O poder geral de cautela dos Tribunais de Contas e a sustação de contratos
+  [DRY] #636 Inserir Material/646: Nova Lei de Licitações e Contratos: impactos no Estado de São Paulo
+  [DRY] #637 Inserir Material/647: As novidades da "Nova Lei de Licitação"
+  [DRY] #638 Inserir Material/648: O indispensável planejamento
+  [DRY] #639 Inserir Material/649: e-Procurement: Euphorie und Realität
+  [DRY] #640 Inserir Material/650: Public Procurement Fraud
+  [DRY] #641 Inserir Material/651: Public procurement design: lessons from the private sector
+  [DRY] #642 Inserir Material/652: Evolução das contratações de manutenção de veículos automotores
+  [DRY] #643 Inserir Material/653: Desafios e oportunidades do primeiro ano da nova Lei de Licitações e Contratos
+  [DRY] #644 Inserir Material/654: Medidas de prevenção à corrupção na nova Lei de Licitações
+  [DRY] #645 Inserir Material/655: Lei de Licitações: apenas um alerta
+  [DRY] #646 Inserir Material/656: Jurisprudência de Bolso
+  [DRY] #647 Inserir Material/657: Programa de Sustentabilidade do TCU
+  [DRY] #648 Inserir Material/658: Referencial Básico de Gestão de Riscos
+  [DRY] #649 Inserir Material/659: Relatório de Pesquisa: Contratação de Soluções Inovadoras pela Administração Púb
+  [DRY] #650 Inserir Material/660: Recomendações para Transparência de Contratações Emergenciais em Resposta à Covi
+  [DRY] #651 Inserir Material/661: Gestão de Riscos: Avaliação da Maturidade
+  [DRY] #652 Inserir Material/662: Pesquisa de Jurisprudência: Guia Rápido
+  [DRY] #653 Inserir Material/663: Obras públicas: recomendações básicas para a contratação e fiscalização de obras
+  [DRY] #654 Inserir Material/664: Guia de Boas Práticas em Contratação de Soluções de Tecnologia da Informação - R
+  [DRY] #655 Inserir Material/665: OECD Guidelines for Fighting Bid Rigging in Public Procurement (2025 Update)
+  [DRY] #656 Inserir Material/666: Elaboração de termos de referência para contratação de bens e serviços
+  [DRY] #657 Inserir Material/667: Curso básico de licitações públicas: enfrentando e vencendo tabus
+  [DRY] #658 Inserir Material/668: Aplicação de Penalidades nos Contratos Administrativos
+  [DRY] #659 Inserir Material/669: Prevenção e detecção de Cartéis em Licitações
+  [DRY] #660 Inserir Material/670: Gestão e fiscalização de contratos administrativos
+  [DRY] #661 Inserir Material/671: Curso Regras e Fundamentos do SCDP – Sistema de Concessão de Diárias e Passagens
+  [DRY] #662 Inserir Material/672: Módulo 1: Conceitos Fundamentais - Curso Formação de Pregoeiros
+  [DRY] #663 Inserir Material/673: Produções do II Seminário Internacional de Laboratórios de Inovação no Setor Púb
+  [DRY] #664 Inserir Material/674: Inovação aberta na prática: como desenhar desafios públicos que geram soluções c
+  [DRY] #665 Inserir Material/675: Licitações e o ODS1 - Erradicação da Pobreza
+  [DRY] #666 Inserir Material/676: Licitações e o ODS2 - Fome Zero e Agricultura Sustentável
+  [DRY] #667 Inserir Material/677: Licitações e o ODS3 - Saúde e Bem Estar
+  [DRY] #668 Inserir Material/678: Licitações e o ODS4 - Educação de Qualidade
+  [DRY] #669 Inserir Material/679: Compras da agricultura familiar para a alimentação escolar no Brasil : aspectos 
+  [DRY] #670 Inserir Material/680: Efeitos das compras públicas na renda de agricultores familiares no Brasil : aná
+  [DRY] #671 Inserir Material/681: Incentivo à produção agroecológica e orgânica da agricultura familiar pelo progr
+  [DRY] #672 Inserir Material/682: Efeitos da inserção de produtos da agricultura familiar na alimentação escolar s
+  [DRY] #673 Inserir Material/683: O Mercosul ante os mega-acordos regionais : o tema de compras governamentais
+  [DRY] #674 Inserir Material/684: Análise das compras municipais da agricultura familiar para a alimentação escola
+  [DRY] #675 Inserir Material/685: Introdução : Indicadores quantitativos da OCDE e o Brasil : governança pública
+  [DRY] #676 Inserir Material/686: Corrupção, anticorrupção e integridade pública
+  [DRY] #677 Inserir Material/687: Aquisições de medicamentos pelo governo federal nas últimas duas décadas
+  [DRY] #678 Inserir Material/688: O Lugar das compras públicas na governança pública
+  [DRY] #679 Inserir Material/689: Política de preços e acesso a medicamentos : o Brasil ante as recomendações da O
+  [DRY] #680 Inserir Material/690: Inexigibilidade de licitação
+  [DRY] #681 Inserir Material/691: Impactos do Programa Nacional de Alimentação Escolar sobre o emprego e a permanê
+  [DRY] #682 Inserir Material/692: Programa de aquisição de alimentos : análise lógico-avaliativa da modalidade com
+  [DRY] #683 Inserir Material/693: Proposta de regulamentação da licitação modalidade concurso como instrumento de 
+  [DRY] #684 Inserir Material/694: Strengthening Brazil’s innovation policy through public procurement
+  [DRY] #685 Inserir Material/695: Condicionantes da aquisição de produtos da agricultura familiar para a alimentaç
+  [DRY] #686 Inserir Material/696: Mapeamento das encomendas tecnológicas no período 2019-2022
+  [DRY] #687 Inserir Material/697: O USO DO PODER DE COMPRA DO ESTADO NAS POLÍTICAS INDUSTRIAIS: EXPERIÊNCIAS DE CH
+  [DRY] #688 Inserir Material/698: Diálogos competitivos motivados pela inovação
+  [DRY] #689 Inserir Material/699: A Nova Lei de Licitações e as políticas ambientais indiretas nas compras pública
+  [DRY] #690 Inserir Material/700: As compras públicas na Administração Pública Federal (APF) e o seu papel na agen
+  [DRY] #691 Inserir Material/701: Cadernos Brasil na OCDE : compras públicas
+  [DRY] #692 Inserir Material/702: Difusão e inovação incremental pela concorrência com julgamento de técnica e pre
+  [DRY] #693 Inserir Material/703: As Parcerias para o desenvolvimento produtivo da saúde
+  [DRY] #694 Inserir Material/704: Riscos em obras públicas e o regime de contratação integrada
+  [DRY] #695 Inserir Material/705: Concursos para inovação : como a licitação na modalidade concurso pode estimular
+  [DRY] #696 Inserir Material/706: É possível promover a inovação por meio do pregão ?
+  [DRY] #697 Inserir Material/707: Radar : tecnologia, produção e comércio exterior : n. 52, ago. 2017 : edição esp
+  [DRY] #698 Inserir Material/708: O poder de compras governamental como instrumento de desenvolvimento tecnológico
+  [DRY] #699 Inserir Material/709: Nova Lei de Licitações (lei nº 14.133/21)
+  [DRY] #700 Inserir Material/710: Seleção de Amostra de Auditoria de Obras Públicas LEI DE BENFORD - versão estend
+  [DRY] #701 Inserir Material/711: Manual de Auditoria de Obras Públicas e Serviços de Engenharia (2019)
+  [DRY] #702 Inserir Material/712: Gerenciamento de obras públicas
+  [DRY] #703 Inserir Material/713: “Principais irregularidades observadas pelos Tribunais de Contas em obras de inf
+  [DRY] #704 Inserir Material/714: Obras públicas inacabadas e seguro-garantia: qual a sua importância e o que espe
+  [DRY] #705 Inserir Material/715: O princípio do planejamento licitatório como alternativa para a redução das exti
+  [DRY] #706 Inserir Material/716: A função regulatória da licitação no Brasil: estado da arte e perspectivas de fu
+  [DRY] #707 Inserir Material/717: Racionalizar as compras públicas para a aquisição de alimentos conforme a Agenda
+  [DRY] #708 Inserir Material/718: Self-cleaning e exclusão obrigatória de operadores econômicos: uma análise compa
+  [DRY] #709 Inserir Material/719: Controle da Administração Pública: um estudo sobre o uso da inteligência artific
+  [DRY] #710 Inserir Material/720: A Lei 14.133/2021 e o setor portuário
+  [DRY] #711 Inserir Material/721: Análise das modalidades de contratação de consultoria para estruturação de proje
+  [DRY] #712 Inserir Material/722: A configuração jurídica das compras governamentais por padronização como concret
+  [DRY] #713 Inserir Material/723: Sanção administrativa de Impedimento de Licitar e Contratar na Lei nº 14.133/202
+  [DRY] #714 Inserir Material/724: Projetos básicos defeituosos e as alterações qualitativas em contratos de obras 
+  [DRY] #715 Inserir Material/725: Características especiais dos contratos de compra e venda de energia elétrica no
+  [DRY] #716 Inserir Material/726: A administração pública e o diálogo competitivo: o atual modelo administrativo n
+  [DRY] #717 Inserir Material/727: A terceirização na administração pública
+  [DRY] #718 Inserir Material/728: O seguro garantia internacional como fomento para obras de infraestrutura
+  [DRY] #719 Inserir Material/729: Desafios da comercialização de energia elétrica no Brasil
+  [DRY] #720 Inserir Material/730: O dia depois do leilão: gestão contratual das parcerias municipais do PPI
+  [DRY] #721 Inserir Material/731: Inovação Colaborativa: um olhar jurídico institucional
+  [DRY] #722 Inserir Material/732: Manual de Boas Práticas em Contratações Públicas
+  [DRY] #723 Inserir Material/733: Regulação e Corrupção: disputas teóricas, evidências empíricas e o papel da qual
+  [DRY] #724 Inserir Material/734: Entrevista com a professora da ENAP Cecília de Almeida Costa sobre estudos técni
+  [DRY] #725 Inserir Material/735: Elaboração dos estudos preliminares para criação do Parque Municipal do Taquaruç
+  [DRY] #726 Inserir Material/736: Planejamento da contratação em Tecnologia da Informação (PCTI)
+  [DRY] #727 Inserir Material/737: Inserção de requisitos de sustentabilidade ambiental no processo “solicitar aqui
+  [DRY] #728 Inserir Material/738: Plano Diretor de Logística Sustentável (PLS): 2025-2027
+  [DRY] #729 Inserir Material/739: Como escrever e usar estudos de caso para ensino e aprendizagem no setor público
+  [DRY] #730 Inserir Material/740: Planejamento em engenharia das obras: paralelo entre a iniciativa pública e priv
+  [DRY] #731 Inserir Material/741: Aspectos legais na gestão e fiscalização de elaboração de estudos e projetos par
+  [DRY] #732 Inserir Material/742: O fenômeno das obras públicas paralisadas: uma análise comparativa entre process
+  [DRY] #733 Inserir Material/743: A visão do TCU sobre contratos incompletos e os reflexos dela na (in)segurança j
+  [DRY] #734 Inserir Material/744: Desafios na implantação da Nova Lei de Licitações em pequenos municípios: capaci
+  [DRY] #735 Inserir Material/745: Compras públicas centralizadas: a experiência do estado do Amapá
+  [DRY] #736 Inserir Material/746: O estudo técnico preliminar nas contratações de serviços de asseio, limpeza e co
+  [DRY] #737 Inserir Material/747: Compliance e anticorrupção: aperfeiçoamentos legais para eficiência dos incentiv
+  [DRY] #738 Inserir Material/748: Eficiência nos pregões eletrônicos do Superior Tribunal Militar: principais fato
+  [DRY] #739 Inserir Material/749: Fiscalização dos contratos administrativos: rotinas para redução de prejuízos
+  [DRY] #740 Inserir Material/750: Análise comparativa entre a aquisição no mercado nacional e a prospecção interna
+  [DRY] #741 Inserir Material/751: Governança das contratações públicas: um estudo de caso aplicado no Tribunal de 
+  [DRY] #742 Inserir Material/752: Fiscalização contratual: um estudo de caso sobre a fiscalização administrativa d
+  [DRY] #743 Inserir Material/753: Ecossistema de inovação como vetor de desenvolvimento regional em Londrina
+  [DRY] #744 Inserir Material/754: Processo administrativo sancionador no âmbito do exército: lacunas e proposta de
+  [DRY] #745 Inserir Material/755: A formação de preços de produtos de tecnologia em processos eletrônicos de compr
+  [DRY] #746 Inserir Material/756: A fase interna dos pregões eletrônicos de defesa cibernética: estudo de caso à l
+  [DRY] #747 Inserir Material/757: Proposta de diretrizes para o avanço dos diálogos público-privados na lei 14.133
+  [DRY] #748 Inserir Material/758: Compêndio de Licitações e Contratos
+  [DRY] #749 Inserir Material/759: Todas as respostas sobre a nova lei de licitações e contratos
+  [DRY] #750 Inserir Material/760: Preço de referência em compras públicas (ênfase em medicamentos)
+  [DRY] #751 Inserir Material/761: Encontro Nacional de Obras Públicas e Serviços de Engenharia - ENEOP
+  [DRY] #752 Inserir Material/762: Estágio Setorial Fiscal de Contratos
+  [DRY] #753 Inserir Material/763: Termo de Referência e Projeto Básico para compras e serviços comuns
+  [DRY] #754 Inserir Material/764: Pareceres parametrizados - CPUC/CFGEP/SUBCONSU/PGF
+  [DRY] #755 Inserir Material/765: Elaboração de termos de referência para contratação de bens e serviços na Nova L
+  [DRY] #756 Inserir Material/766: Estudo Técnico Preliminar( ETP) para elaboração de Termo de Referência/ Projeto 
+  [DRY] #757 Inserir Material/767: Manual de Jurisprudência do TCU
+  [DRY] #758 Inserir Material/768: Transformação digital nas compras públicas: governança, integridade e inovação
+  [DRY] #759 Inserir Material/769: Regulamentação orgânica e segregação de funções: em busca de um ambiente seguro 
+  [DRY] #760 Inserir Material/770: Agente de Contratação: Segregação de Funções e as Atribuições
+  [DRY] #761 Inserir Material/771: A nova Lei de Licitações: avanços ou mais do mesmo?
+  [DRY] #762 Inserir Material/772: A gestão por competência na nova Lei de Licitações e Contratos
+  [DRY] #763 Inserir Material/773: Adesão à Ata de Registro de Preços na Lei 14.133/2021
+  [DRY] #764 Inserir Material/774: A pesquisa de preços na Lei nº 14.133/2021 e aspectos importantes a serem observ
+  [DRY] #765 Inserir Material/775: Credenciamento em Licitações: 3 Cuidados Essenciais que Você Precisa Conhecer
+  [DRY] #766 Inserir Material/776: Remuneração variável nas contratações de infraestrutura
+  [DRY] #767 Inserir Material/777: PNCP e plataformas privadas: o que a Lei nº 14.133/2021 exige?
+  [DRY] #768 Inserir Material/778: É admissível estimar o valor da licitação com base em um único orçamento quando 
+  [DRY] #769 Inserir Material/779: Serviço de Engenharia
+  [DRY] #770 Inserir Material/780: Governança nas empresas estatais e a Lei nº 15.177/2025: retrocesso ou avanço?
+  [DRY] #771 Inserir Material/781: Contratos administrativos de inovação
+  [DRY] #772 Inserir Material/782: Estatais & mecanismos para a inovação
+  [DRY] #773 Inserir Material/783: A participação do mercado no planejamento das contratações públicas
+  [DRY] #774 Inserir Material/784: Building Information Modelling (BIM): inovação tecnológica nas contratações de o
+  [DRY] #775 Inserir Material/785: TCU recomenda ajustes no Compras.gov.br para evitar distorções no critério de ma
+  [DRY] #776 Inserir Material/786: Sobre a utilização de UST para contratação de serviços de TIC e a Portaria SGD/M
+  [DRY] #777 Inserir Material/787: O dilema do artigo 374 da LC nº 214/2025: O reequilíbrio contratual será por con
+  [DRY] #778 Inserir Material/788: Tarjar ou mascarar dados pessoais em atos ou contratos administrativos
+  [DRY] #779 Inserir Material/789: Contexto histórico da evolução da inteligência artificial e a contratação públic
+  RECUSADA Inserir Material/L790: Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 'Vídeos' (aceitos: Manuais, Guias, Tutoriais, Apostilas, Aulas, Cursos, Slides) | Sistema de gestão contratual “Compras Contratos” – webinar
+  [DRY] #780 Inserir Material/791: Cachorro ou Muffin? O que a IA realmente vê (e o que só nós enxergamos) Planejam
+  [DRY] #781 Inserir Material/792: A ilusão da eficiência na “carona” no SRP: planejamento como condição de validad
+  [DRY] #782 Inserir Material/793: A concessão de uso de bens públicos na Lei nº 14.133/2021: uma análise sobre a m
+  [DRY] #783 Inserir Material/794: Direito de preferência nas licitações segundo a Lei 14.133/2021
+  [DRY] #784 Inserir Material/795: As idas e vindas do TCU sobre o dolo ou o erro grosseiro como pressuposto para a
+  [DRY] #785 Inserir Material/796: O registro no Cadin como impedimento à celebração de contratos e aditivos; A rec
+  [DRY] #786 Inserir Material/797: Quarteirização como instrumento para vencer os encargos burocráticos em licitaçõ
+  [DRY] #787 Inserir Material/798: A dispensa de licitação eletrônica é modalidade de licitação disfarçada
+  [DRY] #788 Inserir Material/799: A polêmica da singularidade como condição para a inexigibilidade de licitação qu
+  [DRY] #789 Inserir Material/800: A LINDB esvaziada
+  [DRY] #790 Inserir Material/801: O papel do advogado público na Nova lei de licitação e contratação pública
+  [DRY] #791 Inserir Material/802: Nova lei de licitação e contratação pública - a hora e avez de estados e municíp
+  [DRY] #792 Inserir Material/803: Inexigibilidade e notória especialização: o que é predominantemente intelectual 
+  [DRY] #793 Inserir Material/804: Responsabilização pela revogação da licitação: qual o alcance da Lindb?
+  [DRY] #794 Inserir Material/805: A Administração sob nova direção
+  [DRY] #795 Inserir Material/806: Desconto agressivo é estratégia de aventureiros em licitações
+  [DRY] #796 Inserir Material/807: Quando as petições prejudicam o direito nas licitações
+  [DRY] #797 Inserir Material/808: Sanções administrativas e a retroatividade da Lei 14.133 segundo o STJ
+  [DRY] #798 Inserir Material/809: TCU construiu regime próprio para licitações e contratos no Sistema S. É hora de
+  [DRY] #799 Inserir Material/810: Consequencialismo e as nulidades nos contratos administrativos
+  [DRY] #800 Inserir Material/811: Bonificação pelo desempenho do contratado: vantagem para administração pública
+  [DRY] #801 Inserir Material/812: Participação estrangeira em licitações federais
+  [DRY] #802 Inserir Material/813: Desafios nas aquisições de medicamentos
+  [DRY] #803 Inserir Material/814: Influência da gestão e do planejamento na qualidade aplicada a obras públicas
+  [DRY] #804 Inserir Material/815: Obras públicas: planejamento, controle e medição
+  [DRY] #805 Inserir Material/816: O controle social de obras públicas : estratégias para estimular e viabilizar o 
+  [DRY] #806 Inserir Material/817: Uso de sistema de informatização para otimização da gestão pública em obras : um
+  [DRY] #807 Inserir Material/818: Avaliação das causas e consequências da paralisação de obras públicas no âmbito 
+  [DRY] #808 Inserir Material/819: Matriz de riscos em contratos de obras públicas: dinamismo necessário.
+  [DRY] #809 Inserir Material/820: A importância do planejamento e o gerenciamento antes da contratação de obras pú
+  [DRY] #810 Inserir Material/821: A utilização do BIM para o combate às irregularidades em obras públicas
+  [DRY] #811 Inserir Material/822: Critérios de sustentabilidade em compras públicas
+  [DRY] #812 Inserir Material/823: Vantagens e desvantagens do pregão na gestão de compras no setor público: o caso
+  [DRY] #813 Inserir Material/824: Big Data in the Brazilian public health sector: concept, characteristics, benefi
+  [DRY] #814 Inserir Material/825: As aquisições públicas na Itália à luz do direito administrativo europeu: estudo
+  [DRY] #815 Inserir Material/826: Reestruturação do setor de compras da divisão de apoio administrativo do centro 
+  [DRY] #816 Inserir Material/827: O estudo técnico preliminar (ETP) na nova lei de licitações: análise no âmbito d
+  [DRY] #817 Inserir Material/828: Análise das principais alterações da nova lei de licitações para os serviços de 
+  [DRY] #818 Inserir Material/829: Interesse Público e Planejamento na NLLC
+  [DRY] #819 Inserir Material/830: Inovação Pública: Entre a Eficiência e a Segurança Jurídica
+  [DRY] #820 Inserir Material/831: Alterações consensuais do objeto contratual na Lei 14.133/21
+  [DRY] #821 Inserir Material/832: Chile na vanguarda das contratações públicas
+  [DRY] #822 Inserir Material/833: Governança nas contratações públicas brasileiras
+  [DRY] #823 Inserir Material/834: Sistema de Compras Expressas: entre promessa da agilidade e institucionalizar a 
+  [DRY] #824 Inserir Material/835: O papel da Administração Pública no fomento à inovação tecnológica
+  [DRY] #825 Inserir Material/836: Contratação de inovação pelo setor público: novos desafios, velhos problemas
+  [DRY] #826 Inserir Material/837: Diretrizes do Fórum Econômico Mundial para aquisição de IA no setor público
+  [DRY] #827 Inserir Material/838: Contratação de inovação por governo
+  [DRY] #828 Inserir Material/839: Contratações públicas sustentáveis
+  [DRY] #829 Inserir Material/840: Boletim de Jurisprudência - Edição 1
+  [DRY] #830 Inserir Material/841: Boletim de Jurisprudência - Edição 2
+  [DRY] #831 Inserir Material/842: Boletim de Jurisprudência - Edição 3
+  [DRY] #832 Inserir Material/843: Boletim de Jurisprudência - Edição 4
+  [DRY] #833 Inserir Material/844: Boletim de Jurisprudência - Edição 5
+  [DRY] #834 Inserir Material/845: Boletim de Jurisprudência - Edição 6
+  [DRY] #835 Inserir Material/846: Boletim de Jurisprudência - Edição 7
+  [DRY] #836 Inserir Material/847: Boletim de Jurisprudência - Edição 8
+  [DRY] #837 Inserir Material/848: O marco legal de ciência, tecnologia e inovação dos Estados e do Distrito Federa
+  [DRY] #838 Inserir Material/849: A Integração Internacional do Brasil nos Acordos Comerciais sobre Compras Govern
+  [DRY] #839 Inserir Material/850: Negociações para Acessão do Brasil ao Acordo da OMC em Compras Governamentais - 
+  [DRY] #840 Inserir Material/851: ACORDO MERCOSUL – UNIÃO EUROPEIA: COMPRAS GOVERNAMENTAIS
+  [DRY] #841 Inserir Material/852: Informativo Sobre a Lei Anticorrupção
+  [DRY] #842 Inserir Material/853: Direito Administrativo e inovação: crise e soluções.
+  [DRY] #843 Inserir Material/854: Inovações da Nova Lei de Licitações e Contratos Administrativos
+  [DRY] #844 Inserir Material/855: COMISSÃO DE ESTUDOS SOBRE EMPRESAS ESTATAIS DO INSTITUTO BRASILEIRO DE DIREITO A
+  [DRY] #845 Inserir Material/856: 10 mandamentos do dispute board
+  [DRY] #846 Inserir Material/857: Pagamentos antecipados em contratos de obras públicas
+  [DRY] #847 Inserir Material/858: Uso da sociedade em conta de participação para organizar interesses privados em 
+  [DRY] #848 Inserir Material/859: Negociação de ressarcimento de dano patrimonial ao erário na Lei Anticorrupção e
+  [DRY] #849 Inserir Material/860: A contratualização do risco geológico nas obras públicas subterrâneas
+  [DRY] #850 Inserir Material/861: Os impactos da CPRB no equilíbrio econômico contratual: os contratos de infraest
+  [DRY] #851 Inserir Material/862: Contratos de performance no Programa Novo Rio Pinheiros
+  [DRY] #852 Inserir Material/863: Os monitoramentos negociados no âmbito dos acordos de leniência resultantes de a
+  [DRY] #853 Inserir Material/864: Frameworks para a governança de inteligência artificial: uma análise comparativa
+  [DRY] #854 Inserir Material/865: Atrasos concorrentes em projetos de construção: uma abordagem à luz do direito c
+  [DRY] #855 Inserir Material/866: Improbidade administrativa e controle externo exercido pelos Tribunais de Contas
+  [DRY] #856 Inserir Material/867: Acordos no domínio da improbidade administrativa
+  [DRY] #857 Inserir Material/868: Uma análise quantitativa do processo de concorrência em compras públicas dos pre
+  [DRY] #858 Inserir Material/869: Secretaria Municipal de Inovação e Tecnologia: avanços e marcos da inovação públ
+  [DRY] #859 Inserir Material/870: Avaliação de viabilidade de construção de indicadores de compras públicas a part
+  [DRY] #860 Inserir Material/871: Reflexões sobre carreira, competências e dimensionamento para a Administração Pú
+  [DRY] #861 Inserir Material/872: Capacitações dinâmicas do setor público
+  [DRY] #862 Inserir Material/873: Localizando objetivos do desenvolvimento sustentável: desafios de municípios bra
+  [DRY] #863 Inserir Material/874: Inovação orientada por missão: perspectivas para o setor público a partir de rev
+  [DRY] #864 Inserir Material/875: Impacto da qualificação nas trajetórias profissionais dos servidores públicos fe
+  [DRY] #865 Inserir Material/876: Capacidades e capacitações estatais para uma agenda de futuros
+  [DRY] #866 Inserir Material/877: A aplicação da inteligência artificial na busca de eficiência pela administração
+  [DRY] #867 Inserir Material/878: Ciência de dados e monitoramento social: uma análise do Painel de Integridade Pú
+  [DRY] #868 Inserir Material/879: Governança, gestão de riscos e integridade
+  [DRY] #869 Inserir Material/880: Cátedras : integridade em debate
+  [DRY] #870 Inserir Material/881: Módulo 3 - Ciclo de Gerenciamento de Riscos Corporativos
+  [DRY] #871 Inserir Material/882: Os caminhos da política de responsabilização administrativa e civil de pessoas j
+  [DRY] #872 Inserir Material/883: Implementação das principais boas práticas de prevenção no combate à fraude e à 
+  [DRY] #873 Inserir Material/884: Compliance Anticorrupção em Empresas Estatais
+  [DRY] #874 Inserir Material/885: Governo Aberto: Transparência e Dados Abertos
+  [DRY] #875 Inserir Material/886: Princípios de governo aberto como fatores para a confiança da sociedade civil or
+  [DRY] #876 Inserir Material/887: Avaliação das consultas sobre conflito de interesses: uma contribuição para a pr
+  [DRY] #877 Inserir Material/888: Gestão por competências
+  [DRY] #878 Inserir Material/889: Seminário de Gestão de Pessoas: Experiências Práticas na Implementação da Gestão
+  [DRY] #879 Inserir Material/890: Desenvolvimento de carreiras por competências
+  [DRY] #880 Inserir Material/891: Gestão por competências na administração pública brasileira: uma revisão integra
+  [DRY] #881 Inserir Material/892: Elaboração de planos de capacitação
+  [DRY] #882 Inserir Material/893: Competências para governança de tecnologia da informação no Ministério da Econom
+  [DRY] #883 Inserir Material/894: Implantação de trilhas de aprendizagem como mecanismo de desenvolvimento de comp
+  [DRY] #884 Inserir Material/895: Matrizes de desenvolvimento competências para o setor público brasileiro
+  [DRY] #885 Inserir Material/896: Competências: Proposta de um glossário para a administração pública a partir da 
+  [DRY] #886 Inserir Material/897: Certificação de competências
+  [DRY] #887 Inserir Material/898: Projeto pedagógico do curso de especialista em Políticas Públicas e Gestão Gover
+  [DRY] #888 Inserir Material/899: Inteligência Artificial como instrumento de governança radical para organizações
+  [DRY] #889 Inserir Material/900: Regulação da Inteligência Artificial: benchmarking de países selecionados
+  [DRY] #890 Inserir Material/901: Inteligência Artificial no Contexto do Serviço Público
+  [DRY] #891 Inserir Material/902: Termo de Referência Cooperação Internacional no 04/2022 - Projeto FLACSO 01/2021
+  [DRY] #892 Inserir Material/903: Governança algorítmica e inteligência artificial na auditoria governamental: des
+  [DRY] #893 Inserir Material/904: Pesquisa qualitativa e descritiva sobre base normativa nacional de IA à luz de e
+  [DRY] #894 Inserir Material/905: 3ª Semana de Inovação em Gestão Pública: transformação digital
+  [DRY] #895 Inserir Material/906: Seleção pública MCTI/FINEP/MGI/ENAP – Soluções de IA para o Poder Público – Roda
+  [DRY] #896 Inserir Material/907: Internet das coisas (IoT) aplicada para resolução de desafios na Administração P
+  [DRY] #897 Inserir Material/908: Gestão da Inovação Aberta no Setor Público Federal: um estudo sobre práticas e r
+  [DRY] #898 Inserir Material/909: Gestão Pública em Transformação: Inovação, Tecnologia e Valor
+  [DRY] #899 Inserir Material/910: Categoria Profissionais 2° Lugar: Uso de mineração de dados e textos para cálcul
+  [DRY] #900 Inserir Material/911: Inovação no Processo Normativo
+  [DRY] #901 Inserir Material/912: Competências transversais de um setor público de alto desempenho
+  [DRY] #902 Inserir Material/913: Governança de TIC para o Governo Digital
+  [DRY] #903 Inserir Material/914: Governança de TIC no contexto da transformação digital
+  [DRY] #904 Inserir Material/915: Análise de riscos para a contratações de TIC
+  [DRY] #905 Inserir Material/916: Planejamento da Contratação de Soluções de TIC
+  [DRY] #906 Inserir Material/917: Estudo Técnico Preliminar Avançado para Contratação de Soluções de TIC
+  [DRY] #907 Inserir Material/918: Fiscalização e Gestão de Contratos de TIC
+  [DRY] #908 Inserir Material/919: Gamificação e aprendizagem sobre ética e cidadania: um estudo sobre o game da ci
+  [DRY] #909 Inserir Material/920: Revista das competências comportamentais da Enap 2019-2020
+  [DRY] #910 Inserir Material/921: Como construir um estado empreendedor: por que a inovação precisa da burocracia?
+  [DRY] #911 Inserir Material/922: A adesão de ata de registro de preços municipais na nova Lei de Licitações: por 
+  [DRY] #912 Inserir Material/923: Da Figura do Pregoeiro ao Agente de Contratação: Mudança Terminológica ou Nova L
+  [DRY] #913 Inserir Material/924: Os impactos do fim da escala 6×1 nos contratos de terceirização dos entes públic
+  [DRY] #914 Inserir Material/925: O dever de motivar a alteração de minutas padronizadas: reflexões sobre o Acórdã
+  [DRY] #915 Inserir Material/926: Sanções administrativas em contratações públicas: o que fazer quando o órgão ou 
+  [DRY] #916 Inserir Material/927: Considerações sobre a Fase Preparatória nas Contratações de Serviços de Publicid
+  [DRY] #917 Inserir Material/928: O Acórdão 1387/2026 – Plenário e a (im)possibilidade de adesão a ata de registro
+  [DRY] #918 Inserir Material/929: Uma análise estruturada da gestão por competência na Lei nº 14.133/21
+  [DRY] #919 Inserir Material/930: É possível firmar termo de ajustamento de conduta no âmbito do processo sanciona
+  [DRY] #920 Inserir Material/931: O caso de Irupi-ES e as contratações sem implementação do PNCP
+  [DRY] #921 Inserir Material/932: Portal Nacional de Contratações Públicas (PNCP): por que precisamos falar sobre 
+  [DRY] #922 Inserir Material/933: ESG, Governança e Contratações Públicas: o que esperar e como agir a partir do A
+  [DRY] #923 Inserir Material/934: Programas de Integridade na Nova Lei de Licitações e Contratos
+  [DRY] #924 Inserir Material/935: A origem da Nova Lei de Licitações
+  [DRY] #925 Inserir Material/936: Reflexões sobre o princípio da segregação de funções na Lei nº 14.133/2021
+  [DRY] #926 Inserir Material/937: Quando a contratação desafia a lógica: o problema dos quantitativos
+  [DRY] #927 Inserir Material/938: A revolução da IA no setor público: o caso da ANIA, do TCESP
+  [DRY] #928 Inserir Material/939: A fase de lances na nova Lei de Licitações sob a perspectiva da ‘teoria dos leil
+  [DRY] #929 Inserir Material/940: Breve análise acerca da inaplicabilidade do Decreto Federal n.º 7.174/2010 para 
+  [DRY] #930 Inserir Material/941: A “folha corrida” das marcas e produtos – “atestado de vida pregressa”
+  [DRY] #931 Inserir Material/942: Celebração de acordos negociais para o afastamento condicional da aplicação de s
+  [DRY] #932 Inserir Material/943: A subcontratação e a análise de capacidade técnica
+  [DRY] #933 Inserir Material/944: Contratação direta nos casos de emergência ou calamidade pública: necessidade de
+  [DRY] #934 Inserir Material/945: A centralização de compras nos municípios resultará em contratações públicas mai
+  [DRY] #935 Inserir Material/946: A inexigibilidade de licitação para a contratação de serviços jurídicos à luz da
+  [DRY] #936 Inserir Material/947: Medida Provisória 951 – reflexões sobre a adoção da dispensa de licitação para r
+  [DRY] #937 Inserir Material/948: Por uma compreensão lógica acerca do conteúdo e da estruturação do Plano de Cont
+  [DRY] #938 Inserir Material/949: Fundações de Apoio, Lei n.º 14.133/2021 e PNCP: um esclarecimento necessário
+  [DRY] #939 Inserir Material/950: A fase recursal na Lei nº 14.133/21: considerações objetivas
+  [DRY] #940 Inserir Material/951: O óbvio oculto: sempre será necessário o Estudo Técnico Preliminar (ETP)?
+  [DRY] #941 Inserir Material/952: Competência normativa sobre contratações públicas: o que é norma geral e norma e
+  [DRY] #942 Inserir Material/953: Possibilidades de regulamentação administrativa da Lei n.º 14.133/2021 por parte
+  RECUSADA Inserir Material/L954: Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 'Vídeos' (aceitos: Manuais, Guias, Tutoriais, Apostilas, Aulas, Cursos, Slides) | Um Panorama da Nova Lei de Licitações e Contratos Administra
+  [DRY] #943 Inserir Material/955: Congresso mantém 5 dos dispositivos vetados pela Presidência na nova Lei de Lici
+  RECUSADA Inserir Material/L956: Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 'Vídeos' (aceitos: Manuais, Guias, Tutoriais, Apostilas, Aulas, Cursos, Slides) | Lançamento do ON – Observatório Nacional da Lei de Licitaçõe
+  [DRY] #944 Inserir Material/957: A teoria das nulidades na nova lei de licitações: Um anteparo contra as paralisa
+  [DRY] #945 Inserir Material/958: Redefinindo a identidade do agente de contratação e do pregoeiro na Lei n.º 14.1
+  [DRY] #946 Inserir Material/959: Governança e Due Diligence nas Contratações Públicas: o dever de conhecer quem s
+  [DRY] #947 Inserir Material/960: Integridade à paulista: análise do Decreto n.º 69.861/2025 sobre as regras de av
+  [DRY] #948 Inserir Material/961: O princípio da eficiência e sua materialização pelo critério de julgamento do ma
+  [DRY] #949 Inserir Material/962: Impactos do PNCP na governança e transparência em contratações públicas: desafio
+  [DRY] #950 Inserir Material/963: A teoria ESG nas contratações públicas
+  [DRY] #951 Inserir Material/964: O novo Sistema de Registro de Preços: 11 principais pontos para sua utilização
+  [DRY] #952 Inserir Material/965: Comentários sobre o Enunciado de Orientação Normativa da AGU 87
+  [DRY] #953 Inserir Material/966: Contrato por escopo: uma necessária releitura à luz do art. 111 da Lei nº 14.133
+  [DRY] #954 Inserir Material/967: Apresentação em licitação de atestado emitido com os dados da matriz por um prop
+  [DRY] #955 Inserir Material/968: A necessidade do pagamento do incontroverso na Nova Lei de Licitações
+  [DRY] #956 Inserir Material/969: A comprovação da Capacidade Técnica Operacional por meio de Certidão de Acervo O
+  [DRY] #957 Inserir Material/970: A redescoberta da deferência administrativa: um novo horizonte para o modelo de 
+  [DRY] #958 Inserir Material/971: Contratação de serviços técnicos especializados de natureza predominantemente in
+  [DRY] #959 Inserir Material/972: A inviabilidade de competição relativa na Nova Lei de Licitações e Contratos Adm
+  [DRY] #960 Inserir Material/973: Lei 14.133/21: um olhar pragmático sobre os Procedimentos Auxiliares
+  [DRY] #961 Inserir Material/974: Afinal, onde estão as tais normas gerais de licitações e contratos
+  [DRY] #962 Inserir Material/975: A designação de agentes públicos para o desempenho de funções no âmbito das lici
+  [DRY] #963 Inserir Material/976: O Estigma da Contratação Direta como “Exceção” e a Função Legitimadora do Proces
+  [DRY] #964 Inserir Material/977: O art. 64 da Lei nº 14.133/2021 e a juntada posterior de documento “novo” nas li
+  [DRY] #965 Inserir Material/978: DESAFIOS DA ADMINISTRAÇÃO PÚBLICA NO MUNDO DIGITAL – LIVRO DO XXXVII CONGRESSO B
+  [DRY] #966 Inserir Material/979: Como aumentar a eficiência na contratação de serviços para a administração públi
+  [DRY] #967 Inserir Material/980: Sistema de Compras Expressas (Sicx): um credenciamento com feição competitiva? N
+  [DRY] #968 Inserir Material/981: Onde começa, de fato, uma concorrência de comunicação: a importância do planejam
+  [DRY] #969 Inserir Material/982: Dez requisitos para o uso eficiente e seguro de inteligência artificial na contr
+  [DRY] #970 Inserir Material/983: A terceirização na administração pública e a vedação à superposição de funções
+  [DRY] #971 Inserir Material/984: Governança de Dados na Transformação Digital
+  [DRY] #972 Inserir Material/985: Contratações Públicas para Inovação: as implicações da Nova Lei de Licitações e 
+  [Inserir Material] Inseridos: 972, Ignorados: 0, Erros: 10
+
+=== Resultado Final ===
+  Total inseridos: 972
+  Total ignorados: 0
+  Total recusados (erros de linha): 10
+  Linhas que usaram alias de grafia: categoria 0, subcategoria 55
+
+Linhas recusadas (todas):
+  Inserir Material/L8: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Acórdão 2450/2024-TCU-Plenário
+  Inserir Material/L12: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Directive 2014/24/EU of the European Parliament and of the C
+  Inserir Material/L49: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | UNCITRAL Model Law on Public Procurement (2011)
+  Inserir Material/L76: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | WTO Agreement on Government Procurement (GPA 2012)
+  Inserir Material/L444: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Lei nº 14.133, de 1º de abril de 2021
+  Inserir Material/L460: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Portaria SEGES/ME nº 8.678, de 19 de julho de 2021
+  Inserir Material/L461: Tipo de informação fora do vocabulário da coleção Jurisprudência: 'Documentos Normativos' (aceitos: Súmulas, Boletins, Acórdãos, Deliberações) | Decreto nº 11.246, de 27 de outubro de 2022
+  Inserir Material/L790: Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 'Vídeos' (aceitos: Manuais, Guias, Tutoriais, Apostilas, Aulas, Cursos, Slides) | Sistema de gestão contratual “Compras Contratos” – webinar
+  Inserir Material/L954: Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 'Vídeos' (aceitos: Manuais, Guias, Tutoriais, Apostilas, Aulas, Cursos, Slides) | Um Panorama da Nova Lei de Licitações e Contratos Administra
+  Inserir Material/L956: Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 'Vídeos' (aceitos: Manuais, Guias, Tutoriais, Apostilas, Aulas, Cursos, Slides) | Lançamento do ON – Observatório Nacional da Lei de Licitaçõe
+
+  Recusas por motivo:
+    Tipo de informação fora do vocabulário da coleção Jurisprudência: 7
+    Tipo de informação fora do vocabulário da coleção Instrução e Capacitação: 3
+
+Possíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, não impedem a carga (448 achados em 982 linhas; semântica em catalog/qualidade.py e tools/db-refresh.md):
+  RESUMO_CURTO: 391
+      L6: A Quick Glance at Sustainable Public Procurement
+      L53: Cartilha Nova Lei de Licitações e Contratos
+      L56: Manual de Gestão de Riscos do TCU
+      L66: Manual de Sanções Administrativas do TCU
+      L77: Por que o sistema de Registro de Preços?
+      L78: Licitações e Contratos: Principais aspectos da fase preparatória e gestão contr…
+      L86: Compras públicas para inovação na perspectiva do controle
+      L91: Previsibilidade e Segurança Jurídica: a Matriz de Riscos na Nova Lei de Licitaç…
+      L111: A gestão de estoque nas organizações: uma análise crítica entre a iniciativa pú…
+      L114: A Inteligência Artificial e seus impactos nas contratações e aquisições necessá…
+      … e mais 381
+  RESUMO_MINUSCULA: 19
+      L502: Iniciativa compras sustentáveis & grandes eventos: mapeamento e análise das pri…
+      L587: Faroeste Licitatório: planejamento versus simplificação
+      L604: Gestão de riscos nas licitações do CINDACTA l: um estudo de caso
+      L630: Inexigibilidade de licitação para contratação de serviços atuariais nos RPPSS
+      L648: O indispensável planejamento
+      L659: Relatório de Pesquisa: Contratação de Soluções Inovadoras pela Administração Pú…
+      L663: Obras públicas: recomendações básicas para a contratação e fiscalização de obra…
+      L668: Aplicação de Penalidades nos Contratos Administrativos
+      L829: Interesse Público e Planejamento na NLLC
+      L849: A Integração Internacional do Brasil nos Acordos Comerciais sobre Compras Gover…
+      … e mais 9
+  RESUMO_SCRIBD: 10
+      L758: Compêndio de Licitações e Contratos
+      L759: Todas as respostas sobre a nova lei de licitações e contratos
+      L760: Preço de referência em compras públicas (ênfase em medicamentos)
+      L761: Encontro Nacional de Obras Públicas e Serviços de Engenharia - ENEOP
+      L762: Estágio Setorial Fiscal de Contratos
+      L763: Termo de Referência e Projeto Básico para compras e serviços comuns
+      L764: Pareceres parametrizados - CPUC/CFGEP/SUBCONSU/PGF
+      L765: Elaboração de termos de referência para contratação de bens e serviços na Nova …
+      L766: Estudo Técnico Preliminar( ETP) para elaboração de Termo de Referência/ Projeto…
+      L767: Manual de Jurisprudência do TCU
+  RESUMO_RETICENCIAS: 8
+      L779: Serviço de Engenharia
+      L798: A dispensa de licitação eletrônica é modalidade de licitação disfarçada
+      L856: 10 mandamentos do dispute board
+      L919: Gamificação e aprendizagem sobre ética e cidadania: um estudo sobre o game da c…
+      L924: Os impactos do fim da escala 6×1 nos contratos de terceirização dos entes públi…
+      L943: A subcontratação e a análise de capacidade técnica
+      L956: Lançamento do ON – Observatório Nacional da Lei de Licitações e Contratos Admin…
+      L971: Contratação de serviços técnicos especializados de natureza predominantemente i…
+  RESUMO_CITACAO: 7
+      L926: Sanções administrativas em contratações públicas: o que fazer quando o órgão ou…
+      L932: Portal Nacional de Contratações Públicas (PNCP): por que precisamos falar sobre…
+      L934: Programas de Integridade na Nova Lei de Licitações e Contratos
+      L936: Reflexões sobre o princípio da segregação de funções na Lei nº 14.133/2021
+      L940: Breve análise acerca da inaplicabilidade do Decreto Federal n.º 7.174/2010 para…
+      L960: Integridade à paulista: análise do Decreto n.º 69.861/2025 sobre as regras de a…
+      L965: Comentários sobre o Enunciado de Orientação Normativa da AGU 87
+  DUPLICATA_TITULO: 4
+      L24, L36: Local employment and economic development — 2 linhas
+      L28, L317: Measuring public procurement transparency with an index: Exploring the role of … — 2 linhas
+      L29, L323: Minipúblicos como possibilidade de participação e deliberação em compras públic… — 2 linhas
+      L274, L296: Inteligência artificial para identificação de indícios de fraude e corrupção em… — 2 linhas
+  RESUMO_IGUAL_TITULO: 4
+      L779: Serviço de Engenharia
+      L811: Bonificação pelo desempenho do contratado: vantagem para administração pública
+      L822: Critérios de sustentabilidade em compras públicas
+      L953: Possibilidades de regulamentação administrativa da Lei n.º 14.133/2021 por part…
+  DUPLICATA_DIVERGENTE: 2
+      L24, L36: Local employment and economic development — duplicidade caracterizada de forma diferente — campos divergentes: Tipo (Notas Técnicas ≠ Relatórios); Assunto (Governança ≠ Sustentabilidade e ODS)
+      L29, L323: Minipúblicos como possibilidade de participação e deliberação em compras públic… — duplicidade caracterizada de forma diferente — campos divergentes: Assunto (Controle, Auditoria e Combate à Corrupção ≠ Transparência)
+  DUPLICATA_DOI: 2
+      L28, L317: Measuring public procurement transparency with an index: Exploring the role of … — 2 linhas
+      L29, L323: Minipúblicos como possibilidade de participação e deliberação em compras públic… — 2 linhas
+  ENDERECO_COMPARTILHADO: 1
+      L762, L763: https://pt.scribd.com/document/613104715/Apostila-ESFC-Modulo-II — 2 títulos diferentes no mesmo endereço — estante/coletânea? confirmar endereço individual
+
+[DRY RUN] Nenhum dado foi inserido.

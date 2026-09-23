@@ -1,11 +1,21 @@
 """
-Coleções v6 (canônicas, §7 / planilha BDLP_Template_Insercao_v6.xlsx) e o de-para
-da classificação v5 → v6.
+Coleções v6 (canônicas, §7) com o vocabulário de Tipos de Informação da
+taxonomia v12 (set/2026) e o de-para de grafias legadas.
 
-A v6 define 4 Coleções pelo *Tipo de Informação*. Os mapas abaixo:
-  - COLECOES_V6 / _TIPOS_POR_COLECAO: vocabulário EXATO da planilha v6.
-  - TIPO_V5_TO_V6: normaliza nomes de tipo do acervo legado para os tipos v8
-    (usado só pelo front, em colecao_v6_for_tipo, p/ resiliência de exibição).
+As 4 Coleções são definidas pelo *Tipo de Informação*. Os mapas abaixo:
+  - COLECOES_V6 / _TIPOS_POR_COLECAO: vocabulário EXATO v12 (e-mail "ALTERAÇÕES
+    BIBLIOTECA", Lina, 11/09/2026): Jurisprudência = Súmulas, Boletins, Acórdãos,
+    Deliberações; Doutrina ganha Enunciados; Instrução perde Vídeos. "Pareceres"
+    entrou em 11/09 e saiu em 23/09/2026 (v12.1 — procurador consultado pela
+    chefia: não é doutrina nem jurisprudência).
+  - TIPO_V5_TO_V6: normaliza grafias legadas (singular, sem acento, nomes do
+    acervo v5) para o tipo canônico — usado pelo front (colecao_v6_for_tipo) e
+    pelo importador (tipo_canonico).
+  - TIPOS_LEGADOS: tipos RETIRADOS do vocabulário (Documentos Normativos, Vídeos,
+    Pareceres)
+    → coleção em que ainda devem ser EXIBIDOS enquanto documentos antigos os
+    referenciarem (janela entre a subida do código e a recarga v12). Só
+    colecao_v6_for_tipo usa; o importador recusa esses tipos.
 Os de-para de Categoria/Assunto v5→v6 foram removidos: a migração v8 lê esses
 campos diretamente da planilha (ver migrate_spreadsheet.py).
 """
@@ -22,11 +32,12 @@ def _norm(s):
 # curta em Linguagem Simples (usada na aba Curadoria e nos cards de coleção).
 COLECOES_V6 = [
     {"nome": "Jurisprudência", "slug": "jurisprudencia", "icon": "fi-shield", "color": "c-petrol",
-     "descricao": "Decisões, súmulas, enunciados e documentos normativos que orientam como aplicar a lei."},
+     "descricao": "Acórdãos, deliberações, súmulas e boletins de tribunais que orientam como aplicar a lei."},
     {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-graduation-cap", "color": "c-blue",
      "descricao": "Teses, dissertações, monografias e TCCs produzidos em universidades."},
     {"nome": "Doutrina e Conteúdo Técnico", "slug": "doutrina", "icon": "fi-book-open", "color": "c-red",
-     "descricao": "Livros, artigos, relatórios e notas técnicas que analisam e explicam o tema."},
+     "descricao": "Livros, artigos, relatórios, notas técnicas e enunciados que analisam e "
+                  "explicam o tema."},
     {"nome": "Instrução e Capacitação", "slug": "instrucao", "icon": "fi-file-text", "color": "c-yellow",
      "descricao": "Manuais, guias, cursos e materiais para aprender na prática."},
 ]
@@ -106,26 +117,44 @@ TEMAS_DESTAQUE = [
     },
 ]
 
-# Tipos de Informação EXATOS por coleção (planilha v6, aba "Coleção, Assunto e Natureza")
+# Tipos de Informação EXATOS por coleção — vocabulário v12.1 (11/09/2026;
+# Pareceres retirado em 23/09/2026).
 _TIPOS_POR_COLECAO = {
-    "Jurisprudência": ["Enunciados", "Súmulas", "Boletins", "Documentos Normativos"],
+    "Jurisprudência": ["Súmulas", "Boletins", "Acórdãos", "Deliberações"],
     "Trabalhos Acadêmicos": ["Teses", "Dissertações", "Monografias", "TCCs", "Memoriais Docentes"],
     "Doutrina e Conteúdo Técnico": [
         "Livros digitais", "Artigos", "Notas Técnicas", "Relatórios",
-        "Textos de Discussão", "Resumos", "Resumos expandidos",
+        "Textos de Discussão", "Resumos", "Resumos expandidos", "Enunciados",
     ],
     "Instrução e Capacitação": [
-        "Manuais", "Guias", "Tutoriais", "Apostilas", "Aulas", "Cursos", "Vídeos", "Slides",
+        "Manuais", "Guias", "Tutoriais", "Apostilas", "Aulas", "Cursos", "Slides",
     ],
 }
 
-# nome-normalizado do tipo v6 → coleção
+# nome-normalizado do tipo → coleção; e nome-normalizado → grafia canônica
 TIPO_TO_COLECAO = {}
+_TIPO_CANONICO_POR_NORM = {}
 for _col, _tipos in _TIPOS_POR_COLECAO.items():
     for _t in _tipos:
         TIPO_TO_COLECAO[_norm(_t)] = _col
+        _TIPO_CANONICO_POR_NORM[_norm(_t)] = _t
 
 _FALLBACK = "Doutrina e Conteúdo Técnico"
+
+# Tipos retirados do vocabulário na v12 (e Pareceres na v12.1, 23/09/2026),
+# ainda exibidos na coleção antiga
+# enquanto houver documento carregado com eles (só colecao_v6_for_tipo usa).
+TIPOS_LEGADOS = {
+    "Documentos Normativos": "Jurisprudência",
+    "Vídeos": "Instrução e Capacitação",
+    "Pareceres": "Doutrina e Conteúdo Técnico",
+}
+_TIPOS_LEGADOS_NORM = {_norm(k): v for k, v in TIPOS_LEGADOS.items()}
+_TIPOS_LEGADOS_NORM.update({
+    "documento normativo": "Jurisprudência",
+    "video": "Instrução e Capacitação",
+    "parecer": "Doutrina e Conteúdo Técnico",
+})
 
 # Normalização de tipos do acervo v5 → tipo canônico v6.
 # Chaves = valores REAIS da coluna "Tipo de informação" do v5 (normalizados).
@@ -181,26 +210,55 @@ TIPO_V5_TO_V6 = {
     "aula": "Aulas",
     "cursos": "Cursos",
     "curso": "Cursos",
-    "videos": "Vídeos",
-    "video": "Vídeos",
     "apresentacoes": "Slides",
     "slides": "Slides",
-    # Jurisprudência
-    "documento normativo": "Documentos Normativos",
-    "documentos normativos": "Documentos Normativos",
-    "enunciados": "Enunciados",
+    # Jurisprudência (v12: Acórdãos e Deliberações entram; Enunciados vai p/ Doutrina)
+    "sumula": "Súmulas",
     "sumulas": "Súmulas",
+    "boletim": "Boletins",
     "boletins": "Boletins",
+    "acordao": "Acórdãos",
+    "acordaos": "Acórdãos",
+    "deliberacao": "Deliberações",
+    "deliberacoes": "Deliberações",
+    # Doutrina e Conteúdo Técnico (v12)
+    "enunciado": "Enunciados",
+    "enunciados": "Enunciados",
 }
 
 
-def colecao_v6_for_tipo(type_name):
-    """Coleção v6 (dict) para um nome de Tipo de Informação (v5 ou v6)."""
+def tipo_retirado(type_name):
+    """True para os tipos RETIRADOS do vocabulário na v12 (Documentos Normativos,
+    Vídeos, e grafias legadas) — o importador os recusa mesmo com --allow-new-types."""
+    return _norm(type_name) in _TIPOS_LEGADOS_NORM
+
+
+def tipo_canonico(type_name):
+    """Grafia canônica v12 de um Tipo de Informação, ou None se fora do vocabulário.
+
+    Aceita as grafias legadas de TIPO_V5_TO_V6 (singular, sem acento, nomes v5)
+    e devolve o nome EXATO do vocabulário. É o critério do importador estrito:
+    tipos retirados (Documentos Normativos, Vídeos) e tipos desconhecidos → None.
+    """
     key = _norm(type_name)
-    # normaliza nome v5 → v6 antes de buscar a coleção
+    if not key:
+        return None
     v6 = TIPO_V5_TO_V6.get(key)
     lookup = _norm(v6) if v6 else key
-    nome = TIPO_TO_COLECAO.get(lookup, _FALLBACK)
+    return _TIPO_CANONICO_POR_NORM.get(lookup)
+
+
+def colecao_v6_for_tipo(type_name):
+    """Coleção v6 (dict) para um nome de Tipo de Informação (v5, v8 ou v12).
+
+    Tipos retirados na v12 (TIPOS_LEGADOS) continuam exibidos na coleção antiga
+    — um documento carregado antes da recarga não pode "cair" em Doutrina.
+    """
+    key = _norm(type_name)
+    # normaliza grafia legada → canônica antes de buscar a coleção
+    v6 = TIPO_V5_TO_V6.get(key)
+    lookup = _norm(v6) if v6 else key
+    nome = TIPO_TO_COLECAO.get(lookup) or _TIPOS_LEGADOS_NORM.get(lookup) or _FALLBACK
     return COLECOES_BY_NOME[nome]
 
 
@@ -210,3 +268,242 @@ def tipos_de_colecao(slug_or_nome):
     if not col:
         return []
     return list(_TIPOS_POR_COLECAO.get(col["nome"], []))
+
+
+# ---------------------------------------------------------------------------
+# Descrições dos Assuntos — TEXTO DA CURADORIA (Lina Nakata, 11/09/2026,
+# Caracterizacao_Assuntos_Taxonomia_BDLP.xlsx; tabela no Teams). Chave = nome
+# canônico do seed (06-taxonomia.sql); "curta" = Caracterização (uma frase),
+# "longa" = Explicação (um parágrafo), copiadas verbatim — só erros de
+# digitação evidentes corrigidos ("melhoriua", "públicos..", espaço duplo,
+# ponto final). Regra: texto da curadoria; mudanças vêm dela, não do código.
+# Vive aqui, e não em nr_assunto, porque a tabela não tem coluna de descrição,
+# o portal é somente leitura e não há migrations Django — mesmo padrão de
+# COLECOES_V6["descricao"]. A "página de metodologia" (Eduardo) consumirá o
+# mesmo dado. Exposto ao front por descricao_assunto(), facets.assuntos_glossario()
+# e pelos filtros assunto_curta/assunto_longa (catalog_tags).
+# ---------------------------------------------------------------------------
+ASSUNTOS_DESCRICAO = {
+    "Aspectos Jurídicos e Regulatórios": {
+        "curta": "Sobre a base normativa e legal das contratações públicas.",
+        "longa": "Reúne publicações sobre a legislação aplicável às compras públicas, com destaque para a "
+                 "Lei nº 14.133/2021, pareceres jurídicos e interpretações normativas. Quando o foco for "
+                 "como o assunto é tratado na norma.",
+    },
+    "Governança": {
+        "curta": "Estruturas, princípios e práticas de gestão pública.",
+        "longa": "Implementação de mecanismos e instrumentos que permitam planejar, executar e monitorar as "
+                 "contratações. Abrange modelos de governança aplicados à logística e às contratações, "
+                 "incluindo definição de papéis, tomada de decisão, accountability e alinhamento estratégico "
+                 "das compras aos objetivos institucionais. Estrutura de gestão como um todo.",
+    },
+    "Inovação e Tecnologia": {
+        "curta": "Novas soluções, ferramentas e transformação digital.",
+        "longa": "Trata de inovação nos processos de compras, adoção de novas tecnologias, digitalização, "
+                 "inteligência artificial, automação, modernização e melhoria dos processos da gestão "
+                 "pública. Foco é a inovação e a transformação em si e as novas soluções.",
+    },
+    "Sustentabilidade e ODS": {
+        "curta": "Compras sustentáveis e agenda ambiental/social.",
+        "longa": "Aborda critérios de sustentabilidade nas contratações, licitações sustentáveis, os Objetivos "
+                 "de Desenvolvimento Sustentável (ODS), impacto ambiental e responsabilidade social nos "
+                 "processos de compra.",
+    },
+    "Controle, Auditoria e Combate à Corrupção": {
+        "curta": "Fiscalização, auditoria e prevenção de irregularidades.",
+        "longa": "Reúne conteúdo sobre controle interno e externo, auditoria de contratações, prevenção e "
+                 "combate à corrupção, responsabilização e mecanismos de fiscalização dos atos "
+                 "administrativos. Quando o foco for o ato de fiscalizar, auditar ou responsabilizar.",
+    },
+    "Gestão de Competências": {
+        "curta": "Desenvolvimento de pessoas e capacidades da equipe.",
+        "longa": "Trata das competências necessárias aos agentes públicos envolvidos em contratações, "
+                 "capacitação, desenvolvimento de habilidades e gestão do conhecimento organizacional.",
+    },
+    "Logística e Gestão de Suprimentos": {
+        "curta": "Operação logística e cadeia de suprimentos.",
+        "longa": "Aborda armazenagem, distribuição, transporte, gestão de estoques e a cadeia de suprimentos "
+                 "no setor público. Foco é a operação.",
+    },
+    "Compras Centralizadas/compartilhadas": {
+        "curta": "Modelos de aquisição conjunta e centralizada.",
+        "longa": "Trata de compras compartilhadas, centrais de compras, consórcios públicos e modelos de "
+                 "aquisição centralizada entre órgãos. Foco no modelo de aquisição.",
+    },
+    "Transparência": {
+        "curta": "Publicidade e acesso à informação.",
+        "longa": "Aborda divulgação de dados de contratações, portais da transparência, Lei de Acesso à "
+                 "Informação e publicidade dos atos administrativos. Controle social. Foco na divulgação e "
+                 "acesso à informação.",
+    },
+    "Integridade": {
+        "curta": "Ética, prevenção de conflitos e compliance.",
+        "longa": "Trata de programas de integridade, prevenção de conflitos de interesse, compliance e "
+                 "conduta ética dos agentes públicos. Foco na conduta ética e o compliance.",
+    },
+    "Micro e Pequenas Empresas": {
+        "curta": "Tratamento diferenciado a MPEs nas compras.",
+        "longa": "Aborda o tratamento favorecido a micro e pequenas empresas nas licitações, reserva de "
+                 "mercado, simplificação de exigências e estímulo à participação.",
+    },
+    "Uso de Sistemas": {
+        "curta": "Sistemas operacionais e plataformas de compras.",
+        "longa": "Trata do uso de sistemas informatizados de compras, plataformas eletrônicas, sistemas de "
+                 "registro de preços e ferramentas operacionais já adotadas. Específico sobre sistemas em uso.",
+    },
+    "Sanções Administrativas": {
+        "curta": "Penalidades e responsabilização de fornecedores e agentes públicos.",
+        "longa": "Aborda sanções aplicáveis a fornecedores e contratados, impedimentos de licitar, declaração "
+                 "de inidoneidade e processos sancionatórios. Responsabilização dos Agentes públicos. Foca "
+                 "na penalização.",
+    },
+    "Catálogo eletrônico de Padronização": {
+        "curta": "Instrumento de padronização de itens de compra.",
+        "longa": "Trata do catálogo eletrônico de padronização de materiais e serviços, instrumento previsto "
+                 "na Lei nº 14.133/2021 para uniformizar especificações.",
+    },
+    "Gestão Estratégica e Desempenho das Contratações": {
+        "curta": "Operação e resultados.",
+        "longa": "Trata da operação e resultados dos processos: prazos, economicidade, produtividade, "
+                 "indicadores, qualidade.",
+    },
+    "Logística Pública Internacional": {
+        "curta": "Compras internacionais e cooperação.",
+        "longa": "Marcos, comparações e cooperação internacional em contratações públicas.",
+    },
+}
+
+_SEM_DESCRICAO = {"curta": "", "longa": ""}
+
+# ---------------------------------------------------------------------------
+# Definições de Subcategorias e Microcategorias (glossário de Coleções, "Saiba
+# mais" de cada Categoria — 17/09/2026).
+#
+# STATUS: RASCUNHO TÉCNICO, A VALIDAR PELA CURADORIA (Lina). Ao contrário de
+# ASSUNTOS_DESCRICAO (texto da curadoria, verbatim), a curadoria ainda não
+# escreveu estas definições — nem a planilha (aba "Árvore de Classificação",
+# só nomes), nem nr_subcategoria/nr_microcategoria (só nome e ordem) as têm.
+# Cada frase abaixo foi escrita em Linguagem Simples a partir do dispositivo da
+# Lei nº 14.133/2021 indicado no comentário; nada de valor-limite em reais (os
+# tetos são atualizados por decreto). Quando a curadoria entregar o texto dela,
+# substituir aqui, mantendo o padrão.
+#
+# Chave = nome canônico normalizado (caixa alta, espaços simples), o mesmo
+# critério de catalog_tags.rotulo_sub — cobre subcategorias e microcategorias
+# (os nomes são únicos entre os dois níveis; test_glossario_arvore garante a
+# cobertura exata do seed 07-categories.sql).
+ARVORE_DESCRICAO = {
+    # PLANEJAMENTO/FASE PREPARATÓRIA
+    "ETP": (                                                          # art. 6º, XX; art. 18, I e § 1º
+        "O documento que abre o planejamento da contratação. Descreve a necessidade, compara as "
+        "soluções possíveis e mostra se a contratação é viável."
+    ),
+    "TR": (                                                           # art. 6º, XXIII
+        "O documento que descreve o que será contratado e como. Traz o objeto, os requisitos, o modelo "
+        "de execução e de gestão, os critérios de pagamento e a estimativa de preço."
+    ),
+    "GESTÃO DE RISCOS": (                                             # art. 18, X; art. 22
+        "Identificação dos riscos que podem prejudicar a licitação ou a execução do contrato, e das "
+        "medidas para tratá-los."
+    ),
+    "MAPA DE RISCOS": (                                               # instrumento do art. 18, X
+        "Lista dos riscos da contratação, com a probabilidade, o impacto e as ações para evitar ou "
+        "reduzir cada um."
+    ),
+    "MATRIZ DE ALOCAÇÃO DE RISCOS": (                                 # art. 6º, XXVII; art. 22
+        "Cláusula do contrato que define quais riscos ficam com a Administração e quais ficam com o "
+        "contratado."
+    ),
+    "PESQUISA DE PREÇOS": (                                           # art. 23
+        "Levantamento dos preços praticados no mercado para estimar o valor da contratação e avaliar "
+        "as propostas."
+    ),
+    # SELEÇÃO DO FORNECEDOR
+    "LICITAÇÃO": (                                                    # art. 28 (modalidades)
+        "Disputa pública entre fornecedores, em uma das modalidades da lei, para escolher a proposta "
+        "mais vantajosa."
+    ),
+    "CONCORRÊNCIA": (                                                 # art. 6º, XXXVIII
+        "Modalidade de licitação para bens e serviços especiais e para obras e serviços de engenharia, "
+        "comuns ou especiais."
+    ),
+    "PREGÃO": (                                                       # art. 6º, XLI
+        "Modalidade de licitação obrigatória para bens e serviços comuns, julgada por menor preço ou "
+        "maior desconto."
+    ),
+    "LEILÃO": (                                                       # art. 6º, XL
+        "Modalidade de licitação para vender bens da Administração, como imóveis ou bens sem uso, a "
+        "quem oferecer o maior lance."
+    ),
+    "DIÁLOGO COMPETITIVO": (                                          # art. 6º, XLII; art. 32
+        "Modalidade em que a Administração conversa com fornecedores pré-selecionados para construir a "
+        "solução antes de receber as propostas. Usada em contratações complexas ou inovadoras."
+    ),
+    "CONTRATAÇÃO DIRETA": (                                           # arts. 72 a 75
+        "Contratação sem licitação, nos casos que a lei permite: por inexigibilidade ou por dispensa."
+    ),
+    "INEXIGIBILIDADE": (                                              # art. 74
+        "Contratação direta quando não há como haver disputa — por exemplo, com fornecedor exclusivo ou "
+        "com profissional de notória especialização."
+    ),
+    "EMERGÊNCIA - INCISO VIII": (                                     # art. 75, VIII
+        "Dispensa de licitação em situação de emergência ou de calamidade pública, para atender uma "
+        "urgência que possa causar prejuízo ou interromper um serviço público."
+    ),
+    "DISPENSA POR VALOR (ART 75 - INCISOS I E II)": (                 # art. 75, I e II
+        "Dispensa de licitação para contratações de pequeno valor, até os limites que a lei fixa e "
+        "atualiza para obras, serviços e compras."
+    ),
+    "CONTRATAÇÃO DIRETA OUTROS INCISOS": (                            # art. 75, III a XVIII
+        "Os demais casos de dispensa previstos no art. 75, como licitação deserta ou fracassada, "
+        "contratação de outro órgão público e situações específicas."
+    ),
+    "PROCEDIMENTOS AUXILIARES": (                                     # art. 78
+        "Procedimentos que apoiam as licitações e as contratações: credenciamento, pré-qualificação, "
+        "manifestação de interesse, registro de preços e registro cadastral."
+    ),
+    "CREDENCIAMENTO": (                                               # art. 6º, XLIII; art. 79
+        "Chamamento público em que todos os interessados que cumprem os requisitos se cadastram para "
+        "fornecer quando convocados, sem disputa entre eles."
+    ),
+    "REGISTRO DE PREÇOS (RP)": (                                      # art. 6º, XLV; arts. 82 a 86
+        "Registro formal de preços de fornecedores, obtido por licitação, para contratações futuras "
+        "conforme a necessidade."
+    ),
+    "PRÉ-QUALIFICAÇÃO": (                                             # art. 80
+        "Seleção feita antes da licitação para verificar se os interessados ou os produtos atendem aos "
+        "requisitos."
+    ),
+    "PMI": (                                                          # art. 81
+        "Procedimento de Manifestação de Interesse: a Administração pede à iniciativa privada estudos e "
+        "projetos de soluções inovadoras para uma necessidade."
+    ),
+    "REGISTRO CADASTRAL": (                                           # art. 87
+        "Cadastro de fornecedores que antecipa a verificação de habilitação para as licitações futuras."
+    ),
+    # GESTÃO CONTRATUAL
+    "GESTÃO DE CONTRATOS": (                                          # art. 117; art. 104 e seguintes
+        "Acompanhamento do contrato pelo gestor: prazos, pagamentos, aditivos, prorrogações e "
+        "encerramento."
+    ),
+    "FISCALIZAÇÃO DE CONTRATOS": (                                    # art. 117
+        "Verificação, pelo fiscal, de que o contratado entrega o objeto como combinado, com registro "
+        "das ocorrências."
+    ),
+}
+
+
+def descricao_arvore(nome):
+    """Definição de uma Subcategoria ou Microcategoria pelo nome canônico
+    (normalizado como rotulo_sub); string vazia quando não há texto — um nó
+    novo sem definição não quebra nada."""
+    chave = " ".join(str(nome or "").upper().split())
+    return ARVORE_DESCRICAO.get(chave, "")
+
+
+
+def descricao_assunto(nome):
+    """{"curta", "longa"} do Assunto pelo nome canônico; strings vazias quando
+    não há descrição (um Assunto novo sem texto da curadoria não quebra nada)."""
+    d = ASSUNTOS_DESCRICAO.get(str(nome or "").strip())
+    return dict(d) if d else dict(_SEM_DESCRICAO)

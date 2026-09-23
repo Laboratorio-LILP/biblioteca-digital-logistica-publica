@@ -1,8 +1,14 @@
+import logging
+import re
+
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db import DatabaseError, connection
 from django.db.models import F
 
 from .models import Document, TypeInformation
 from .taxonomy_v6 import colecao_v6_for_tipo
+
+logger = logging.getLogger(__name__)
 
 
 def _typeinform_ids_for_colecao(slug):
@@ -110,6 +116,115 @@ def _apply_sort(qs, sort, default):
     return qs.order_by(default, "-pk")
 
 
+# Campos e pesos do vetor de busca. Inclui campos LILP (complexidade,
+# uso_futuro, metodo, resultado) além dos clássicos title/keywords/author/abstract.
+_FTS_CAMPOS = (
+    ("title", "A"),
+    ("keywords", "A"),
+    ("author", "B"),
+    ("autor_principal", "B"),
+    ("abstract", "C"),
+    ("uso_futuro", "C"),
+    ("metodo", "D"),
+    ("resultado", "D"),
+    ("complexidade", "D"),
+)
+
+
+def _vetor(config):
+    """Soma dos SearchVector dos campos de _FTS_CAMPOS numa configuração de busca."""
+    vetor = None
+    for campo, peso in _FTS_CAMPOS:
+        sv = SearchVector(campo, weight=peso, config=config)
+        vetor = sv if vetor is None else vetor + sv
+    return vetor
+
+
+# Sufixos nasais do português que o usuário costuma digitar sem acento. O
+# radicalizador `portuguese` depende do "ção"/"ções" para chegar ao mesmo
+# radical de singular e plural ("licitação" e "licitações" → "licit"); sem o
+# acento, "licitacao" → "licitaca" e "licitacoes" → "licitaco" — mesmo com
+# unaccent, que roda ANTES do stemmer. Por isso a consulta ganha uma variante
+# re-acentuada, só nos tokens 100% ASCII, do sufixo mais longo para o mais curto.
+_SUFIXOS_REACENTUACAO = (
+    ("coes", "ções"), ("cao", "ção"), ("aos", "ãos"), ("oes", "ões"), ("aes", "ães"),
+    ("ao", "ão"), ("ae", "ãe"),
+)
+# Token de letras ASCII não colado a outra letra Unicode (senão seria pedaço
+# de uma palavra já acentuada, ex.: "licita" em "licitação").
+_TOKEN_ASCII_RE = re.compile(r"(?<![^\W\d_])[A-Za-z]+(?![^\W\d_])")
+
+
+def reacentuar(termo):
+    """Variante da consulta com os sufixos nasais re-acentuados ("licitacao" →
+    "licitação", "sancoes" → "sanções"); '' quando nada muda. Usada em OR com a
+    consulta original — só acrescenta resultados, nunca tira."""
+
+    def _token(m):
+        palavra = m.group(0)
+        baixa = palavra.lower()
+        for sufixo, acentuado in _SUFIXOS_REACENTUACAO:
+            if baixa.endswith(sufixo) and len(baixa) > len(sufixo) + 1:
+                return baixa[: -len(sufixo)] + acentuado
+        return palavra
+
+    novo = _TOKEN_ASCII_RE.sub(_token, termo or "")
+    return novo if novo != (termo or "") else ""
+
+
+_CONFIG_UNACCENT = "portuguese_unaccent"
+_unaccent_estado = {"ok": False, "avisado": False}
+
+
+def _unaccent_disponivel():
+    """True se a configuração de busca `portuguese_unaccent` existe no banco.
+
+    Positivo fica em cache no processo; negativo é reavaliado a cada chamada
+    (uma consulta a pg_ts_config, custo desprezível) e avisa no log uma vez —
+    um banco ainda sem a seção 1 do script de migração v12 (homologação antes
+    do SQL) degrada a busca sem acento em vez de derrubar a busca e a home.
+    """
+    if _unaccent_estado["ok"]:
+        return True
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT 1 FROM pg_ts_config WHERE cfgname = %s", [_CONFIG_UNACCENT])
+            ok = cur.fetchone() is not None
+    except DatabaseError:
+        ok = False
+    if ok:
+        _unaccent_estado["ok"] = True
+    elif not _unaccent_estado["avisado"]:
+        _unaccent_estado["avisado"] = True
+        logger.warning(
+            "configuração de busca %s ausente: busca sem acento degradada (só `portuguese` + variante "
+            "re-acentuada); aplique a seção 1 de docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql",
+            _CONFIG_UNACCENT,
+        )
+    return ok
+
+
+def _consulta(query, com_unaccent):
+    """tsquery montada POR TOKEN: OR das configurações (e da variante re-acentuada)
+    dentro de cada palavra, E entre as palavras.
+
+    Revisão de 14/09/2026: OR entre consultas inteiras deixava a raiz da árvore
+    em OR e o ts_rank passava a aceitar documento com só uma das palavras
+    ("pregão eletrônico": 29 → 81). Por token, a semântica de plainto_tsquery
+    (todas as palavras) é preservada e cada palavra fica tolerante a acento.
+    """
+    total = None
+    for tok in query.split():
+        q = SearchQuery(tok, config="portuguese")
+        if com_unaccent:
+            q = q | SearchQuery(tok, config="portuguese_unaccent")
+        variante = reacentuar(tok)
+        if variante:
+            q = q | SearchQuery(variante, config="portuguese")
+        total = q if total is None else total & q
+    return total if total is not None else SearchQuery(query, config="portuguese")
+
+
 def apply_fulltext(qs, query):
     """Restringe `qs` aos documentos que casam a busca textual, anotando `rank`.
 
@@ -117,22 +232,32 @@ def apply_fulltext(qs, query):
     resultados (search_documents) e pela base das facetas (compute_facets).
     Se divergirem, a contagem da barra lateral não bate com a lista exibida.
 
-    O vetor inclui campos LILP (complexidade, uso_futuro, metodo, resultado)
-    além dos clássicos title/keywords/author/abstract.
+    Busca sem acento (set/2026): "pregao" precisa achar o mesmo que "pregão"
+    SEM perder o que a configuração `portuguese` já casa (plural, flexões).
+    Aplicar unaccent ANTES do radicalizador quebra regras do português
+    ("licitações" → "licitaco" ≠ "licitação" → "licitaca"), então as duas
+    configurações são SOMADAS, não trocadas: vetor = campos em `portuguese`
+    + os mesmos campos (mesmos pesos) em `portuguese_unaccent`; consulta por
+    token (_consulta), com a variante re-acentuada dos sufixos nasais
+    (reacentuar), que fecha o caso plural/singular que o unaccent-antes-do-
+    stemmer não cobre ("licitacao" precisa achar "licitações").
+
+    O casamento booleano é explícito (`vetor @@ consulta`, via filter(busca=…));
+    o rank fica só como limiar (rank__gte=0.01) e ordenação. `portuguese_unaccent`
+    nasce em 00-extensions.sql (volume novo) e na seção 1 do script de
+    migração v12; sem ela, a busca degrada para `portuguese` (ver
+    _unaccent_disponivel) em vez de falhar.
     """
-    vector = (
-        SearchVector("title", weight="A", config="portuguese")
-        + SearchVector("keywords", weight="A", config="portuguese")
-        + SearchVector("author", weight="B", config="portuguese")
-        + SearchVector("autor_principal", weight="B", config="portuguese")
-        + SearchVector("abstract", weight="C", config="portuguese")
-        + SearchVector("uso_futuro", weight="C", config="portuguese")
-        + SearchVector("metodo", weight="D", config="portuguese")
-        + SearchVector("resultado", weight="D", config="portuguese")
-        + SearchVector("complexidade", weight="D", config="portuguese")
+    com_unaccent = _unaccent_disponivel()
+    if com_unaccent:
+        vector = _vetor("portuguese") + _vetor("portuguese_unaccent")
+    else:
+        vector = _vetor("portuguese")
+    consulta = _consulta(query, com_unaccent)
+    return (
+        qs.annotate(busca=vector, rank=SearchRank(vector, consulta))
+        .filter(busca=consulta, rank__gte=0.01)
     )
-    search_query = SearchQuery(query, config="portuguese")
-    return qs.annotate(rank=SearchRank(vector, search_query)).filter(rank__gte=0.01)
 
 
 def search_documents(query, filters=None, sort=None):

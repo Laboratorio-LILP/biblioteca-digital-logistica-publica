@@ -1,0 +1,39 @@
+# Verificação com CSP ligada (DJANGO_DEBUG=false, SECURE_SSL ausente=false, ALLOWED_HOSTS local) — 14/09/2026
+
+## Cabeçalho
+X-Frame-Options: DENY
+Content-Security-Policy: img-src 'self' data: https://saopaulo.sp.gov.br https://compras.sp.gov.br; frame-ancestors 'none'; base-uri 'self'; font-src 'self' https://fonts.gstatic.com; default-src 'self'; form-action 'self'; connect-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com
+Referrer-Policy: strict-origin-when-cross-origin
+
+## Página de debug desligada (0 = sim)
+0
+
+## Cenas Playwright (JS ligado/desligado, desktop/mobile) — checks e erros de console
+== filtro-desktop-js
+   [ok] url_com_assunto_id: ok — assunto_id=10
+   [ok] rolagem_preservada: ok — antes=1128 depois=1128
+   [ok] sem_recarregar_pagina: 
+   [ok] foco_no_checkbox: ok — assunto_id:10:1
+   [ok] chip_do_assunto: ok — Assunto: Micro e Pequenas Empresas
+   [ok] anuncio_aria_live: ok — Resultados atualizados: 19 documentos
+   [ok] voltar_sem_recarregar: ok — http://localhost:8000/busca/
+   [ok] voltar_desmarca_filtro: 
+== filtro-desktop-semjs
+   [ok] url_com_assunto_id: ok — q=&assunto_id=10&ano_min=&ano_max=&sort=#acervo-resultados
+   [ok] ancora_resultados: ok — http://localhost:8000/busca/?q=&assunto_id=10&ano_min=&ano_max=&sort=#acervo-resultados
+   [ok] pagina_posicionada_nos_resultados: ok — scrollY=456
+== filtro-mobile-js
+   [ok] drawer_continua_aberto: ok — is-open=True aria-expanded=true
+   [ok] sem_recarregar_pagina: 
+   [ok] url_com_assunto_id: 
+   [ok] lista_atualizada_por_tras: ok — Assunto: Micro e Pequenas Empresas
+== cartao-desktop
+   [ok] rodape_do_cartao: ok — Etapa: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento
+== cartao-mobile
+   [ok] rodape_do_cartao: ok — Etapa: Conteúdos Transversais · Assunto: Inovação e Tecnologia Ver documento
+== documento
+   [ok] badges_do_heroi: ok — Artigos | Aspectos Jurídicos e Regulatórios | Etapa: Seleção do Fornecedor › Procedimentos Auxiliares | Aberto
+   [ok] rotulos_classificacao: ok — Coleção | Tipo de informação | Assunto | Natureza | Etapa (categoria processual) | Subcategoria | Microcategoria
+
+capturas em /var/folders/s4/9b8pvl5n5595hmstq0sz6dnh0000gn/T/evid-csp — verificações com falha: 0
+exit playwright: 0

@@ -4,7 +4,8 @@
 {% block title %}{% if query %}{{ query }} — busca{% else %}Acervo{% endif %} — Biblioteca Digital de Logística Pública{% endblock %}
 
 {% block content_raw %}
-<form id="acervo-form" action="{% url 'catalog:search' %}" method="get">
+{# A âncora no action faz o envio sem JS aterrissar nos resultados (o navegador preserva o fragmento do action ao montar a URL GET); com JS, acervo-filters.js troca as regiões sem recarregar. #}
+<form id="acervo-form" action="{% url 'catalog:search' %}#acervo-resultados" method="get">
   <section class="sp-section sp-section--pattern catalog-hero">
     <div class="sp-container">
       <nav class="breadcrumb" aria-label="Trilha de navegação">
@@ -60,7 +61,7 @@
           <div class="filter-group__body">
             {% include "_partials/_cat_toggle.html" with param="colecao_v6" id=grp.slug nome="Toda a coleção" count=grp.total disabled=grp.toda_disabled current=filters.colecao_v6 noun="coleção" klass="toggle-opt--all-strong" %}
             {% for tipo in grp.tipos %}
-            {% include "_partials/_cat_toggle.html" with param="typeinform_id" id=tipo.id nome=tipo.nome count=tipo.count current=filters.typeinform_id noun="tipo" %}
+            {% include "_partials/_cat_toggle.html" with param="typeinform_id" id=tipo.id nome=tipo.nome count=tipo.count disabled=tipo.disabled current=filters.typeinform_id noun="tipo" %}
             {% endfor %}
           </div>
         </details>
@@ -70,7 +71,7 @@
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <details class="side-section"{% if filters.category_id or filters.subcategoria_id or filters.microcategoria_id %} open{% endif %}>
         <summary><h3>Categorias</h3></summary>
-        <p class="side-section__hint">Cada categoria é uma etapa do processo de contratação pública.</p>
+        <p class="side-section__hint">A etapa da contratação em que o material se aplica. <a class="side-section__link" href="{% url 'catalog:collection_list' %}#categorias">O que significa cada opção?</a></p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias, ex.: PCA, Ciclo Completo, Conteúdos Transversais) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
@@ -105,7 +106,7 @@
 
       <details class="side-section"{% if filters.assunto_id %} open{% endif %}>
         <summary><h3>Assunto</h3></summary>
-        <p class="side-section__hint">O tema tratado no documento.</p>
+        <p class="side-section__hint">O tema tratado no documento (um documento tem um assunto principal). <a class="side-section__link" href="{% url 'catalog:collection_list' %}#assuntos">O que significa cada opção?</a></p>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
       </details>
 
@@ -134,6 +135,8 @@
 
     <div class="acervo-results">
       <p id="acervo-status" class="sr-only" role="status" aria-live="polite"></p>
+      {# #acervo-resultados: alvo da âncora sem JS e região trocada pelo fetch. O status aria-live fica FORA dela (uma live region recém-inserida não é anunciada). #}
+      <div id="acervo-resultados">
       <button type="button" class="acervo-mobile-toggle" aria-expanded="false" aria-controls="acervo-sidebar">
         <svg class="fi" aria-hidden="true"><use href="#fi-sliders"/></svg>
         Filtros{% if filtros_count %} ({{ filtros_count }}){% endif %}
@@ -158,13 +161,19 @@
         </label>
       </div>
 
-      {% if query %}
-      <p class="query-indicator">Pesquisa por <strong>“{{ query }}”</strong></p>
-      {% endif %}
-      {% if filtros_count %}
-      {% applied_filters request.GET as chips %}
-      <p class="query-indicator">Filtrando por <strong>{% for c in chips %}{{ c.texto }}{% if not forloop.last %} · {% endif %}{% endfor %}</strong></p>
-      {% endif %}
+      {% comment %}
+        Linha de estado SEMPRE presente (15/09/2026): quando ela era inserida só com
+        filtro/busca, a grade de resultados descia ~33 px no primeiro filtro e subia ao
+        remover o último — "de vez em quando joga para baixo". Uma única <p> com o
+        estado corrente mantém o topo da grade no lugar. (Bloco comment/endcomment, não
+        o comentário curto de uma linha: o comentário curto do Django só vale em UMA
+        linha — em várias, vaza como texto na página.)
+      {% endcomment %}
+      <p class="query-indicator">
+        {% if query %}Pesquisa por <strong>“{{ query }}”</strong>{% if filtros_count %} · {% endif %}{% endif %}
+        {% if filtros_count %}{% applied_filters request.GET as chips %}Filtrando por <strong>{% for c in chips %}{{ c.texto }}{% if not forloop.last %} · {% endif %}{% endfor %}</strong>{% endif %}
+        {% if not query and not filtros_count %}Mostrando todo o acervo{% endif %}
+      </p>
 
       {% if page_obj.object_list %}
       <div class="doc-grid">
@@ -175,7 +184,7 @@
         <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
         {% if filters %}
         <strong>Nenhum documento com esses filtros</strong>
-        <p>Remova um filtro ou amplie o intervalo de anos para ver mais resultados. <a href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}">Limpar tudo</a></p>
+        <p>Remova um filtro ou amplie o intervalo de anos para ver mais resultados. <a href="{% url 'catalog:search' %}{% if query %}?q={{ query|urlencode }}{% endif %}#acervo-resultados">Limpar tudo</a></p>
         {% elif query %}
         <strong>Nenhum documento encontrado</strong>
         <p>Tente outros termos de pesquisa.</p>
@@ -185,29 +194,31 @@
         {% endif %}
       </div>
       {% endif %}
+      </div>
     </div>
   </div>
   </section>
 
+  {# #acervo-paginacao: terceira região trocada pelo fetch (inserida/removida quando a paginação aparece/some); os links levam a âncora para o caminho sem JS. #}
   {% if page_obj.has_other_pages %}
-  <section class="sp-section sp-section--alt">
+  <section id="acervo-paginacao" class="sp-section sp-section--alt">
     <div class="sp-container">
       <nav class="pagination" aria-label="Paginação dos resultados">
         {% if page_obj.has_previous %}
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' 1 %}" aria-label="Primeira página">Primeira</a>
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}" aria-label="Página anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' 1 %}#acervo-resultados" aria-label="Primeira página">Primeira</a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.previous_page_number %}#acervo-resultados" aria-label="Página anterior"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-left"/></svg></a>
         {% else %}
         <span class="page-btn is-disabled" aria-disabled="true">Primeira</span>
         <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-left"/></svg></span>
         {% endif %}
         {% for num in page_obj.paginator.page_range %}
           {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
-          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}"{% if num == page_obj.number %} aria-current="page"{% endif %} aria-label="Página {{ num }}">{{ num }}</a>
+          <a class="page-btn{% if num == page_obj.number %} active{% endif %}" href="?{% querystring_replace request.GET 'page' num %}#acervo-resultados"{% if num == page_obj.number %} aria-current="page"{% endif %} aria-label="Página {{ num }}">{{ num }}</a>
           {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}" aria-label="Próxima página"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>
-        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.paginator.num_pages %}" aria-label="Última página">Última</a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.next_page_number %}#acervo-resultados" aria-label="Próxima página"><svg class="fi" aria-hidden="true"><use href="#fi-chevron-right"/></svg></a>
+        <a class="page-btn" href="?{% querystring_replace request.GET 'page' page_obj.paginator.num_pages %}#acervo-resultados" aria-label="Última página">Última</a>
         {% else %}
         <span class="page-btn is-disabled" aria-hidden="true"><svg class="fi"><use href="#fi-chevron-right"/></svg></span>
         <span class="page-btn is-disabled" aria-disabled="true">Última</span>

@@ -47,8 +47,12 @@ ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS microcategoria_id INT REFERENCE
 ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS ano INT;
 ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS permissao VARCHAR(20);
 
--- 2.5 Seed dos 14 Assuntos temáticos v8 (eixo paralelo, coluna C da planilha) -
--- Fonte: aba "Coleção, Assunto e Natureza" de BDLP_Template_Insercao_v8.xlsx.
+-- 2.5 Seed dos 16 Assuntos temáticos (eixo paralelo, coluna C da planilha) ----
+-- Fonte: aba "Coleção, Assunto e Natureza" do template (14 assuntos v8) mais os
+-- dois da taxonomia v12 (Lina, 11/09/2026, Caracterizacao_Assuntos_Taxonomia_BDLP.xlsx):
+-- "Gestão Estratégica e Desempenho das Contratações" e "Logística Pública
+-- Internacional". As descrições (caracterização/explicação) vivem em
+-- portal/catalog/taxonomy_v6.py (ASSUNTOS_DESCRICAO) — nr_assunto não tem coluna.
 -- As subcategorias/microcategorias dependem de nr_category (populada em
 -- 07-categories.sql, que roda DEPOIS deste arquivo) e por isso são semeadas lá.
 INSERT INTO nr_assunto (nome, slug, ordem) VALUES
@@ -65,7 +69,9 @@ INSERT INTO nr_assunto (nome, slug, ordem) VALUES
     ('Sanções Administrativas', 'sancoes-administrativas', 11),
     ('Sustentabilidade e ODS', 'sustentabilidade-e-ods', 12),
     ('Transparência', 'transparencia', 13),
-    ('Uso de Sistemas', 'uso-de-sistemas', 14)
+    ('Uso de Sistemas', 'uso-de-sistemas', 14),
+    ('Gestão Estratégica e Desempenho das Contratações', 'gestao-estrategica-e-desempenho-das-contratacoes', 15),
+    ('Logística Pública Internacional', 'logistica-publica-internacional', 16)
 ON CONFLICT (nome) DO NOTHING;
 
 -- 3. Índices para os filtros do Acervo ---------------------------------------

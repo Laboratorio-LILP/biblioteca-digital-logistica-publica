@@ -40,9 +40,10 @@ def test_home_tem_5_ancoras_e_a_seta():
     assert "js/seta-secoes.js" in home
 
 
-def test_colecoes_tem_3_ancoras_e_a_seta():
+def test_colecoes_tem_4_ancoras_e_a_seta():
+    # 16/09: o glossário saiu da seção "Organização" e virou seção própria.
     colecoes = _template("collection_list.html")
-    assert colecoes.count("data-sec=") == 3
+    assert colecoes.count("data-sec=") == 4
     assert "_partials/_seta_secoes.html" in colecoes
     assert "js/seta-secoes.js" in colecoes
 

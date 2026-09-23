@@ -53,7 +53,7 @@
     <div class="stats-grid">
       <div class="stat"><div class="stat__value">{{ total_docs }}</div><div class="stat__label">Documentos catalogados</div></div>
       <div class="stat"><div class="stat__value">{{ colecoes_v6|length }}</div><div class="stat__label">Coleções com curadoria</div></div>
-      <div class="stat"><div class="stat__value">{{ cobertura.macroetapas }}</div><div class="stat__label">Categorias processuais</div></div>
+      <div class="stat"><div class="stat__value">{{ cobertura.categorias }}</div><div class="stat__label">Categorias da contratação</div></div>
       <div class="stat"><div class="stat__value">{{ cobertura.assuntos }}</div><div class="stat__label">Assuntos temáticos</div></div>
     </div>
   </div>
@@ -91,11 +91,11 @@
   </div>
 </section>
 
-<section class="sp-section home-etapas" data-sec="Etapas da contratação">
+<section class="sp-section home-etapas" data-sec="Categorias da contratação">
   <div class="sp-container">
     <div class="section-heading">
       <div>
-        <span class="eyebrow">Comece pela etapa</span>
+        <span class="eyebrow">Categorias</span>
         <h2>Encontre materiais pela etapa da contratação</h2>
       </div>
       <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Ver todo o acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>

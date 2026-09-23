@@ -1,0 +1,58 @@
+{
+  "filtro-desktop-js": {
+    "erros": [],
+    "checks": {
+      "url_com_assunto_id": "ok — q=&assunto_id=10&ano_min=&ano_max=&sort=",
+      "rolagem_preservada": "FALHOU — antes=1112 depois=0",
+      "sem_recarregar_pagina": false,
+      "foco_no_checkbox": "FALHOU — ::0",
+      "chip_do_assunto": "ok — Assunto: Micro e Pequenas Empresas",
+      "anuncio_aria_live": false,
+      "voltar_sem_recarregar": "FALHOU — http://localhost:8000/busca/",
+      "voltar_desmarca_filtro": false
+    }
+  },
+  "filtro-desktop-semjs": {
+    "erros": [],
+    "checks": {
+      "url_com_assunto_id": "ok — q=&assunto_id=10&ano_min=&ano_max=&sort=",
+      "ancora_resultados": "FALHOU — http://localhost:8000/busca/?q=&assunto_id=10&ano_min=&ano_max=&sort=",
+      "pagina_posicionada_nos_resultados": "FALHOU — scrollY=0"
+    }
+  },
+  "filtro-mobile-js": {
+    "erros": [],
+    "checks": {
+      "drawer_continua_aberto": "FALHOU — is-open=False aria-expanded=false",
+      "sem_recarregar_pagina": false,
+      "url_com_assunto_id": true,
+      "lista_atualizada_por_tras": "ok — Assunto: Micro e Pequenas Empresas"
+    }
+  },
+  "cartao-desktop": {
+    "erros": [],
+    "checks": {
+      "rodape_do_cartao": "ok — Inovação e Tecnologia Ver documento"
+    }
+  },
+  "cartao-mobile": {
+    "erros": [],
+    "checks": {
+      "rodape_do_cartao": "ok — Inovação e Tecnologia Ver documento"
+    }
+  },
+  "documento": {
+    "erros": [],
+    "checks": {
+      "badges_do_heroi": "ok — Guias | Governança | Aberto",
+      "rotulos_classificacao": "ok — Coleção | Tipo de informação | Assunto | Natureza | Categoria"
+    }
+  },
+  "colecoes": {
+    "erros": [],
+    "checks": {
+      "glossario_assuntos": "FALHOU — 0 itens",
+      "glossario_categorias": "FALHOU — 0 itens"
+    }
+  }
+}

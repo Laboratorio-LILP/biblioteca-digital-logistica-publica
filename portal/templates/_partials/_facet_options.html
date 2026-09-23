@@ -1,19 +1,13 @@
 {% comment %}
 Opções de faceta no estilo ToggleOpt do protótipo (checkbox quadrado custom).
-Params: facet (lista {id,nome,count}), param (campo GET), current (valor ativo —
+Params: facet (lista {id,nome,count,disabled}), param (campo GET), current (valor ativo —
 único OU lista, ver filtro selected_in), empty_msg.
 Multi vs single-select por grupo + auto-submit ficam em acervo-filters.js (.facet-input).
 {% endcomment %}
 {% load catalog_tags %}
 {% if facet %}
-  {% for opt in facet %}
-  <label class="toggle-opt{% if current|selected_in:opt.id %} active{% endif %}">
-    <input class="facet-input sr-only" type="checkbox" name="{{ param }}" value="{{ opt.id }}"{% if current|selected_in:opt.id %} checked{% endif %}>
-    <span class="toggle-opt__box" aria-hidden="true"><svg class="fi"><use href="#fi-check"/></svg></span>
-    <span>{{ opt.nome }}</span>
-    <span class="toggle-opt__count">{{ opt.count }}</span>
-  </label>
-  {% endfor %}
+  {# Cada opção é o mesmo nó da cascata de Categorias (_cat_toggle.html): com 0 documentos vira um <span> cinza não clicável — a taxonomia inteira fica visível (17/09/2026). #}
+  {% for opt in facet %}{% include "_partials/_cat_toggle.html" with param=param id=opt.id nome=opt.nome count=opt.count disabled=opt.disabled current=current noun="opção" %}{% endfor %}
 {% elif empty_msg %}
   <p class="facet-empty">{{ empty_msg }}</p>
 {% endif %}
