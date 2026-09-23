@@ -30,6 +30,10 @@ Cenas (cada uma vira um PNG com o sufixo informado):
       Página do documento, inteira (badge "Etapa" e bloco Classificação BDLP).
   colecoes-glossario-desktop-<suffix>.png
       Página de Coleções, inteira (glossário de Assuntos e Categorias).
+  colecoes-organizacao-desktop-<suffix>.png / colecoes-organizacao-mobile-<suffix>.png
+      Ajuste de 16/09: glossário com listas em colunas (assuntos em 3 no
+      desktop), contagem por assunto e subcategorias em texto corrido. Confere
+      também que /busca/ não vaza sintaxe de template ("{#", "#}") no texto.
 
 Além das capturas, grava `checks-<suffix>.json` com os erros de console/página
 observados em cada cena e o resultado das verificações automáticas (rolagem
@@ -238,6 +242,16 @@ def cena_documento(page: Page, base: str, out: Path, suffix: str, cena: Cena, co
     labels = page.locator(".meta-grid .meta-item .label").all_inner_texts()
     cena.check("badges_do_heroi", bool(badges), " | ".join(b.replace("\n", " ") for b in badges))
     cena.check("rotulos_classificacao", bool(labels), " | ".join(labels))
+    # 17/09: corpo do título por faixa de comprimento (texto sempre inteiro).
+    titulo = page.locator(".doc-detail-hero__title")
+    n = len(titulo.inner_text().strip())
+    classe = titulo.get_attribute("class") or ""
+    esperado = "--longa" if n > 180 else "--media" if n > 110 else ""
+    tem = ("--longa" in classe, "--media" in classe)
+    ok = (esperado == "--longa" and tem == (True, False)) or (esperado == "--media" and tem == (False, True)) \
+        or (esperado == "" and tem == (False, False))
+    cena.check("titulo_na_faixa_certa", ok, f"{n} caracteres → {esperado or 'corpo padrão'} ({classe})")
+    cena.check("titulo_inteiro", not titulo.inner_text().rstrip().endswith(("…", "...")), f"{n} caracteres")
     page.screenshot(path=str(out / f"documento-classificacao-desktop-{suffix}.png"), full_page=True)
 
 
@@ -249,6 +263,40 @@ def cena_colecoes(page: Page, base: str, out: Path, suffix: str, cena: Cena) -> 
     cena.check("glossario_assuntos", n_assuntos > 0, f"{n_assuntos} itens")
     cena.check("glossario_categorias", n_categorias > 0, f"{n_categorias} itens")
     page.screenshot(path=str(out / f"colecoes-glossario-desktop-{suffix}.png"), full_page=True)
+
+    # Ajuste de 16/09: listas em colunas (assuntos em 3 no desktop), contagem por
+    # assunto, subcategorias em texto corrido e régua fechando em cada item (sem
+    # "célula fantasma" na última linha incompleta).
+    colunas = page.evaluate(
+        "() => new Set([...document.querySelectorAll('#assuntos .glossario__item')]"
+        ".map(li => Math.round(li.getBoundingClientRect().left))).size"
+    )
+    cena.check("assuntos_3_colunas_desktop", colunas == 3, f"{colunas} colunas")
+    n_count = page.locator("#assuntos .glossario__count").count()
+    cena.check("contagem_por_assunto", n_count == n_assuntos, f"{n_count} contagens para {n_assuntos} assuntos")
+    # 17/09: sub e microcategorias ficam no "Saiba mais" da categoria (árvore de links)
+    arvores = page.locator("#categorias details.glossario__mais .glossario__arvore")
+    n_arv = arvores.count()
+    n_links = page.locator("#categorias .glossario__arvore a").count()
+    cena.check("subcategorias_no_saiba_mais", n_arv >= 1 and n_links >= n_arv, f"{n_arv} árvores, {n_links} nomes")
+    fecho = page.evaluate(
+        "() => { const ul = document.querySelector('#assuntos .glossario__lista');"
+        " const li = [...ul.querySelectorAll('.glossario__item')].pop();"
+        " return Math.round(ul.getBoundingClientRect().bottom - li.getBoundingClientRect().bottom); }"
+    )
+    cena.check("regua_fecha_no_ultimo_item", fecho == 0, f"ul termina {fecho}px após o último item")
+    page.screenshot(path=str(out / f"colecoes-organizacao-desktop-{suffix}.png"), full_page=True)
+
+    page.set_viewport_size(MOBILE)
+    page.goto(f"{base}/colecoes/", wait_until="networkidle")
+    page.screenshot(path=str(out / f"colecoes-organizacao-mobile-{suffix}.png"), full_page=True)
+
+    # Regressão do comentário {# #} multi-linha que vazava como texto no Acervo.
+    page.set_viewport_size(DESKTOP)
+    page.goto(f"{base}/busca/", wait_until="networkidle")
+    texto = page.locator("main").inner_text()
+    vazou = "{#" in texto or "#}" in texto or "{%" in texto
+    cena.check("acervo_sem_vazamento_de_template", not vazou, "sintaxe de template visível" if vazou else "limpo")
 
 
 CENAS = [

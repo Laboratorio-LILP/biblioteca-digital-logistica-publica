@@ -61,7 +61,7 @@
           <div class="filter-group__body">
             {% include "_partials/_cat_toggle.html" with param="colecao_v6" id=grp.slug nome="Toda a coleção" count=grp.total disabled=grp.toda_disabled current=filters.colecao_v6 noun="coleção" klass="toggle-opt--all-strong" %}
             {% for tipo in grp.tipos %}
-            {% include "_partials/_cat_toggle.html" with param="typeinform_id" id=tipo.id nome=tipo.nome count=tipo.count current=filters.typeinform_id noun="tipo" %}
+            {% include "_partials/_cat_toggle.html" with param="typeinform_id" id=tipo.id nome=tipo.nome count=tipo.count disabled=tipo.disabled current=filters.typeinform_id noun="tipo" %}
             {% endfor %}
           </div>
         </details>
@@ -71,7 +71,7 @@
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <details class="side-section"{% if filters.category_id or filters.subcategoria_id or filters.microcategoria_id %} open{% endif %}>
         <summary><h3>Categorias</h3></summary>
-        <p class="side-section__hint">A etapa da contratação em que o material se aplica (categoria processual). <a class="side-section__link" href="{% url 'catalog:collection_list' %}#categorias">O que significa cada opção?</a></p>
+        <p class="side-section__hint">A etapa da contratação em que o material se aplica. <a class="side-section__link" href="{% url 'catalog:collection_list' %}#categorias">O que significa cada opção?</a></p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias, ex.: PCA, Ciclo Completo, Conteúdos Transversais) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
@@ -161,10 +161,14 @@
         </label>
       </div>
 
-      {# Linha de estado SEMPRE presente (15/09/2026): quando ela era inserida só com
-         filtro/busca, a grade de resultados descia ~33 px no primeiro filtro e subia ao
-         remover o último — "de vez em quando joga para baixo". Uma única <p> com o
-         estado corrente mantém o topo da grade no lugar. #}
+      {% comment %}
+        Linha de estado SEMPRE presente (15/09/2026): quando ela era inserida só com
+        filtro/busca, a grade de resultados descia ~33 px no primeiro filtro e subia ao
+        remover o último — "de vez em quando joga para baixo". Uma única <p> com o
+        estado corrente mantém o topo da grade no lugar. (Bloco comment/endcomment, não
+        o comentário curto de uma linha: o comentário curto do Django só vale em UMA
+        linha — em várias, vaza como texto na página.)
+      {% endcomment %}
       <p class="query-indicator">
         {% if query %}Pesquisa por <strong>“{{ query }}”</strong>{% if filtros_count %} · {% endif %}{% endif %}
         {% if filtros_count %}{% applied_filters request.GET as chips %}Filtrando por <strong>{% for c in chips %}{{ c.texto }}{% if not forloop.last %} · {% endif %}{% endfor %}</strong>{% endif %}

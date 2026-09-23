@@ -147,7 +147,7 @@ def home(request):
     cobertura = {
         "assuntos": Assunto.objects.count(),
         "subcategorias": Subcategoria.objects.count(),
-        "macroetapas": NrCategory.objects.count(),
+        "categorias": NrCategory.objects.count(),
     }
 
     return render(request, "home.html", {
@@ -337,7 +337,8 @@ def document_detail(request, code):
 
 def collection_list(request):
     """As 4 coleções v6 (derivadas do Tipo de Informação) com contagem real, e o
-    glossário público de Assuntos e Categorias (definições da curadoria)."""
+    glossário público de Assuntos e Categorias (definições da curadoria,
+    contagens do acervo e subcategorias)."""
     colecoes_v6 = colecao_v6_overview()
     return render(request, "collection_list.html", {
         "colecoes_v6": colecoes_v6,

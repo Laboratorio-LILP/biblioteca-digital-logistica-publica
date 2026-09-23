@@ -5,11 +5,14 @@ taxonomia v12 (set/2026) e o de-para de grafias legadas.
 As 4 Coleções são definidas pelo *Tipo de Informação*. Os mapas abaixo:
   - COLECOES_V6 / _TIPOS_POR_COLECAO: vocabulário EXATO v12 (e-mail "ALTERAÇÕES
     BIBLIOTECA", Lina, 11/09/2026): Jurisprudência = Súmulas, Boletins, Acórdãos,
-    Deliberações; Doutrina ganha Enunciados e Pareceres; Instrução perde Vídeos.
+    Deliberações; Doutrina ganha Enunciados; Instrução perde Vídeos. "Pareceres"
+    entrou em 11/09 e saiu em 23/09/2026 (v12.1 — procurador consultado pela
+    chefia: não é doutrina nem jurisprudência).
   - TIPO_V5_TO_V6: normaliza grafias legadas (singular, sem acento, nomes do
     acervo v5) para o tipo canônico — usado pelo front (colecao_v6_for_tipo) e
     pelo importador (tipo_canonico).
-  - TIPOS_LEGADOS: tipos RETIRADOS do vocabulário (Documentos Normativos, Vídeos)
+  - TIPOS_LEGADOS: tipos RETIRADOS do vocabulário (Documentos Normativos, Vídeos,
+    Pareceres)
     → coleção em que ainda devem ser EXIBIDOS enquanto documentos antigos os
     referenciarem (janela entre a subida do código e a recarga v12). Só
     colecao_v6_for_tipo usa; o importador recusa esses tipos.
@@ -33,7 +36,7 @@ COLECOES_V6 = [
     {"nome": "Trabalhos Acadêmicos", "slug": "trabalhos-academicos", "icon": "fi-graduation-cap", "color": "c-blue",
      "descricao": "Teses, dissertações, monografias e TCCs produzidos em universidades."},
     {"nome": "Doutrina e Conteúdo Técnico", "slug": "doutrina", "icon": "fi-book-open", "color": "c-red",
-     "descricao": "Livros, artigos, relatórios, notas técnicas, pareceres e enunciados que analisam e "
+     "descricao": "Livros, artigos, relatórios, notas técnicas e enunciados que analisam e "
                   "explicam o tema."},
     {"nome": "Instrução e Capacitação", "slug": "instrucao", "icon": "fi-file-text", "color": "c-yellow",
      "descricao": "Manuais, guias, cursos e materiais para aprender na prática."},
@@ -114,13 +117,14 @@ TEMAS_DESTAQUE = [
     },
 ]
 
-# Tipos de Informação EXATOS por coleção — vocabulário v12 (11/09/2026).
+# Tipos de Informação EXATOS por coleção — vocabulário v12.1 (11/09/2026;
+# Pareceres retirado em 23/09/2026).
 _TIPOS_POR_COLECAO = {
     "Jurisprudência": ["Súmulas", "Boletins", "Acórdãos", "Deliberações"],
     "Trabalhos Acadêmicos": ["Teses", "Dissertações", "Monografias", "TCCs", "Memoriais Docentes"],
     "Doutrina e Conteúdo Técnico": [
         "Livros digitais", "Artigos", "Notas Técnicas", "Relatórios",
-        "Textos de Discussão", "Resumos", "Resumos expandidos", "Enunciados", "Pareceres",
+        "Textos de Discussão", "Resumos", "Resumos expandidos", "Enunciados",
     ],
     "Instrução e Capacitação": [
         "Manuais", "Guias", "Tutoriais", "Apostilas", "Aulas", "Cursos", "Slides",
@@ -137,16 +141,19 @@ for _col, _tipos in _TIPOS_POR_COLECAO.items():
 
 _FALLBACK = "Doutrina e Conteúdo Técnico"
 
-# Tipos retirados do vocabulário na v12, ainda exibidos na coleção antiga
+# Tipos retirados do vocabulário na v12 (e Pareceres na v12.1, 23/09/2026),
+# ainda exibidos na coleção antiga
 # enquanto houver documento carregado com eles (só colecao_v6_for_tipo usa).
 TIPOS_LEGADOS = {
     "Documentos Normativos": "Jurisprudência",
     "Vídeos": "Instrução e Capacitação",
+    "Pareceres": "Doutrina e Conteúdo Técnico",
 }
 _TIPOS_LEGADOS_NORM = {_norm(k): v for k, v in TIPOS_LEGADOS.items()}
 _TIPOS_LEGADOS_NORM.update({
     "documento normativo": "Jurisprudência",
     "video": "Instrução e Capacitação",
+    "parecer": "Doutrina e Conteúdo Técnico",
 })
 
 # Normalização de tipos do acervo v5 → tipo canônico v6.
@@ -217,8 +224,6 @@ TIPO_V5_TO_V6 = {
     # Doutrina e Conteúdo Técnico (v12)
     "enunciado": "Enunciados",
     "enunciados": "Enunciados",
-    "parecer": "Pareceres",
-    "pareceres": "Pareceres",
 }
 
 
@@ -369,6 +374,132 @@ ASSUNTOS_DESCRICAO = {
 }
 
 _SEM_DESCRICAO = {"curta": "", "longa": ""}
+
+# ---------------------------------------------------------------------------
+# Definições de Subcategorias e Microcategorias (glossário de Coleções, "Saiba
+# mais" de cada Categoria — 17/09/2026).
+#
+# STATUS: RASCUNHO TÉCNICO, A VALIDAR PELA CURADORIA (Lina). Ao contrário de
+# ASSUNTOS_DESCRICAO (texto da curadoria, verbatim), a curadoria ainda não
+# escreveu estas definições — nem a planilha (aba "Árvore de Classificação",
+# só nomes), nem nr_subcategoria/nr_microcategoria (só nome e ordem) as têm.
+# Cada frase abaixo foi escrita em Linguagem Simples a partir do dispositivo da
+# Lei nº 14.133/2021 indicado no comentário; nada de valor-limite em reais (os
+# tetos são atualizados por decreto). Quando a curadoria entregar o texto dela,
+# substituir aqui, mantendo o padrão.
+#
+# Chave = nome canônico normalizado (caixa alta, espaços simples), o mesmo
+# critério de catalog_tags.rotulo_sub — cobre subcategorias e microcategorias
+# (os nomes são únicos entre os dois níveis; test_glossario_arvore garante a
+# cobertura exata do seed 07-categories.sql).
+ARVORE_DESCRICAO = {
+    # PLANEJAMENTO/FASE PREPARATÓRIA
+    "ETP": (                                                          # art. 6º, XX; art. 18, I e § 1º
+        "O documento que abre o planejamento da contratação. Descreve a necessidade, compara as "
+        "soluções possíveis e mostra se a contratação é viável."
+    ),
+    "TR": (                                                           # art. 6º, XXIII
+        "O documento que descreve o que será contratado e como. Traz o objeto, os requisitos, o modelo "
+        "de execução e de gestão, os critérios de pagamento e a estimativa de preço."
+    ),
+    "GESTÃO DE RISCOS": (                                             # art. 18, X; art. 22
+        "Identificação dos riscos que podem prejudicar a licitação ou a execução do contrato, e das "
+        "medidas para tratá-los."
+    ),
+    "MAPA DE RISCOS": (                                               # instrumento do art. 18, X
+        "Lista dos riscos da contratação, com a probabilidade, o impacto e as ações para evitar ou "
+        "reduzir cada um."
+    ),
+    "MATRIZ DE ALOCAÇÃO DE RISCOS": (                                 # art. 6º, XXVII; art. 22
+        "Cláusula do contrato que define quais riscos ficam com a Administração e quais ficam com o "
+        "contratado."
+    ),
+    "PESQUISA DE PREÇOS": (                                           # art. 23
+        "Levantamento dos preços praticados no mercado para estimar o valor da contratação e avaliar "
+        "as propostas."
+    ),
+    # SELEÇÃO DO FORNECEDOR
+    "LICITAÇÃO": (                                                    # art. 28 (modalidades)
+        "Disputa pública entre fornecedores, em uma das modalidades da lei, para escolher a proposta "
+        "mais vantajosa."
+    ),
+    "CONCORRÊNCIA": (                                                 # art. 6º, XXXVIII
+        "Modalidade de licitação para bens e serviços especiais e para obras e serviços de engenharia, "
+        "comuns ou especiais."
+    ),
+    "PREGÃO": (                                                       # art. 6º, XLI
+        "Modalidade de licitação obrigatória para bens e serviços comuns, julgada por menor preço ou "
+        "maior desconto."
+    ),
+    "LEILÃO": (                                                       # art. 6º, XL
+        "Modalidade de licitação para vender bens da Administração, como imóveis ou bens sem uso, a "
+        "quem oferecer o maior lance."
+    ),
+    "DIÁLOGO COMPETITIVO": (                                          # art. 6º, XLII; art. 32
+        "Modalidade em que a Administração conversa com fornecedores pré-selecionados para construir a "
+        "solução antes de receber as propostas. Usada em contratações complexas ou inovadoras."
+    ),
+    "CONTRATAÇÃO DIRETA": (                                           # arts. 72 a 75
+        "Contratação sem licitação, nos casos que a lei permite: por inexigibilidade ou por dispensa."
+    ),
+    "INEXIGIBILIDADE": (                                              # art. 74
+        "Contratação direta quando não há como haver disputa — por exemplo, com fornecedor exclusivo ou "
+        "com profissional de notória especialização."
+    ),
+    "EMERGÊNCIA - INCISO VIII": (                                     # art. 75, VIII
+        "Dispensa de licitação em situação de emergência ou de calamidade pública, para atender uma "
+        "urgência que possa causar prejuízo ou interromper um serviço público."
+    ),
+    "DISPENSA POR VALOR (ART 75 - INCISOS I E II)": (                 # art. 75, I e II
+        "Dispensa de licitação para contratações de pequeno valor, até os limites que a lei fixa e "
+        "atualiza para obras, serviços e compras."
+    ),
+    "CONTRATAÇÃO DIRETA OUTROS INCISOS": (                            # art. 75, III a XVIII
+        "Os demais casos de dispensa previstos no art. 75, como licitação deserta ou fracassada, "
+        "contratação de outro órgão público e situações específicas."
+    ),
+    "PROCEDIMENTOS AUXILIARES": (                                     # art. 78
+        "Procedimentos que apoiam as licitações e as contratações: credenciamento, pré-qualificação, "
+        "manifestação de interesse, registro de preços e registro cadastral."
+    ),
+    "CREDENCIAMENTO": (                                               # art. 6º, XLIII; art. 79
+        "Chamamento público em que todos os interessados que cumprem os requisitos se cadastram para "
+        "fornecer quando convocados, sem disputa entre eles."
+    ),
+    "REGISTRO DE PREÇOS (RP)": (                                      # art. 6º, XLV; arts. 82 a 86
+        "Registro formal de preços de fornecedores, obtido por licitação, para contratações futuras "
+        "conforme a necessidade."
+    ),
+    "PRÉ-QUALIFICAÇÃO": (                                             # art. 80
+        "Seleção feita antes da licitação para verificar se os interessados ou os produtos atendem aos "
+        "requisitos."
+    ),
+    "PMI": (                                                          # art. 81
+        "Procedimento de Manifestação de Interesse: a Administração pede à iniciativa privada estudos e "
+        "projetos de soluções inovadoras para uma necessidade."
+    ),
+    "REGISTRO CADASTRAL": (                                           # art. 87
+        "Cadastro de fornecedores que antecipa a verificação de habilitação para as licitações futuras."
+    ),
+    # GESTÃO CONTRATUAL
+    "GESTÃO DE CONTRATOS": (                                          # art. 117; art. 104 e seguintes
+        "Acompanhamento do contrato pelo gestor: prazos, pagamentos, aditivos, prorrogações e "
+        "encerramento."
+    ),
+    "FISCALIZAÇÃO DE CONTRATOS": (                                    # art. 117
+        "Verificação, pelo fiscal, de que o contratado entrega o objeto como combinado, com registro "
+        "das ocorrências."
+    ),
+}
+
+
+def descricao_arvore(nome):
+    """Definição de uma Subcategoria ou Microcategoria pelo nome canônico
+    (normalizado como rotulo_sub); string vazia quando não há texto — um nó
+    novo sem definição não quebra nada."""
+    chave = " ".join(str(nome or "").upper().split())
+    return ARVORE_DESCRICAO.get(chave, "")
+
 
 
 def descricao_assunto(nome):

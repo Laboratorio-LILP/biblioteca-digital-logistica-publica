@@ -169,6 +169,27 @@ def rotulo_sub(nome):
     return SUBCAT_DISPLAY.get(key) or titulo_pt(nome)
 
 
+# Faixas de comprimento do título na página do documento (17/09/2026): o corpo
+# tipográfico encolhe por faixa para o bloco do título ficar em ~200px no desktop
+# qualquer que seja o comprimento — o texto fica íntegro, nunca é cortado.
+# Limiares medidos no acervo v11 (982 docs): ≤110 → 697 docs (corpo padrão, 46px);
+# 111–180 → 265 (36px); >180 → 20 (28px; o maior título tem 270 caracteres).
+_TITULO_FAIXA_MEDIA = 110
+_TITULO_FAIXA_LONGA = 180
+
+
+@register.filter
+def faixa_titulo(titulo):
+    """Modificador do h1 do herói do documento conforme o comprimento do título:
+    'media', 'longa' ou '' (faixa curta, corpo padrão)."""
+    n = len(str(titulo or "").strip())
+    if n > _TITULO_FAIXA_LONGA:
+        return "longa"
+    if n > _TITULO_FAIXA_MEDIA:
+        return "media"
+    return ""
+
+
 @register.filter
 def url_domain(value):
     """Extrai o host de uma URL para exibir como hint sob botões de
@@ -280,7 +301,7 @@ def assunto_longa(nome):
 
 @register.simple_tag
 def classificacao_card(doc):
-    """Os dois eixos do rodapé do cartão — e do badge "Etapa" do documento —
+    """Os dois eixos do rodapé do cartão — e do badge de categoria do documento —
     resolvidos SÓ pelos mapas cacheados (zero query por cartão; nada de
     doc.category/doc.subcategoria, que disparam uma consulta cada).
 

@@ -37,7 +37,7 @@
         {% if document.type_info %}{{ document.type_info.name }}{% else %}{{ cv.nome }}{% endif %}
       </span>
       {% with an=document|assunto_nome %}{% if an %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-bookmark"/></svg>{{ an }}</span>{% endif %}{% endwith %}
-      {# Categoria processual (› subcategoria) como badge, sem prefixo — 15/09/2026: "Etapa:" confundia. #}
+      {# Categoria (› subcategoria) como badge, sem prefixo — 15/09/2026: "Etapa:" confundia. #}
       {% if cl.etapa %}<span class="doc-badge"><svg class="fi" aria-hidden="true"><use href="#fi-layers"/></svg>{{ cl.etapa }}</span>{% endif %}
       {% if document.permissao %}
       <span class="doc-badge {{ document.permissao|lower }}">
@@ -47,7 +47,8 @@
       {% endif %}
     </div>
 
-    <h1>{{ document.title }}</h1>
+    {# Corpo do título por faixa de comprimento (faixa_titulo): o texto é sempre o título inteiro. #}
+    {% with faixa=document.title|faixa_titulo %}<h1 class="doc-detail-hero__title{% if faixa %} doc-detail-hero__title--{{ faixa }}{% endif %}">{{ document.title }}</h1>{% endwith %}
 
     <div class="doc-authors">
       {% for autor in document.display_authors %}<span><svg class="fi" aria-hidden="true"><use href="#fi-user"/></svg>{{ autor }}</span>{% endfor %}
@@ -79,14 +80,12 @@
 
     <section class="sp-panel doc-panel">
       <h2 class="doc-section-title">Classificação BDLP</h2>
-      {# Fórmula da classificação (Lina, 10/09/2026), em Linguagem Simples. #}
-      <p class="classificacao-formula">Todo material recebe uma coleção (o tipo de material), uma etapa da contratação (a categoria; subcategoria e microcategoria quando couber), um assunto (o tema) e, quando couber, a natureza (o que se contrata). A classificação tem várias dimensões: você pode combinar esses filtros no Acervo ou buscar por palavra sem filtro nenhum.</p>
       <div class="meta-grid">
         <div class="meta-item"><div class="label">Coleção</div><div class="value"><a href="{% url 'catalog:search' %}?colecao_v6={{ cv.slug }}">{{ cv.nome }}</a></div></div>
         {% if document.type_info %}<div class="meta-item"><div class="label">Tipo de informação</div><div class="value"><a href="{% url 'catalog:search' %}?typeinform_id={{ document.typeinform_id }}">{{ document.type_info.name }}</a></div></div>{% endif %}
         {% with assunto=document.assunto %}{% if assunto %}<div class="meta-item"><div class="label">Assunto</div><div class="value"><a href="{% url 'catalog:search' %}?assunto_id={{ document.assunto_id }}">{{ assunto.nome }}</a></div>{% with d=assunto.nome|assunto_curta %}{% if d %}<p class="meta-item__desc">{{ d }}</p>{% endif %}{% endwith %}</div>{% endif %}{% endwith %}
         {% if document.natureza %}<div class="meta-item"><div class="label">Natureza</div><div class="value"><a href="{% url 'catalog:search' %}?natureza={{ document.natureza|urlencode }}">{{ document.natureza }}</a></div></div>{% endif %}
-        {% with cat=document.category %}{% if cat %}<div class="meta-item"><div class="label">Etapa (categoria processual)</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ cat.name|titulo_pt }}</a></div>{% if cat.description %}<p class="meta-item__desc">{{ cat.description }}</p>{% endif %}</div>{% endif %}{% endwith %}
+        {% with cat=document.category %}{% if cat %}<div class="meta-item"><div class="label">Categoria (etapa da contratação)</div><div class="value"><a href="{% url 'catalog:search' %}?category_id={{ document.category_id }}">{{ cat.name|titulo_pt }}</a></div>{% if cat.description %}<p class="meta-item__desc">{{ cat.description }}</p>{% endif %}</div>{% endif %}{% endwith %}
         {% with sub=document.subcategoria %}{% if sub %}<div class="meta-item"><div class="label">Subcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?subcategoria_id={{ document.subcategoria_id }}">{{ sub.nome|rotulo_sub }}</a></div></div>{% endif %}{% endwith %}
         {% with mic=document.microcategoria %}{% if mic %}<div class="meta-item"><div class="label">Microcategoria</div><div class="value"><a href="{% url 'catalog:search' %}?microcategoria_id={{ document.microcategoria_id }}">{{ mic.nome|titulo_pt }}</a></div></div>{% endif %}{% endwith %}
       </div>

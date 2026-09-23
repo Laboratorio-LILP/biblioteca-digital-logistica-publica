@@ -61,7 +61,10 @@ def test_tipo_canonico_resolve_subcolecao(cmd):
     tm = _topic_map()
     assert cmd._resolve_topic({"colecao": "Jurisprudência", "tipo_informacao": "Acórdãos"}, tm) == 29
     assert cmd._resolve_topic({"colecao": "Doutrina e Conteúdo Técnico", "tipo_informacao": "Enunciados"}, tm) == 31
-    assert cmd._resolve_topic({"colecao": "Doutrina e Conteúdo Técnico", "tipo_informacao": "Pareceres"}, tm) == 32
+    # v12.1 (23/09/2026): Pareceres saiu do vocabulário — recusado mesmo com a
+    # subcoleção ainda no banco.
+    with pytest.raises(LinhaRecusadaError):
+        cmd._resolve_topic({"colecao": "Doutrina e Conteúdo Técnico", "tipo_informacao": "Pareceres"}, tm)
 
 
 def test_grafia_legada_do_tipo_e_aceita_e_normalizada(cmd):

@@ -79,13 +79,16 @@ def test_cartao_mostra_categoria_e_assunto_no_rodape_sem_badge():
     assert "{{ cv.nome }}" in rodape                                # fallback: nome da coleção
 
 
-def test_documento_tem_badge_de_categoria_sem_prefixo_e_formula():
+def test_documento_tem_badge_de_categoria_sem_prefixo_nem_formula():
     t = _template("document_detail.html")
     assert "Etapa: {{ cl.etapa }}" not in t                        # 15/09: sem "Etapa:" no badge
     assert '<use href="#fi-layers"/></svg>{{ cl.etapa }}' in t
-    assert "Etapa (categoria processual)" in t                     # rótulo do bloco de classificação fica
-    assert "Todo material recebe" in t and "coleção" in t and "assunto" in t and "natureza" in t
-    assert "classificacao-formula" in t
+    assert "Categoria (etapa da contratação)" in t                 # 17/09: rótulo padronizado
+    # 17/09: o parágrafo da fórmula saiu do painel "Classificação BDLP" (Bernardo);
+    # a explicação vive só em /colecoes/. Sem CSS órfão.
+    assert "Todo material recebe" not in t and "classificacao-formula" not in t
+    css = (TEMPLATES.parent / "static" / "css" / "portal.css").read_text(encoding="utf-8")
+    assert ".classificacao-formula" not in css
 
 
 def test_css_do_rodape_com_dois_eixos():
@@ -97,7 +100,7 @@ def test_css_do_rodape_com_dois_eixos():
 
 def test_hints_das_facetas_amarram_etapa_e_assunto():
     t = _template("search.html")
-    assert "A etapa da contratação em que o material se aplica (categoria processual)." in t
+    assert "A etapa da contratação em que o material se aplica." in t   # 17/09: sem o jargão "categoria processual"
     assert "O tema tratado no documento (um documento tem um assunto principal)." in t
     # títulos das facetas não mudam
     assert "<h3>Categorias</h3>" in t and "<h3>Assunto</h3>" in t

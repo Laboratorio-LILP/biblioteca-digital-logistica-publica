@@ -4,7 +4,8 @@ sem prefixo e script de migração para bancos existentes — contratos sem banc
 Fonte: e-mail "ALTERAÇÕES BIBLIOTECA" (Lina, 11/09/2026) e reunião de 10/09:
   - Jurisprudência: saem Enunciados e Documentos Normativos; entram Acórdãos e
     Deliberações.
-  - Doutrina e Conteúdo Técnico: entram Enunciados e Pareceres.
+  - Doutrina e Conteúdo Técnico: entra Enunciados (Pareceres entrou em 11/09 e
+    saiu em 23/09/2026 — v12.1).
   - Instrução e Capacitação: sai Vídeos.
   - Assuntos: +"Gestão Estratégica e Desempenho das Contratações" e
     +"Logística Pública Internacional" (16 no total).
@@ -43,7 +44,7 @@ def test_vocabulario_v12_por_colecao():
     ]
     assert tipos_de_colecao("Doutrina e Conteúdo Técnico") == [
         "Livros digitais", "Artigos", "Notas Técnicas", "Relatórios",
-        "Textos de Discussão", "Resumos", "Resumos expandidos", "Enunciados", "Pareceres",
+        "Textos de Discussão", "Resumos", "Resumos expandidos", "Enunciados",
     ]
     assert tipos_de_colecao("Instrução e Capacitação") == [
         "Manuais", "Guias", "Tutoriais", "Apostilas", "Aulas", "Cursos", "Slides",
@@ -54,7 +55,10 @@ def test_tipos_novos_resolvem_colecao():
     assert colecao_v6_for_tipo("Acórdãos")["nome"] == "Jurisprudência"
     assert colecao_v6_for_tipo("Deliberações")["nome"] == "Jurisprudência"
     assert colecao_v6_for_tipo("Enunciados")["nome"] == "Doutrina e Conteúdo Técnico"
+    # v12.1: Pareceres foi retirado — segue EXIBIDO em Doutrina (TIPOS_LEGADOS)
+    # enquanto houver documento antigo, mas o importador o recusa.
     assert colecao_v6_for_tipo("Pareceres")["nome"] == "Doutrina e Conteúdo Técnico"
+    assert tipo_canonico("Pareceres") is None
 
 
 def test_grafias_legadas_dos_tipos_novos():
@@ -63,8 +67,8 @@ def test_grafias_legadas_dos_tipos_novos():
     assert tipo_canonico("acordaos") == "Acórdãos"
     assert tipo_canonico("Deliberação") == "Deliberações"
     assert tipo_canonico("deliberacoes") == "Deliberações"
-    assert tipo_canonico("Parecer") == "Pareceres"
-    assert tipo_canonico("pareceres") == "Pareceres"
+    assert tipo_canonico("Parecer") is None  # retirado na v12.1 (23/09/2026)
+    assert tipo_canonico("pareceres") is None
     assert tipo_canonico("Enunciado") == "Enunciados"
     assert tipo_canonico("enunciados") == "Enunciados"
 
@@ -84,11 +88,14 @@ def test_tipos_legados_exibem_na_colecao_antiga():
     assert TIPOS_LEGADOS == {
         "Documentos Normativos": "Jurisprudência",
         "Vídeos": "Instrução e Capacitação",
+        "Pareceres": "Doutrina e Conteúdo Técnico",  # v12.1 (23/09/2026)
     }
     assert colecao_v6_for_tipo("Documentos Normativos")["nome"] == "Jurisprudência"
     assert colecao_v6_for_tipo("Documento normativo")["nome"] == "Jurisprudência"
     assert colecao_v6_for_tipo("Vídeos")["nome"] == "Instrução e Capacitação"
     assert colecao_v6_for_tipo("Video")["nome"] == "Instrução e Capacitação"
+    assert colecao_v6_for_tipo("Pareceres")["nome"] == "Doutrina e Conteúdo Técnico"
+    assert colecao_v6_for_tipo("parecer")["nome"] == "Doutrina e Conteúdo Técnico"
     # ...e o fallback continua valendo para tipo realmente desconhecido.
     assert colecao_v6_for_tipo("xpto inexistente")["nome"] == "Doutrina e Conteúdo Técnico"
 
@@ -111,7 +118,8 @@ def test_descricao_de_jurisprudencia_sem_normativo():
 
 def test_seed_collections_v12():
     sql = _read(INIT / "06-collections.sql")
-    assert "('Acórdãos'" in sql and "('Deliberações'" in sql and "('Pareceres'" in sql
+    assert "('Acórdãos'" in sql and "('Deliberações'" in sql
+    assert "('Pareceres'" not in sql  # v12.1
     assert "('Documentos Normativos'" not in sql
     assert "('Vídeos'" not in sql
     # Enunciados existe uma única vez — sob Doutrina, não sob Jurisprudência.
@@ -124,7 +132,8 @@ def test_seed_collections_v12():
 def test_seed_type_information_v12():
     sql = _read(INIT / "08-type-information.sql")
     canon = sql[sql.index("Tipos de Informação canônicos"):]
-    assert "('Acórdãos')" in canon and "('Deliberações')" in canon and "('Pareceres')" in canon
+    assert "('Acórdãos')" in canon and "('Deliberações')" in canon
+    assert "('Pareceres')" not in canon  # v12.1
     assert "('Documentos Normativos')" not in canon
     assert "('Vídeos')" not in canon
 
@@ -185,8 +194,10 @@ def test_script_de_migracao_existe_com_duas_secoes():
     s1 = sql[sql.index(m1): sql.index(m2)]
     s2 = sql[sql.index(m2):]
     # Seção 1: aditiva — tipos/topics novos, 2 assuntos, renomes, busca.
-    for nome in ("Acórdãos", "Deliberações", "Pareceres", "Enunciados"):
+    for nome in ("Acórdãos", "Deliberações", "Enunciados"):
         assert nome in s1
+    assert "('Pareceres'" not in s1.split("-- 1.3")[1].split("-- 1.4")[0]  # v12.1
+    assert "'Pareceres'" in s2  # v12.1: a seção 2 remove subcoleção e tipo
     assert "Gestão Estratégica e Desempenho das Contratações" in s1
     assert "Logística Pública Internacional" in s1
     assert "FASE PREPARATÓRIA - ETP" in s1 and "'ETP'" in s1

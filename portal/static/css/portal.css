@@ -456,9 +456,10 @@ main { flex: 1 0 auto; }
 .tema-chip__lab { font-family: var(--font-subtitle); font-weight: 600; font-size: 12.5px; line-height: 1.25; color: var(--sp-black); }
 .tema-chip__count { font-size: 11px; color: rgb(var(--rgb-black) / 0.55); margin-top: 2px; }
 
-/* Divisor sutil na fronteira branco-branco Coleções→Etapas (como o stats tem
-   border-bottom) — o espaçamento já é padrão (--space-section); falta só o divisor. */
-.home-etapas { border-top: var(--border); }
+/* Divisor sutil na fronteira branco-branco (como o stats tem border-bottom) — o
+   espaçamento já é padrão (--space-section); falta só o divisor. Home:
+   Coleções→Etapas. Coleções: Organização→Glossário. */
+.home-etapas, .colecoes-glossario { border-top: var(--border); }
 
 /* Stepper: ícone no nó (acento vermelho) + linha conectora = fluxo do processo.
    Base = mobile (vertical, linha à esquerda); ≥768px vira horizontal. O <ol> dá a
@@ -833,7 +834,13 @@ html.js .btn-apply { display: none; }
 .doc-badge.c-red    { border-color: rgb(var(--rgb-red) / 0.4);    background: var(--gov-red-100);           color: var(--sp-red-dark); }
 .doc-badge.c-petrol { border-color: rgb(var(--rgb-olive) / 0.45); background: rgb(var(--rgb-petrol) / 0.1); color: var(--sp-petrol); }
 .doc-badge.c-yellow { border-color: rgb(var(--rgb-yellow) / 0.5); background: rgb(var(--rgb-yellow) / 0.18); color: var(--sp-yellow-dark); }
-.doc-detail-hero h1 { font-family: var(--font-heading); font-weight: 700; margin-top: 14px; max-width: 940px; font-size: clamp(28px, 4vw, 46px); line-height: 1.12; }
+.doc-detail-hero__title { font-family: var(--font-heading); font-weight: 700; margin-top: 14px; max-width: 940px; font-size: clamp(28px, 4vw, 46px); line-height: 1.12; }
+/* Corpo por faixa de comprimento do título (filtro faixa_titulo, 17/09/2026): o
+   título inteiro fica; o corpo encolhe para o bloco ficar em ~200px no desktop
+   qualquer que seja o comprimento (270 caracteres: 9 linhas/464px → 5/165px).
+   Mesma especificidade da base — a ordem decide. */
+.doc-detail-hero__title--media { font-size: clamp(24px, 3.2vw, 36px); line-height: 1.14; }
+.doc-detail-hero__title--longa { font-size: clamp(22px, 2.5vw, 28px); line-height: 1.18; }
 .doc-authors { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: rgb(var(--rgb-black) / 0.66); }
 .doc-authors span { display: inline-flex; align-items: center; gap: 8px; }
 .doc-authors .fi { color: var(--sp-blue); }
@@ -847,9 +854,6 @@ html.js .btn-apply { display: none; }
 .doc-aplicabilidade p, .doc-callout p { margin-top: 8px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
 .doc-detail-tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
 .doc-detail-tags .tg { border: 1px solid var(--sp-gray-medium); background: var(--sp-white); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: rgb(var(--rgb-black) / 0.7); }
-/* Fórmula da classificação (set/2026) sob o título "Classificação BDLP" — mesmo
-   corpo/cor dos parágrafos de callout do painel. */
-.classificacao-formula { margin: 12px 0 0; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
 /* Caracterização curta (texto da curadoria) sob o valor do Assunto e da Etapa. */
 .meta-item__desc { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.62); }
 /* Link discreto do hint das facetas para o glossário da página de Coleções. */
@@ -859,19 +863,24 @@ html.js .btn-apply { display: none; }
 .org-card__nota a { color: var(--sp-blue); text-decoration: underline; }
 .org-card__nota a:hover, .org-card__nota a:focus-visible { text-decoration-thickness: 2px; }
 
-/* Glossário de Assuntos e Categorias (página de Coleções, set/2026): nome
-   linkado ao acervo filtrado, caracterização curta e explicação longa num
-   <details> por item; âncoras #assuntos/#categorias com folga para o cabeçalho. */
-.glossario { display: grid; gap: var(--space-6); margin-top: var(--space-6); grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 900px) { .glossario { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.glossario__grupo { min-width: 0; scroll-margin-top: 88px; }
-.glossario__titulo { margin: 0 0 6px; font-family: var(--font-subtitle); font-weight: 600; font-size: 16px; color: var(--sp-black); }
-.glossario__intro { margin: 0 0 12px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.66); }
-.glossario__lista { list-style: none; margin: 0; padding: 0; }
-.glossario__item { padding: 10px 0; border-top: var(--border); font-size: 14px; line-height: 1.6; }
-.glossario__item:last-child { border-bottom: var(--border); }
+/* Glossário de Assuntos e Categorias (seção própria na página de Coleções,
+   set/2026): verbete = nome linkado ao acervo filtrado, caracterização curta da
+   curadoria, subcategorias em linha, contagem e a explicação longa num
+   <details>. Os dois grupos são sub-blocos da seção, rotulados com
+   .tema-grupo da home ("Temas em alta": título em destaque + ícone + intro,
+   âncora com folga para o cabeçalho) — nenhuma regra própria de grupo. Listas em
+   colunas (2 a partir de 640px; assuntos em 3 a partir de 1024px) para a página
+   não descer demais nem sobrar coluna vazia. */
+.section-heading + .tema-grupo { margin-top: var(--space-6); }   /* mesmo respiro da home após o eyebrow */
+/* Régua no fundo de CADA item (como .meta-item), não no <ul>: numa grade com a
+   última linha incompleta (16 assuntos em 3 colunas), a régua do contêiner
+   corria inteira sob as células vazias e parecia esticar os itens de cima. */
+.glossario__lista { list-style: none; margin: 0; padding: 0; border-top: var(--border); display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--space-6); }
+@media (min-width: 640px) { .glossario__lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .glossario__lista--3col { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.glossario__item { padding: 10px 0; border-bottom: var(--border); font-size: 14px; line-height: 1.6; }
 .glossario__nome { font-family: var(--font-subtitle); font-weight: 600; color: var(--sp-blue); }
-.glossario__nome:hover { text-decoration: underline; }
+.glossario__nome:hover, .glossario__nome:focus-visible { text-decoration: underline; }
 .glossario__curta { display: block; color: rgb(var(--rgb-black) / 0.72); }
 .glossario__count { display: block; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
 .glossario__mais { margin-top: 4px; }
@@ -881,7 +890,18 @@ html.js .btn-apply { display: none; }
 .glossario__mais[open] > summary::before { transform: rotate(45deg); }
 .glossario__mais > summary:focus-visible { outline: 3px solid rgb(var(--rgb-blue) / 0.55); outline-offset: 2px; border-radius: 4px; }
 .glossario__mais > p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
+/* "Saiba mais" das categorias: subcategorias e, recuadas, microcategorias — lista
+   simples no mesmo corpo/cor do texto do "Saiba mais" dos assuntos, cada nó com o
+   nome (link para o Acervo filtrado) e a definição embaixo. Recuo 18px como as
+   listas dos cards (.org-card ul). */
+.glossario__arvore { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
+.glossario__arvore ul { margin: 2px 0 4px; padding-left: 18px; }
+.glossario__arvore li { margin: 4px 0; }
+.glossario__arvore-def { display: block; color: rgb(var(--rgb-black) / 0.62); }   /* definição sob o nome */
+.glossario__arvore a { color: var(--sp-blue); }
+.glossario__arvore a:hover, .glossario__arvore a:focus-visible { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .glossario__mais > summary::before { transition: none; } }
+
 .meta-grid { display: grid; gap: 14px; margin-top: 16px; grid-template-columns: 1fr; }
 @media (min-width: 600px) { .meta-grid { grid-template-columns: repeat(2, 1fr); } }
 .meta-item { border-bottom: var(--border); padding-bottom: 12px; }
