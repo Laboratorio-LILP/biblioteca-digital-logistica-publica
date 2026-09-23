@@ -13,14 +13,15 @@
 --   SEÇÃO 1 — aditiva, segura a qualquer momento (antes ou depois da recarga):
 --     • extensão unaccent + configuração de busca portuguese_unaccent (T4);
 --     • subcoleções (topic) e tipos (type_information) novos: Acórdãos e
---       Deliberações sob Jurisprudência; Enunciados e Pareceres sob Doutrina;
+--       Deliberações sob Jurisprudência; Enunciados sob Doutrina;
 --     • topic_path/topic_users/topic_type das subcoleções novas;
 --     • os 2 Assuntos novos (ordem 15 e 16);
 --     • renomeia as 4 subcategorias de Planejamento (nome + slug);
 --     • descrições das coleções raiz sem "documentos normativos"/"vídeos".
 --
 --   SEÇÃO 2 — pós-recarga, GUARDADA: remove as subcoleções e os tipos retirados
---     (Documentos Normativos, Vídeos) e o Enunciados antigo sob Jurisprudência
+--     (Documentos Normativos, Vídeos e — v12.1, 23/09/2026 — Pareceres) e o
+--     Enunciados antigo sob Jurisprudência
 --     SOMENTE se nenhum nr_document (qualquer status) os referenciar. Se ainda
 --     houver documento, não faz nada e imprime aviso (RAISE NOTICE).
 --
@@ -61,12 +62,12 @@ FROM (VALUES
 JOIN topic r ON r.parent_id = 0 AND r.name = 'Jurisprudência'
 WHERE NOT EXISTS (SELECT 1 FROM topic t WHERE t.parent_id = r.id AND t.name = v.name);
 
--- 1.3 Subcoleções novas (topic) — Doutrina: Enunciados, Pareceres.
+-- 1.3 Subcoleção nova (topic) — Doutrina: Enunciados. (Pareceres, criado pela
+--     v12 de 11/09, saiu na v12.1 de 23/09/2026: a seção 2 o remove.)
 INSERT INTO topic (name, description, parent_id, archieve)
 SELECT v.name, v.description, r.id, 's'
 FROM (VALUES
-    ('Enunciados', 'Enunciados'),
-    ('Pareceres', 'Pareceres jurídicos e técnicos')
+    ('Enunciados', 'Enunciados')
 ) AS v(name, description)
 JOIN topic r ON r.parent_id = 0 AND r.name = 'Doutrina e Conteúdo Técnico'
 WHERE NOT EXISTS (SELECT 1 FROM topic t WHERE t.parent_id = r.id AND t.name = v.name);
@@ -100,7 +101,7 @@ ON CONFLICT (users_id, topic_id) DO NOTHING;
 
 -- 1.6 Tipos de informação novos (Enunciados costuma já existir).
 INSERT INTO type_information (name)
-SELECT v.name FROM (VALUES ('Acórdãos'), ('Deliberações'), ('Pareceres'), ('Enunciados')) AS v(name)
+SELECT v.name FROM (VALUES ('Acórdãos'), ('Deliberações'), ('Enunciados')) AS v(name)
 WHERE NOT EXISTS (SELECT 1 FROM type_information ti WHERE ti.name = v.name);
 
 INSERT INTO topic_type (topic_id, type_id)
@@ -129,9 +130,9 @@ UPDATE nr_subcategoria SET nome = 'PESQUISA DE PREÇOS', slug = 'pesquisa-de-pre
 UPDATE topic SET description = 'Acórdãos, deliberações, súmulas e boletins'
  WHERE parent_id = 0 AND name = 'Jurisprudência'
    AND description IS DISTINCT FROM 'Acórdãos, deliberações, súmulas e boletins';
-UPDATE topic SET description = 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos, enunciados e pareceres'
+UPDATE topic SET description = 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos e enunciados'
  WHERE parent_id = 0 AND name = 'Doutrina e Conteúdo Técnico'
-   AND description IS DISTINCT FROM 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos, enunciados e pareceres';
+   AND description IS DISTINCT FROM 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos e enunciados';
 UPDATE topic SET description = 'Manuais, guias, tutoriais, apostilas, aulas, cursos e slides'
  WHERE parent_id = 0 AND name = 'Instrução e Capacitação'
    AND description IS DISTINCT FROM 'Manuais, guias, tutoriais, apostilas, aulas, cursos e slides';
@@ -141,7 +142,8 @@ UPDATE topic SET description = 'Manuais, guias, tutoriais, apostilas, aulas, cur
 -- ===========================================================================
 -- Alvos: Jurisprudência/Documentos Normativos (topic + tipo), Jurisprudência/
 -- Enunciados (só o topic — o tipo "Enunciados" continua, agora sob Doutrina) e
--- Instrução e Capacitação/Vídeos (topic + tipo). Para cada alvo, conta em
+-- Instrução e Capacitação/Vídeos (topic + tipo) e — v12.1, 23/09/2026 — Doutrina e
+-- Conteúdo Técnico/Pareceres (topic + tipo). Para cada alvo, conta em
 -- nr_document (qualquer status) por topic_id e pelas duas colunas de tipo
 -- (typeinform_id e typeinformation) e em supplementary_files por topic_id.
 DO $$
@@ -152,11 +154,12 @@ DECLARE
 BEGIN
     FOR alvo IN
         SELECT t.id AS topic_id, t.name AS topic_name, p.name AS root_name,
-               CASE WHEN t.name IN ('Documentos Normativos', 'Vídeos') THEN t.name END AS type_name
+               CASE WHEN t.name IN ('Documentos Normativos', 'Vídeos', 'Pareceres') THEN t.name END AS type_name
         FROM topic t
         JOIN topic p ON p.id = t.parent_id AND p.parent_id = 0
         WHERE (p.name = 'Jurisprudência' AND t.name IN ('Documentos Normativos', 'Enunciados'))
            OR (p.name = 'Instrução e Capacitação' AND t.name = 'Vídeos')
+           OR (p.name = 'Doutrina e Conteúdo Técnico' AND t.name = 'Pareceres')
     LOOP
         SELECT COUNT(*) INTO n_docs
           FROM nr_document d

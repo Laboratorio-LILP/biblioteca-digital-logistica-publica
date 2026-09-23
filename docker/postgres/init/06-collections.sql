@@ -4,7 +4,8 @@
 -- Fonte: e-mail "ALTERAÇÕES BIBLIOTECA" (Lina, 11/09/2026) sobre a aba
 -- "Coleção, Assunto e Natureza" do template. Jurisprudência = Súmulas, Boletins,
 -- Acórdãos e Deliberações (saem Enunciados e Documentos Normativos); Doutrina
--- ganha Enunciados e Pareceres; Instrução perde Vídeos. Normas, leis, decretos e
+-- ganha Enunciados; Instrução perde Vídeos. Pareceres entrou em 11/09 e saiu em
+-- 23/09/2026 (v12.1: não é doutrina nem jurisprudência). Normas, leis, decretos e
 -- portarias saem do acervo pela planilha, não por código.
 -- Cada Tipo de Informação é semeado como subcoleção da sua Coleção, para que o
 -- migrate_spreadsheet._resolve_topic() case a coluna "Coleção" → raiz e refine
@@ -19,7 +20,7 @@ INSERT INTO topic (name, description, parent_id, archieve) VALUES
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
     ('Trabalhos Acadêmicos', 'Teses, dissertações, monografias, TCCs e memoriais docentes', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
-    ('Doutrina e Conteúdo Técnico', 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos, enunciados e pareceres', 0, 's');
+    ('Doutrina e Conteúdo Técnico', 'Livros digitais, artigos, notas técnicas, relatórios, textos de discussão, resumos e enunciados', 0, 's');
 INSERT INTO topic (name, description, parent_id, archieve) VALUES
     ('Instrução e Capacitação', 'Manuais, guias, tutoriais, apostilas, aulas, cursos e slides', 0, 's');
 
@@ -58,8 +59,7 @@ FROM topic t,
     ('Textos de Discussão', 'Textos para discussão e debate'),
     ('Resumos', 'Resumos'),
     ('Resumos expandidos', 'Resumos expandidos'),
-    ('Enunciados', 'Enunciados'),
-    ('Pareceres', 'Pareceres jurídicos e técnicos')
+    ('Enunciados', 'Enunciados')
 ) AS sub(name, description)
 WHERE t.name = 'Doutrina e Conteúdo Técnico' AND t.parent_id = 0;
 

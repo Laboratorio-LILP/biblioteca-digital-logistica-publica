@@ -42,7 +42,7 @@ SELECT name FROM (VALUES
     -- Doutrina e Conteúdo Técnico
     ('Livros digitais'), ('Artigos'), ('Notas Técnicas'), ('Relatórios'),
     ('Textos de Discussão'), ('Resumos'), ('Resumos expandidos'),
-    ('Enunciados'), ('Pareceres'),
+    ('Enunciados'),
     -- Instrução e Capacitação
     ('Manuais'), ('Guias'), ('Tutoriais'), ('Apostilas'), ('Aulas'),
     ('Cursos'), ('Slides')
