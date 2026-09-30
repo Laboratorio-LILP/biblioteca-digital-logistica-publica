@@ -18,7 +18,8 @@
 --     • os 2 Assuntos novos (ordem 15 e 16);
 --     • renomeia as 4 subcategorias de Planejamento (nome + slug);
 --     • descrições das coleções raiz sem "documentos normativos"/"vídeos";
---     • (30/09) coluna gerada `busca` + índice GIN para a busca textual.
+--     • (30/09) coluna gerada `busca` + índice GIN para a busca textual;
+--     • (30/09) REVOKE da tabela users para a role de leitura do portal.
 --
 --   SEÇÃO 2 — pós-recarga, GUARDADA: remove as subcoleções e os tipos retirados
 --     (Documentos Normativos, Vídeos e — v12.1, 23/09/2026 — Pareceres) e o
@@ -168,6 +169,24 @@ ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS busca tsvector
         setweight(to_tsvector('portuguese_unaccent', coalesce(complexidade, '')), 'D')
     ) STORED;
 CREATE INDEX IF NOT EXISTS idx_nr_document_busca ON nr_document USING gin (busca);
+
+-- 1.11 Role de leitura do portal sem acesso à tabela de credenciais do Nou-Rau
+--      (30/09/2026, auditoria F2-05; Todoist p1 de 03/09). O init de volume novo
+--      já faz isso (10-portal-readonly-revoke-users.sql); um banco existente não
+--      passou por ele, e todo pg_restore recria a tabela `users` e reaplica os
+--      privilégios padrão (ALTER DEFAULT PRIVILEGES … GRANT SELECT), devolvendo
+--      a leitura ao portal. Rode esta seção depois de qualquer restore.
+--      Guardada: se a role não existir (volume anterior ao PR #16), só avisa —
+--      crie-a com docker/postgres/init/09-portal-readonly-user.sh.
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'portal_reader') THEN
+        REVOKE ALL ON TABLE users FROM portal_reader;
+    ELSE
+        RAISE NOTICE 'seção 1.11 — aviso: role portal_reader não existe; rode docker/postgres/init/09-portal-readonly-user.sh (o portal não sobe sem ela)';
+    END IF;
+END
+$$;
 
 -- ===========================================================================
 -- SEÇÃO 2 — pós-recarga, guardada (só remove o que nenhum documento referencia)

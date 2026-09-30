@@ -223,3 +223,19 @@ def test_script_de_migracao_e_idempotente_por_construcao():
         assert ("ON CONFLICT" in trecho) or ("NOT EXISTS" in trecho), trecho[:120]
     for m in re.finditer(r"UPDATE\s+\w+[\s\S]*?;", sql, flags=re.I):
         assert "WHERE" in m.group(0), m.group(0)[:120]
+
+
+def test_migracao_revoga_da_role_do_portal_a_tabela_users():
+    # Achado F2-05 (23/09/2026) e tarefa Todoist p1 de 03/09: o REVOKE vivia só no
+    # init de volume novo (10-portal-readonly-revoke-users.sql); um banco existente
+    # — e qualquer pg_restore, que recria a tabela e reaplica os privilégios
+    # padrão — deixava o portal lendo a tabela de credenciais do Nou-Rau. A seção
+    # 1 passa a revogar, guardada pela existência da role (a VM pode não tê-la).
+    sql = _read(MIGRACAO)
+    m1, m2 = "-- SEÇÃO 1 — aditiva", "-- SEÇÃO 2 — pós-recarga"
+    s1 = sql[sql.index(m1): sql.index(m2)]
+    assert "REVOKE ALL ON TABLE users FROM portal_reader" in s1
+    bloco = s1[s1.index("REVOKE ALL ON TABLE users") - 400: s1.index("REVOKE ALL ON TABLE users")]
+    assert "pg_roles" in bloco and "rolname = 'portal_reader'" in bloco     # guarda: só se a role existir
+    init = _read(REPO / "docker" / "postgres" / "init" / "10-portal-readonly-revoke-users.sql")
+    assert "REVOKE ALL ON TABLE users FROM portal_reader" in init            # o init segue igual
