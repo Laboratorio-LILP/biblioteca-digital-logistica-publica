@@ -183,8 +183,22 @@ NATUREZA_CHOICES = [
 ]
 
 
+class DocumentManager(models.Manager):
+    """Adia a coluna gerada `busca` em toda consulta: o vetor da busca não entra
+    no SELECT dos documentos (é grande e só a busca o usa, no WHERE e no
+    ts_rank). Também é o que deixa o portal servir um banco que ainda não tem a
+    coluna (antes da seção 1 da migração v12, ou depois de restaurar um backup
+    anterior): sem o defer, todo SELECT de Document falhava com "column busca
+    does not exist" (ensaio de 30/09/2026)."""
+
+    def get_queryset(self):
+        return super().get_queryset().defer("busca")
+
+
 class Document(models.Model):
     """Documento digital — mapeia tabela 'nr_document' do Nou-Rau."""
+
+    objects = DocumentManager()
 
     STATUS_CHOICES = [
         ("i", "Incoming"),

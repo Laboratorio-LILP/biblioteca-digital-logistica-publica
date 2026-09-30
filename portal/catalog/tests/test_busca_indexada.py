@@ -73,3 +73,13 @@ def test_busca_usa_a_coluna_e_degrada_sem_ela():
     assert '_vetor("portuguese") + _vetor("portuguese_unaccent")' in src   # caminho antigo, sem a coluna
     src_mod = inspect.getsource(search)
     assert "information_schema.columns" in src_mod and "logger.warning" in src_mod
+
+
+def test_consultas_normais_nao_selecionam_a_coluna_gerada():
+    # Ensaio de 30/09/2026 (§4.2, banco v11 restaurado, sem a coluna): a home dava
+    # 500 porque todo SELECT de Document trazia `busca`. O gerente padrão adia a
+    # coluna: só a busca a referencia (WHERE/ts_rank), e só quando ela existe.
+    sql = str(Document.objects.filter(status="a").order_by("-pk")[:2].query)
+    assert '"busca"' not in sql
+    assert '"title"' in sql
+    assert "busca" in Document.objects.all().query.deferred_loading[0]
