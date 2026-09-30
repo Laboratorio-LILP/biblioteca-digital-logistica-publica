@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 
 from catalog import qualidade
-from catalog.taxonomy_v6 import COLECOES_V6, colecao_v6_for_tipo, tipo_canonico
+from catalog.taxonomy_v6 import COLECOES_V6, TIPOS_LEGADOS, colecao_v6_for_tipo, tipo_canonico
 
 
 class Command(BaseCommand):
@@ -117,9 +117,11 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("    nenhum")
 
-            # Aviso explícito: documento ativo com tipo retirado (Documentos
-            # Normativos, Vídeos) ou na subcoleção Enunciados sob Jurisprudência
-            # — impede a seção 2 do script de migração de remover esses nós.
+            # Aviso explícito: documento ativo com tipo retirado do vocabulário
+            # (TIPOS_LEGADOS: Documentos Normativos, Vídeos e, desde a v12.1,
+            # Pareceres) ou na subcoleção Enunciados sob Jurisprudência — impede a
+            # seção 2 do script de migração de remover esses nós.
+            retirados_nomes = "/".join(TIPOS_LEGADOS)
             cursor.execute(
                 """
                 SELECT COUNT(*)
@@ -128,20 +130,21 @@ class Command(BaseCommand):
                 LEFT JOIN topic t ON t.id = d.topic_id
                 LEFT JOIN topic r ON r.id = t.parent_id
                 WHERE d.status = 'a'
-                  AND (ti.name IN ('Documentos Normativos', 'Vídeos')
+                  AND (ti.name IN %s
                        OR (t.name = 'Enunciados' AND r.name = 'Jurisprudência'))
-                """
+                """,
+                [tuple(TIPOS_LEGADOS)],
             )
             retirados = cursor.fetchone()[0]
             if retirados:
                 self.stdout.write(self.style.WARNING(
                     f"\n  AVISO v12: {retirados} documento(s) ativo(s) com tipo retirado da taxonomia "
-                    "(Documentos Normativos/Vídeos) ou em Jurisprudência/Enunciados — recarregue o "
+                    f"({retirados_nomes}) ou em Jurisprudência/Enunciados — recarregue o "
                     "acervo v12 antes da seção 2 do script de migração."
                 ))
             else:
                 self.stdout.write(self.style.SUCCESS(
-                    "\n  Nenhum documento ativo com tipo retirado na v12 (Documentos Normativos/Vídeos/"
+                    f"\n  Nenhum documento ativo com tipo retirado na v12 ({retirados_nomes}/"
                     "Enunciados sob Jurisprudência)."
                 ))
 
