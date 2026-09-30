@@ -1,6 +1,9 @@
 import unicodedata
 
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+
+from . import fts
 
 
 def _author_key(s):
@@ -256,6 +259,14 @@ class Document(models.Model):
     permissao = models.CharField(max_length=20, blank=True, choices=PERMISSAO_CHOICES)
     # Natureza do objeto da contratação (v6, obrigatória na captura)
     natureza = models.CharField(max_length=80, blank=True, choices=NATUREZA_CHOICES)
+    # Vetor da busca textual, GERADO pelo Postgres (coluna `busca`, índice GIN
+    # idx_nr_document_busca; seed 06-taxonomia.sql §5 e seção 1 da migração
+    # v12). GeneratedField: o Django lê e nunca escreve; a expressão é a mesma
+    # que a busca montava a cada consulta (catalog/fts.py), só para documentação
+    # — a tabela é do Nou-Rau (managed = False), quem cria a coluna é o SQL.
+    busca = models.GeneratedField(
+        expression=fts.expressao_vetor(), output_field=SearchVectorField(), db_persist=True,
+    )
 
     class Meta:
         managed = False

@@ -1,10 +1,11 @@
 import logging
 import re
 
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db import DatabaseError, connection
 from django.db.models import F
 
+from . import fts
 from .models import Document, TypeInformation
 from .taxonomy_v6 import colecao_v6_for_tipo
 
@@ -116,28 +117,15 @@ def _apply_sort(qs, sort, default):
     return qs.order_by(default, "-pk")
 
 
-# Campos e pesos do vetor de busca. Inclui campos LILP (complexidade,
-# uso_futuro, metodo, resultado) além dos clássicos title/keywords/author/abstract.
-_FTS_CAMPOS = (
-    ("title", "A"),
-    ("keywords", "A"),
-    ("author", "B"),
-    ("autor_principal", "B"),
-    ("abstract", "C"),
-    ("uso_futuro", "C"),
-    ("metodo", "D"),
-    ("resultado", "D"),
-    ("complexidade", "D"),
-)
+# Campos e pesos do vetor de busca vivem em catalog/fts.py — fonte única para
+# o Django e para o SQL da coluna gerada `nr_document.busca`.
+_FTS_CAMPOS = fts.FTS_CAMPOS
 
 
 def _vetor(config):
-    """Soma dos SearchVector dos campos de _FTS_CAMPOS numa configuração de busca."""
-    vetor = None
-    for campo, peso in _FTS_CAMPOS:
-        sv = SearchVector(campo, weight=peso, config=config)
-        vetor = sv if vetor is None else vetor + sv
-    return vetor
+    """Soma dos SearchVector dos campos de _FTS_CAMPOS numa configuração de busca
+    (caminho sem a coluna materializada)."""
+    return fts.vetor(config)
 
 
 # Sufixos nasais do português que o usuário costuma digitar sem acento. O
@@ -174,6 +162,36 @@ def reacentuar(termo):
 
 _CONFIG_UNACCENT = "portuguese_unaccent"
 _unaccent_estado = {"ok": False, "avisado": False}
+_coluna_estado = {"ok": False, "avisado": False}
+
+
+def _busca_materializada_disponivel():
+    """True se `nr_document.busca` (coluna gerada com o vetor da busca) existe.
+
+    Mesma disciplina de _unaccent_disponivel: positivo em cache no processo;
+    negativo reavaliado a cada chamada (uma consulta a information_schema) com
+    um aviso no log — um banco ainda sem a seção 1 da migração v12 busca pelo
+    vetor calculado (mais lento) em vez de responder 500.
+    """
+    if _coluna_estado["ok"]:
+        return True
+    try:
+        with connection.cursor() as cur:
+            cur.execute(
+                "SELECT 1 FROM information_schema.columns WHERE table_name = 'nr_document' AND column_name = 'busca'"
+            )
+            ok = cur.fetchone() is not None
+    except DatabaseError:
+        ok = False
+    if ok:
+        _coluna_estado["ok"] = True
+    elif not _coluna_estado["avisado"]:
+        _coluna_estado["avisado"] = True
+        logger.warning(
+            "coluna nr_document.busca ausente: busca pelo vetor calculado na consulta (sem índice, mais lenta); "
+            "aplique a seção 1 de docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql"
+        )
+    return ok
 
 
 def _unaccent_disponivel():
@@ -260,7 +278,23 @@ def apply_fulltext(qs, query):
     nasce em 00-extensions.sql (volume novo) e na seção 1 do script de
     migração v12; sem ela, a busca degrada para `portuguese` (ver
     _unaccent_disponivel) em vez de falhar.
+
+    Desde 30/09/2026 o vetor é a coluna gerada `nr_document.busca` (índice GIN),
+    quando o banco a tem (_busca_materializada_disponivel); sem ela, o vetor é
+    calculado na consulta como antes. Os dois caminhos dão o mesmo resultado —
+    a coluna nasce da mesma definição (catalog/fts.py).
     """
+    if _busca_materializada_disponivel():
+        # Coluna gerada `busca` (as duas configurações, mesmos campos e pesos —
+        # catalog/fts.py) com índice GIN: `busca @@ consulta` vira Bitmap Index
+        # Scan; o ts_rank só roda nos documentos que casaram.
+        consulta = _consulta(query, com_unaccent=True)
+        return (
+            qs.annotate(rank=SearchRank(F("busca"), consulta))
+            .filter(busca=consulta, rank__gte=0.01)
+        )
+    # Sem a coluna (banco ainda sem a seção 1 da migração): vetor calculado na
+    # consulta, como antes de 30/09/2026 — Seq Scan, mas funciona.
     com_unaccent = _unaccent_disponivel()
     if com_unaccent:
         vector = _vetor("portuguese") + _vetor("portuguese_unaccent")
@@ -268,8 +302,8 @@ def apply_fulltext(qs, query):
         vector = _vetor("portuguese")
     consulta = _consulta(query, com_unaccent)
     return (
-        qs.annotate(busca=vector, rank=SearchRank(vector, consulta))
-        .filter(busca=consulta, rank__gte=0.01)
+        qs.annotate(busca_calc=vector, rank=SearchRank(vector, consulta))
+        .filter(busca_calc=consulta, rank__gte=0.01)
     )
 
 

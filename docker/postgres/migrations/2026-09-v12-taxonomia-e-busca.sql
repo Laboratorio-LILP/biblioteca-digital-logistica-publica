@@ -17,7 +17,8 @@
 --     • topic_path/topic_users/topic_type das subcoleções novas;
 --     • os 2 Assuntos novos (ordem 15 e 16);
 --     • renomeia as 4 subcategorias de Planejamento (nome + slug);
---     • descrições das coleções raiz sem "documentos normativos"/"vídeos".
+--     • descrições das coleções raiz sem "documentos normativos"/"vídeos";
+--     • (30/09) coluna gerada `busca` + índice GIN para a busca textual.
 --
 --   SEÇÃO 2 — pós-recarga, GUARDADA: remove as subcoleções e os tipos retirados
 --     (Documentos Normativos, Vídeos e — v12.1, 23/09/2026 — Pareceres) e o
@@ -136,6 +137,37 @@ UPDATE topic SET description = 'Livros digitais, artigos, notas técnicas, relat
 UPDATE topic SET description = 'Manuais, guias, tutoriais, apostilas, aulas, cursos e slides'
  WHERE parent_id = 0 AND name = 'Instrução e Capacitação'
    AND description IS DISTINCT FROM 'Manuais, guias, tutoriais, apostilas, aulas, cursos e slides';
+
+-- 1.10 Busca textual indexada (30/09/2026, auditoria F2-02): coluna GERADA
+--      `busca` com o vetor da busca (campos e pesos de portal/catalog/fts.py,
+--      nas configurações portuguese e portuguese_unaccent da 1.1) + índice GIN.
+--      Espelha o seed 06-taxonomia.sql §5. Sem a coluna o portal ainda busca
+--      (vetor calculado na consulta, mais lento) e avisa no log; com ela a home
+--      e a busca deixam de varrer a tabela. Recriar a coluna se os campos ou os
+--      pesos mudarem: DROP COLUMN busca e rodar de novo.
+DROP INDEX IF EXISTS idx_nr_document_fts;
+ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS busca tsvector
+    GENERATED ALWAYS AS (
+        setweight(to_tsvector('portuguese', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('portuguese', coalesce(keywords, '')), 'A') ||
+        setweight(to_tsvector('portuguese', coalesce(author, '')), 'B') ||
+        setweight(to_tsvector('portuguese', coalesce(autor_principal, '')), 'B') ||
+        setweight(to_tsvector('portuguese', coalesce(abstract, '')), 'C') ||
+        setweight(to_tsvector('portuguese', coalesce(uso_futuro, '')), 'C') ||
+        setweight(to_tsvector('portuguese', coalesce(metodo, '')), 'D') ||
+        setweight(to_tsvector('portuguese', coalesce(resultado, '')), 'D') ||
+        setweight(to_tsvector('portuguese', coalesce(complexidade, '')), 'D') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(keywords, '')), 'A') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(author, '')), 'B') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(autor_principal, '')), 'B') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(abstract, '')), 'C') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(uso_futuro, '')), 'C') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(metodo, '')), 'D') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(resultado, '')), 'D') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(complexidade, '')), 'D')
+    ) STORED;
+CREATE INDEX IF NOT EXISTS idx_nr_document_busca ON nr_document USING gin (busca);
 
 -- ===========================================================================
 -- SEÇÃO 2 — pós-recarga, guardada (só remove o que nenhum documento referencia)

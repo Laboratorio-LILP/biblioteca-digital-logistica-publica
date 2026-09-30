@@ -94,19 +94,33 @@ WHERE ano IS NULL
   AND source IS NOT NULL
   AND source ~ '\m(?:19|20)\d{2}\M';
 
--- 5. FTS index expandido — inclui campos LILP --------------------------------
--- Substitui o índice criado em 05-custom-metadata.sql (mais estreito).
-
+-- 5. Busca textual: coluna GERADA com o vetor da busca + índice GIN ------------
+-- O vetor é a soma dos campos com peso nas configurações `portuguese` e
+-- `portuguese_unaccent` (00-extensions.sql) — a MESMA soma que o portal montava a
+-- cada consulta (portal/catalog/fts.py; o teste test_busca_indexada confere que
+-- este texto é idêntico ao gerado lá). Materializar tira o Seq Scan da home e da
+-- busca (auditoria de 23/09/2026, F2-02). O índice antigo idx_nr_document_fts
+-- (05-custom-metadata.sql) tinha outra expressão e o planejador nunca o usava.
 DROP INDEX IF EXISTS idx_nr_document_fts;
-CREATE INDEX IF NOT EXISTS idx_nr_document_fts ON nr_document
-    USING gin(to_tsvector('portuguese',
-        coalesce(title, '') || ' ' ||
-        coalesce(author, '') || ' ' ||
-        coalesce(autor_principal, '') || ' ' ||
-        coalesce(keywords, '') || ' ' ||
-        coalesce(abstract, '') || ' ' ||
-        coalesce(uso_futuro, '') || ' ' ||
-        coalesce(metodo, '') || ' ' ||
-        coalesce(resultado, '') || ' ' ||
-        coalesce(complexidade, '')
-    ));
+ALTER TABLE nr_document ADD COLUMN IF NOT EXISTS busca tsvector
+    GENERATED ALWAYS AS (
+        setweight(to_tsvector('portuguese', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('portuguese', coalesce(keywords, '')), 'A') ||
+        setweight(to_tsvector('portuguese', coalesce(author, '')), 'B') ||
+        setweight(to_tsvector('portuguese', coalesce(autor_principal, '')), 'B') ||
+        setweight(to_tsvector('portuguese', coalesce(abstract, '')), 'C') ||
+        setweight(to_tsvector('portuguese', coalesce(uso_futuro, '')), 'C') ||
+        setweight(to_tsvector('portuguese', coalesce(metodo, '')), 'D') ||
+        setweight(to_tsvector('portuguese', coalesce(resultado, '')), 'D') ||
+        setweight(to_tsvector('portuguese', coalesce(complexidade, '')), 'D') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(keywords, '')), 'A') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(author, '')), 'B') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(autor_principal, '')), 'B') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(abstract, '')), 'C') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(uso_futuro, '')), 'C') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(metodo, '')), 'D') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(resultado, '')), 'D') ||
+        setweight(to_tsvector('portuguese_unaccent', coalesce(complexidade, '')), 'D')
+    ) STORED;
+CREATE INDEX IF NOT EXISTS idx_nr_document_busca ON nr_document USING gin (busca);
