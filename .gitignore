@@ -216,8 +216,12 @@ __marimo__/
 # Django collected static files
 portal/staticfiles/
 
-# Backups SQL
+# Backups do banco e dos arquivos da curadoria — nunca versionar (têm a tabela users)
 backup_*.sql
+backup_*.dump
+backup_*.dump.part
+backup_*_arquivos.tgz
+backup_*.tgz.part
 
 # Dados de migração temporários
 migration/output/
