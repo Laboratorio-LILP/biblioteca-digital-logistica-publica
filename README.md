@@ -43,7 +43,7 @@ Portal em `http://localhost:${PORTAL_PORT:-8000}`. Curadoria em `http://localhos
 ## Testes e qualidade
 
 ```bash
-make test          # pytest (em container) — ou: cd portal && python -m pytest
+make test          # ruff + pytest num contêiner de teste — ou: cd portal && DJANGO_SECRET_KEY=teste-local-sem-valor python -m pytest -q
 ruff check portal/ # lint
 ```
 

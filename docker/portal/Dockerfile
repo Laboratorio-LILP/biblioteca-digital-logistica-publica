@@ -27,7 +27,8 @@ RUN DJANGO_SECRET_KEY=build-placeholder python manage.py collectstatic --noinput
 # `make test` constrói este estágio (--target test) e monta o working tree em /src.
 FROM base AS test
 COPY requirements-dev.txt /app/
-RUN pip install --no-cache-dir -r requirements-dev.txt
+RUN apt-get update && apt-get install -y --no-install-recommends make && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir -r requirements-dev.txt
 
 # --- Estágio final (o padrão do `docker build`/compose): execução.
 FROM base AS runtime
