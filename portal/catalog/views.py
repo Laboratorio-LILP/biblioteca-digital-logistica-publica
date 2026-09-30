@@ -209,6 +209,7 @@ MULTI_PARAMS = frozenset({
 # Params que só fazem sentido como inteiro (ids da taxonomia e anos). Qualquer
 # outra coisa é URL manipulada — vira 400 tratado, não 500 (achado F2-01, 23/09).
 INT_PARAMS = frozenset({
+    "topic_id",
     "category_id",
     "subcategoria_id",
     "microcategoria_id",

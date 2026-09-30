@@ -30,13 +30,19 @@ ARMAZENAMENTO_SIMPLES = {
 }
 
 
-@pytest.mark.parametrize("param", ["category_id", "subcategoria_id", "microcategoria_id", "assunto_id",
+@pytest.mark.parametrize("param", ["topic_id", "category_id", "subcategoria_id", "microcategoria_id", "assunto_id",
                                    "typeinform_id", "ano_min", "ano_max"])
 def test_id_ou_ano_que_nao_e_inteiro_vira_400(param):
     with pytest.raises(BadRequest):
         views._read_filters_from(QueryDict(f"{param}=abc"))
     with pytest.raises(BadRequest):
         views._read_filters_from(QueryDict(f"{param}=1%00"))
+
+
+def test_todo_id_e_ano_de_filter_params_e_validado_como_inteiro():
+    # contraprova de 30/09: topic_id estava em FILTER_PARAMS e fora de INT_PARAMS → ?topic_id=abc dava 500
+    esperados = {p for p in views.FILTER_PARAMS if p.endswith("_id") or p.startswith("ano_")}
+    assert esperados == set(views.INT_PARAMS)
 
 
 def test_ids_validos_sao_normalizados_e_multi_select_vira_lista():

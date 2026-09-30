@@ -15,6 +15,7 @@ na stack local (EXPLAIN ANALYZE), não aqui.
 """
 
 import inspect
+import re
 from pathlib import Path
 
 from django.contrib.postgres.search import SearchVectorField
@@ -83,3 +84,32 @@ def test_consultas_normais_nao_selecionam_a_coluna_gerada():
     assert '"busca"' not in sql
     assert '"title"' in sql
     assert "busca" in Document.objects.all().query.deferred_loading[0]
+
+
+def _triplas(sql):
+    """(configuração, campo, peso) de cada setweight(to_tsvector(...)) num SQL, em qualquer grafia."""
+    # str(query) substitui os parâmetros sem aspas (portuguese::regconfig, COALESCE(x, ), A);
+    # o SQL da coluna os traz com aspas — as duas grafias caem na mesma forma
+    sql = sql.replace("::regconfig", "").replace('"nr_document".', "").replace('"', "").replace("'", "").lower()
+    return set(re.findall(r"setweight\(to_tsvector\((\w+), coalesce\((\w+), \)\), ([a-d])\)", sql))
+
+
+def test_coluna_gerada_e_vetor_do_django_tem_as_mesmas_triplas_config_campo_peso():
+    # contraprova de 30/09: o teste anterior contava setweight na própria string gerada (tautológico).
+    # Aqui o vetor do Django é COMPILADO em SQL (sem executar) e comparado com o SQL da coluna.
+    compilado = str(Document.objects.annotate(v=fts.expressao_vetor()).values("v").query)
+    assert _triplas(compilado) == _triplas(fts.sql_coluna_gerada())
+    assert len(_triplas(compilado)) == 2 * len(fts.FTS_CAMPOS)
+
+
+def test_sql_da_busca_usa_a_coluna_quando_existe_e_o_vetor_calculado_quando_nao(monkeypatch):
+    monkeypatch.setattr(search, "_busca_materializada_disponivel", lambda: True)
+    com_coluna = str(search.search_documents("pregão eletrônico").query)
+    assert '"nr_document"."busca" @@' in com_coluna and "setweight(" not in com_coluna
+    assert "&&" in com_coluna and "||" in com_coluna          # E entre palavras, OU dentro de cada palavra
+    assert 'ts_rank("nr_document"."busca"' in com_coluna                    # rank sobre a coluna, só nos que casaram
+    monkeypatch.setattr(search, "_busca_materializada_disponivel", lambda: False)
+    monkeypatch.setattr(search, "_unaccent_disponivel", lambda: True)
+    calculado = str(search.search_documents("pregão eletrônico").query)
+    assert "setweight(to_tsvector(portuguese_unaccent" in calculado.replace("'", "").replace("::regconfig", "")
+    assert '"nr_document"."busca"' not in calculado
