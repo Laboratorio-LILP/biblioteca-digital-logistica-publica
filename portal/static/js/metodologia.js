@@ -33,15 +33,14 @@
     });
     if (!fields.length) return;
     var initial = -1;
-    fields.forEach(function (f, i) { if (initial < 0 && f.button.getAttribute("aria-pressed") === "true") initial = i; });
+    fields.forEach(function (f, i) { if (initial < 0 && f.button.getAttribute("aria-expanded") === "true") initial = i; });
     var selected = initial < 0 ? null : initial;
 
     function render() {
       fields.forEach(function (f, index) {
         var active = index === selected;
         f.item.classList.toggle("is-selected", active);
-        f.button.setAttribute("aria-pressed", String(active));
-        f.button.setAttribute("aria-expanded", String(active));
+        f.button.setAttribute("aria-expanded", String(active));   // um estado só: o cartão abre/fecha a explicação
         f.mobilePanel.hidden = !active;
         f.panel.hidden = index !== (selected === null ? 0 : selected);
       });

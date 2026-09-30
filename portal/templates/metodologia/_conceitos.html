@@ -12,7 +12,7 @@
       {% for campo in campos %}
       <li data-trail-field="{{ campo.id }}" class="classification-step{% if forloop.first %} is-selected{% endif %}">
         {% if not forloop.first %}<span class="classification-connector" aria-hidden="true"><svg class="fi"><use href="#{% if campo.id == 'subcategoria' or campo.id == 'microcategoria' %}fi-arrow-right{% else %}fi-plus{% endif %}"/></svg></span>{% endif %}
-        <button type="button" class="classification-node {% if campo.obrigatorio %}is-required{% else %}is-conditional{% endif %}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="classificacao-{{ campo.id }} classificacao-mobile-{{ campo.id }}">
+        <button type="button" class="classification-node {% if campo.obrigatorio %}is-required{% else %}is-conditional{% endif %}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="classificacao-{{ campo.id }} classificacao-mobile-{{ campo.id }}">
           <span class="classification-node-top"><span>{{ forloop.counter|stringformat:"02d" }}</span><svg class="fi classification-icon" aria-hidden="true"><use href="#{{ campo.icon }}"/></svg></span>
           <strong>{{ campo.nome }}</strong>
           <span class="classification-value">{{ campo.resumo }}</span>
