@@ -114,6 +114,31 @@ NOURAU_ARCHIVE_DIR = env("NOURAU_ARCHIVE_DIR", default="/nourau/archive")
 # Itens por página nos resultados de busca
 SEARCH_RESULTS_PER_PAGE = 10
 
+# Registro (log) na saída do contêiner — é o que a TI vê com `docker compose
+# logs portal`. Sem isto, com DEBUG=false o Django só tentaria mail_admins e um
+# erro 500 em homologação não deixava rastro nenhum (achado F2-01, 23/09/2026).
+#   django.request  WARNING: 400/404 (uma linha) e 500 (com a exceção)
+#   django.security WARNING: host não permitido, CSRF etc.
+#   catalog         INFO:    avisos do portal (ex.: busca sem acento degradada)
+# A linha traz método, caminho e status; não traz corpo de requisição nem
+# cookies. Com DEBUG=false a exceção também não traz o dump de settings.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "portal": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "portal"},
+    },
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {
+        "django.request": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "catalog": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+}
+
 # Segurança. Flags que EXIGEM HTTPS ficam sob SECURE_SSL (separado de DEBUG),
 # para que DEBUG=false funcione na VM de homologação (somente HTTP/:80).
 # Em produção com TLS (Prodesp): SECURE_SSL=true.

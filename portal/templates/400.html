@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Endereço inválido (400) — Biblioteca Digital de Logística Pública{% endblock %}
+
+{% block content_raw %}
+<section class="sp-section sp-section--pattern">
+  <div class="sp-container error-page">
+    <p class="error-page__code" aria-hidden="true">400</p>
+    <h1>Endereço inválido</h1>
+    <p>O endereço tem um filtro ou um termo de busca que a biblioteca não consegue ler. Volte à página inicial ou comece uma busca nova.</p>
+  </div>
+</section>
+<section class="sp-section">
+  <div class="sp-container error-page">
+    <div class="error-page__actions">
+      <a class="sp-button-primary" href="{% url 'catalog:home' %}">Ir para a página inicial</a>
+      <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Buscar no acervo</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

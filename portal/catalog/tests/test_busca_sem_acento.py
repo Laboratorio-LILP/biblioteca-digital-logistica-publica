@@ -34,7 +34,8 @@ def test_consulta_e_por_token_e_entre_palavras():
     # eletrônico" 29 → 81). A consulta é montada por token — OR das configurações
     # DENTRO de cada palavra, E entre palavras — e o casamento booleano é explícito (@@).
     src = inspect.getsource(search._consulta)
-    assert "query.split()" in src or ".split()" in src
+    # 30/09: as palavras vêm de _tokens (split limitado a MAX_TOKENS_BUSCA)
+    assert "_tokens(query)" in src and ".split()" in inspect.getsource(search._tokens)
     assert "& " in src or "&=" in src or " & " in src
     src_apply = inspect.getsource(search.apply_fulltext)
     assert "filter(busca=" in src_apply           # vetor @@ consulta — semântica booleana garantida

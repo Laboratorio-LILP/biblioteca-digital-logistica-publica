@@ -204,6 +204,19 @@ def _unaccent_disponivel():
     return ok
 
 
+# Palavras da consulta que entram na tsquery. Cada palavra vira até 3 nós
+# (portuguese OR portuguese_unaccent OR variante re-acentuada) encadeados em AND;
+# um texto de ~200 palavras colado na busca estourava a recursão do Django ao
+# compilar a árvore (achado F2-01, 23/09/2026). Trinta e duas palavras cobrem
+# qualquer busca real; o excedente é ignorado, a busca funciona.
+MAX_TOKENS_BUSCA = 32
+
+
+def _tokens(query):
+    """Palavras da consulta, no máximo MAX_TOKENS_BUSCA."""
+    return (query or "").split()[:MAX_TOKENS_BUSCA]
+
+
 def _consulta(query, com_unaccent):
     """tsquery montada POR TOKEN: OR das configurações (e da variante re-acentuada)
     dentro de cada palavra, E entre as palavras.
@@ -214,7 +227,7 @@ def _consulta(query, com_unaccent):
     (todas as palavras) é preservada e cada palavra fica tolerante a acento.
     """
     total = None
-    for tok in query.split():
+    for tok in _tokens(query):
         q = SearchQuery(tok, config="portuguese")
         if com_unaccent:
             q = q | SearchQuery(tok, config="portuguese_unaccent")

@@ -1,10 +1,13 @@
+from datetime import datetime
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.db.models import Count
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponseBadRequest, HttpResponseServerError
 from django.shortcuts import get_object_or_404, render
+from django.template import loader
 from django.urls import reverse
 
 from .facets import (
@@ -203,23 +206,56 @@ MULTI_PARAMS = frozenset({
 })
 
 
+# Params que só fazem sentido como inteiro (ids da taxonomia e anos). Qualquer
+# outra coisa é URL manipulada — vira 400 tratado, não 500 (achado F2-01, 23/09).
+INT_PARAMS = frozenset({
+    "category_id",
+    "subcategoria_id",
+    "microcategoria_id",
+    "assunto_id",
+    "typeinform_id",
+    "ano_min",
+    "ano_max",
+})
+# Tamanho máximo de um valor textual de filtro (natureza, etapa, permissão…):
+# os valores reais têm até ~45 caracteres; acima disso é lixo colado na URL.
+MAX_TEXTO_FILTRO = 200
+
+
+def _valor_de_filtro(param, value):
+    """Valida UM valor de filtro vindo da URL. Inteiro normalizado ("007" → "7")
+    para INT_PARAMS; texto sem NUL e de tamanho razoável para os demais. Mantém
+    str porque templates e facetas comparam com os ids das opções como texto.
+    Levanta BadRequest — o Django responde 400 pelo handler400 e registra em
+    django.request — em vez de deixar o Postgres estourar em 500."""
+    if param in INT_PARAMS:
+        try:
+            return str(int(value))
+        except (TypeError, ValueError):
+            raise BadRequest(f"filtro {param} precisa ser um número") from None
+    if "\x00" in value or len(value) > MAX_TEXTO_FILTRO:
+        raise BadRequest(f"filtro {param} com valor inválido")
+    return value
+
+
 def _read_filters_from(getparams):
     """Extrai filtros válidos de um QueryDict, descartando vazios.
 
     Params em MULTI_PARAMS viram lista de valores (`getlist`); os demais,
-    valor único (`get`). Usado tanto com request.GET quanto com um `ctx` de busca
-    reconstruído (para o anterior/próximo na página de documento).
+    valor único (`get`). Cada valor passa por _valor_de_filtro (400 se inválido).
+    Usado tanto com request.GET quanto com um `ctx` de busca reconstruído (para o
+    anterior/próximo na página de documento).
     """
     filters = {}
     for p in FILTER_PARAMS:
         if p in MULTI_PARAMS:
-            vals = [v for v in getparams.getlist(p) if v]
+            vals = [_valor_de_filtro(p, v) for v in getparams.getlist(p) if v]
             if vals:
                 filters[p] = vals
         else:
             value = getparams.get(p)
             if value:
-                filters[p] = value
+                filters[p] = _valor_de_filtro(p, value)
     return filters
 
 
@@ -228,9 +264,20 @@ def _read_filters(request):
     return _read_filters_from(request.GET)
 
 
+def _termo_de_busca(getparams):
+    """Termo `q` aparado. NUL numa string literal derruba o Postgres ("A string
+    literal cannot contain NUL") — é URL manipulada: 400 tratado. O tamanho não
+    é limitado aqui: a consulta usa só as primeiras MAX_TOKENS_BUSCA palavras
+    (search._tokens), então um texto colado inteiro na busca funciona."""
+    query = getparams.get("q", "")
+    if "\x00" in query:
+        raise BadRequest("termo de busca com caractere inválido")
+    return query.strip()
+
+
 def search(request):
     """Busca full-text com filtros facetados em cascata."""
-    query = request.GET.get("q", "").strip()
+    query = _termo_de_busca(request.GET)
     page_number = request.GET.get("page", 1)
     sort = request.GET.get("sort", "")
     filters = _read_filters(request)
@@ -294,9 +341,12 @@ def _resultado_navegacao(doc, ctx):
     if not ctx:
         return nav
     cq = QueryDict(ctx)
-    query = cq.get("q", "").strip()
     sort = cq.get("sort", "")
-    filters = _read_filters_from(cq)
+    try:
+        query = _termo_de_busca(cq)
+        filters = _read_filters_from(cq)
+    except BadRequest:
+        return nav   # ctx manipulado: a página do documento abre sem anterior/próximo
     if query:
         results = search_documents(query, filters or None, sort=sort)
     elif filters:
@@ -544,3 +594,31 @@ def mapa_site(request):
 def fale_conosco(request):
     """Canal de contato — Lei 13.460/2017 (Direitos do Usuário)."""
     return render(request, "legal/fale_conosco.html")
+
+
+# =====================================================================
+# Páginas de erro (handler400 e handler500 em portal/urls.py)
+# =====================================================================
+# O handler500 padrão do Django renderiza o template SEM context processors —
+# de propósito: se o erro veio do banco, o site_context (que consulta o banco)
+# entraria em laço. Estas versões fazem o mesmo (render sem `request`, logo sem
+# processors) e passam um contexto mínimo, sem consulta nenhuma, para o rodapé
+# sair inteiro (ano) e o menu sem item ativo.
+
+def _contexto_minimo():
+    return {"current_url_name": "", "site_year": datetime.now().year}
+
+
+def erro_400(request, exception=None):
+    """URL manipulada (filtro que não é número, NUL no termo): página no padrão
+    da plataforma, sem devolver o valor recebido. O Django já registra o pedido
+    em django.request (WARNING) antes de chamar este handler."""
+    html = loader.get_template("400.html").render(_contexto_minimo())
+    return HttpResponseBadRequest(html)
+
+
+def erro_500(request):
+    """Erro interno: contexto mínimo, sem tocar no banco. A exceção sai no
+    stdout do contêiner pelo LOGGING (django.request, ERROR)."""
+    html = loader.get_template("500.html").render(_contexto_minimo())
+    return HttpResponseServerError(html)
