@@ -48,8 +48,9 @@ services:
       dockerfile: docker/portal/Dockerfile
     restart: unless-stopped
     environment:
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-insecure-dev-key-change-in-production}
-      DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
+      # Chave própria obrigatória, como as senhas do banco; DEBUG só quando pedido.
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?defina DJANGO_SECRET_KEY no .env (ver .env.example)}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
       # Proxy reverso / subcaminho (VM atrás do index.php). Vazio em dev → settings trata como raiz.
       FORCE_SCRIPT_NAME: ${FORCE_SCRIPT_NAME:-}

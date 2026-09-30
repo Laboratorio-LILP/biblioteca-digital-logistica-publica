@@ -1,16 +1,34 @@
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
 )
 
-SECRET_KEY = env("DJANGO_SECRET_KEY", default="insecure-dev-key-change-in-production")
-DEBUG = env("DJANGO_DEBUG", default=True)
+# DEBUG só liga quando pedido (DJANGO_DEBUG=true no .env de desenvolvimento).
+# Ausente vale false: homologação e produção não podem depender de alguém
+# lembrar de desligar.
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
+
+# Chave secreta SEM padrão conhecido. Fora do desenvolvimento a ausência derruba
+# o boot — é o mesmo tratamento que o compose dá às senhas do banco. Em
+# desenvolvimento sem chave, uma aleatória por processo (o portal não tem
+# sessão nem formulário POST; nada depende da chave persistir).
+SECRET_KEY = env("DJANGO_SECRET_KEY", default="")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY não definida. Fora do modo de desenvolvimento o portal só sobe com chave "
+            "própria: gere uma com "
+            "`python -c \"from django.core.management.utils import get_random_secret_key as g; print(g())\"` "
+            "e grave em DJANGO_SECRET_KEY no .env (ver .env.example)."
+        )
+    SECRET_KEY = "dev-" + get_random_secret_key()
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 # ── Proxy reverso / subcaminho /Biblioteca (parametrizado; default seguro p/ dev) ──
