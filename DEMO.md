@@ -2,6 +2,8 @@
 
 **Apresentação para o Subsecretário — MVP Local**
 
+> **Roteiro histórico** (abril a julho de 2026; última atualização em 28/07/2026: acervo de 507 materiais, taxonomia v9). Os números e a planilha abaixo são daquela época. Não use este arquivo para carga nem para subida: o roteiro vigente está em `docs/DEPLOY.md` (homologação: §4.1 e §4.2) e em `tools/db-refresh.md`.
+
 ## Pré-requisitos
 - Docker Desktop instalado e rodando
 - Planilha `BDLP_507_v9_FINAL.xlsx` em mãos (master do acervo — raiz da pasta da frente)
@@ -55,7 +57,7 @@ Deve mostrar: 507 documentos arquivados; por coleção: Doutrina e Conteúdo Té
 
 ## Passo 7 — Demonstrar o Nou-Rau (http://localhost:8080/manager)
 
-1. Login: usuário `admin`, senha `admin` (seed de demonstração — **trocar no deploy**; nunca manter em homologação/produção, ver `docs/DEPLOY.md`).
+1. Login: usuário `admin`, senha do seed de demonstração (ver `docs/DEPLOY.md` §5) — **trocar no deploy**; nunca manter em homologação/produção.
 2. Mostrar a lista de documentos catalogados (507 registros).
 3. Abrir um documento para mostrar os metadados.
 
@@ -92,7 +94,7 @@ docker compose --env-file .env -f docker/docker-compose.yml exec postgres psql -
 ```
 
 ### Esqueceu a senha do Nou-Rau
-Login: `admin` / Senha: `admin` (seed local de demo — em homologação/produção a credencial deve estar rotacionada, ver `docs/DEPLOY.md`)
+Login: `admin` / Senha: senha do seed local de demonstração (ver `docs/DEPLOY.md` §5) — em homologação/produção a credencial deve estar rotacionada.
 
 ---
 

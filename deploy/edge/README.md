@@ -13,4 +13,4 @@ Roteador PHP multi-projeto que serve, sob um domínio único, cada sistema do LI
 3. No `.env` do app: `FORCE_SCRIPT_NAME=/OutroSistema` + `ALLOWED_HOSTS`/`CSRF_TRUSTED_ORIGINS` do host público.
 
 ## Deploy na VM
-Provisionar `index.php` + `.htaccess` em `/opt/lampp/htdocs/` (hoje feito à mão; alvo: script/CI). **Não** editar direto no servidor sem refletir aqui.
+Provisionar `index.php` + `.htaccess` na pasta do servidor web da VM, sob responsabilidade da TI (hoje feito à mão; alvo: script/CI). **Não** editar direto no servidor sem refletir aqui.

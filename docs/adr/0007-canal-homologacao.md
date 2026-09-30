@@ -16,8 +16,8 @@
 
 ## Decisão
 
-- O canal **canônico de homologação é a VM on-premise** (`bdlp-vm`), em loopback, exposta só na `:80` via Apache/`index.php`.
-- Dev Tunnels é **auxiliar/temporário** (demo/acesso pontual), nunca o caminho de homologação oficial; quando usado, exige `DJANGO_DEBUG=false` e `CSRF_TRUSTED_ORIGINS`/`ALLOWED_HOSTS` ajustados.
+- O canal **canônico de homologação é a VM on-premise** da SGGD (acesso só pela VPN, operada pela TI; sem nome de máquina neste documento), em loopback, exposta só na `:80` via Apache/`index.php`.
+- ~~Dev Tunnels é **auxiliar/temporário** (demo/acesso pontual), nunca o caminho de homologação oficial; quando usado, exige `DJANGO_DEBUG=false` e `CSRF_TRUSTED_ORIGINS`/`ALLOWED_HOSTS` ajustados.~~ **Revogado em 02/07/2026** (ADR-006 da vault; ver a nota de status acima): nenhum túnel, em nenhuma hipótese. O texto riscado fica como registro histórico.
 
 ## Consequências
 
