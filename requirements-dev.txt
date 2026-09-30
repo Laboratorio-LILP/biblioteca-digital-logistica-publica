@@ -1,0 +1,5 @@
+# Ferramentas de teste e lint — só no estágio `test` do Dockerfile (make test) e no CI.
+# Não entram na imagem de execução. Versões travadas como as do lock de runtime.
+pytest==9.1.1
+pytest-django==4.14.0
+ruff==0.16.7

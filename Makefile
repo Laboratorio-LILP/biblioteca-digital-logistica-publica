@@ -1,5 +1,7 @@
 .PHONY: up down logs shell migrate migrate-dry validate enrich test backup restore clean a11y-check collectstatic prod-up prod-down prod-logs prod-rebuild
 
+COMPOSE = docker compose --env-file .env -f docker/docker-compose.yml
+
 # Ambiente de desenvolvimento
 up:
 	docker compose --env-file .env -f docker/docker-compose.yml up -d
@@ -42,9 +44,13 @@ validate:
 enrich:
 	docker compose --env-file .env -f docker/docker-compose.yml exec portal python manage.py enrich_metadata
 
-# Testes
+# Testes: ruff + pytest num contêiner com o MESMO Python e o mesmo lock da
+# imagem, mais as ferramentas de teste (estágio `test` do Dockerfile — a imagem
+# de execução não leva pytest), sobre o working tree montado em /src. Não
+# depende da stack estar no ar nem de Python no host.
 test:
-	docker compose --env-file .env -f docker/docker-compose.yml exec portal python -m pytest
+	docker build --target test -t lilp-bdlp-portal-test -f docker/portal/Dockerfile .
+	docker run --rm -v "$(CURDIR)":/src -w /src/portal -e DJANGO_SECRET_KEY=teste-local-sem-valor -e PYTHONPATH=/src/portal -e PYTHONDONTWRITEBYTECODE=1 lilp-bdlp-portal-test sh -c "ruff check . && python -m pytest -q -p no:cacheprovider"
 
 # Backup do banco de dados
 backup:

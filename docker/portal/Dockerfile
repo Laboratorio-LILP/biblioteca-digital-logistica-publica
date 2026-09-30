@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -22,6 +22,15 @@ COPY portal/ /app/
 
 # Coletar arquivos estáticos
 RUN DJANGO_SECRET_KEY=build-placeholder python manage.py collectstatic --noinput
+
+# --- Estágio de teste: as ferramentas de teste NÃO entram na imagem de execução.
+# `make test` constrói este estágio (--target test) e monta o working tree em /src.
+FROM base AS test
+COPY requirements-dev.txt /app/
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# --- Estágio final (o padrão do `docker build`/compose): execução.
+FROM base AS runtime
 
 EXPOSE 8000
 
