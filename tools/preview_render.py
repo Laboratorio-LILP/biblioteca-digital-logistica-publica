@@ -39,6 +39,10 @@ import django  # noqa: E402
 
 django.setup()
 
+from catalog.taxonomy_v6 import (  # noqa: E402
+    ASSUNTOS_COMPARACOES, CAMPOS_CLASSIFICACAO, EXEMPLOS_CLASSIFICACAO,
+)
+
 from django.template.loader import render_to_string  # noqa: E402
 from django.test import RequestFactory  # noqa: E402
 
@@ -154,12 +158,23 @@ PAGES = [
         "complexidades": ["Baixa", "Média", "Alta"],
         "total_results": 0,
     }),
-    ("collection_list.html", "/colecoes/", {
-        "current_url_name": "collection_list",
-        "collection_data": [
-            {"topic": c, "subcollections": [], "doc_count": 0}
-            for c in COLLECTIONS
+    ("metodologia.html", "/metodologia/", {
+        "current_url_name": "metodologia",
+        "abas": [
+            {"chave": chave, "href": href, "rotulo": rotulo, "titulo": f"{rotulo} — Metodologia",
+             "meta": "", "ativa": chave == "conceitos"}
+            for chave, href, rotulo in (("conceitos", "/metodologia/", "Conceitos e coleções"),
+                                        ("categorias", "/metodologia/categorias/", "Categorias"),
+                                        ("assuntos", "/metodologia/assuntos/", "Assuntos"))
         ],
+        "aba_ativa": {"chave": "conceitos", "titulo": "Metodologia — Biblioteca Digital de Logística Pública",
+                      "meta": ""},
+        "campos": CAMPOS_CLASSIFICACAO,
+        "exemplo_pratico": dict(EXEMPLOS_CLASSIFICACAO[0], campos_valores=list(
+            zip(CAMPOS_CLASSIFICACAO, EXEMPLOS_CLASSIFICACAO[0]["valores"]))),
+        "exemplos": [dict(e, campos_valores=list(zip(CAMPOS_CLASSIFICACAO, e["valores"])))
+                     for e in EXEMPLOS_CLASSIFICACAO],
+        "colecoes": [], "categorias": [], "assuntos": [], "comparacoes": ASSUNTOS_COMPARACOES,
     }),
 ]
 

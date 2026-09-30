@@ -72,7 +72,7 @@ collectstatic:
 A11Y_URLS = \
 	http://localhost:8000/ \
 	http://localhost:8000/busca/ \
-	http://localhost:8000/colecoes/ \
+	http://localhost:8000/metodologia/ \
 	http://localhost:8000/sobre/ \
 	http://localhost:8000/transparencia/ \
 	http://localhost:8000/acessibilidade/ \

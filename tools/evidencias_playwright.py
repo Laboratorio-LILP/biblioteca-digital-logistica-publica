@@ -28,11 +28,12 @@ Cenas (cada uma vira um PNG com o sufixo informado):
       Viewport dos primeiros cards do Acervo (rodapé do card com os dois eixos).
   documento-classificacao-desktop-<suffix>.png
       Página do documento, inteira (badge "Etapa" e bloco Classificação BDLP).
-  colecoes-glossario-desktop-<suffix>.png
-      Página de Coleções, inteira (glossário de Assuntos e Categorias).
-  colecoes-organizacao-desktop-<suffix>.png / colecoes-organizacao-mobile-<suffix>.png
-      Ajuste de 16/09: glossário com listas em colunas (assuntos em 3 no
-      desktop), contagem por assunto e subcategorias em texto corrido. Confere
+  colecoes-metodologia-desktop-<suffix>.png / colecoes-metodologia-mobile-<suffix>.png
+      Metodologia (ex-Coleções) — Estrutura da classificação (porte da
+      interface do Eduardo, 23/09): trilha dos seis campos, exemplo prático,
+      coleções e tipos; abas que trocam sem recarregar.
+  colecoes-categorias-desktop-<suffix>.png / colecoes-assuntos-desktop-<suffix>.png
+      As abas Categorias (árvore com definições) e Assuntos (busca). Confere
       também que /busca/ não vaza sintaxe de template ("{#", "#}") no texto.
 
 Além das capturas, grava `checks-<suffix>.json` com os erros de console/página
@@ -256,40 +257,63 @@ def cena_documento(page: Page, base: str, out: Path, suffix: str, cena: Cena, co
 
 
 def cena_colecoes(page: Page, base: str, out: Path, suffix: str, cena: Cena) -> None:
+    """Metodologia (chamava-se Coleções até 23/09/2026): um documento com três abas
+    que trocam sem recarregar. Confere a trilha dos seis campos (inclusive
+    teclado), as quatro coleções, a troca de aba sem recarregar (URL, título, h1
+    e o voltar do navegador), os cartões de categoria com a árvore, o navegador
+    de assuntos com busca sem acento, o redirecionamento dos endereços antigos e
+    que o Acervo não vaza sintaxe de template."""
     page.set_viewport_size(DESKTOP)
-    page.goto(f"{base}/colecoes/", wait_until="networkidle")
-    n_assuntos = page.locator("#assuntos .glossario__item").count()
-    n_categorias = page.locator("#categorias .glossario__item").count()
-    cena.check("glossario_assuntos", n_assuntos > 0, f"{n_assuntos} itens")
-    cena.check("glossario_categorias", n_categorias > 0, f"{n_categorias} itens")
-    page.screenshot(path=str(out / f"colecoes-glossario-desktop-{suffix}.png"), full_page=True)
+    page.goto(f"{base}/metodologia/", wait_until="networkidle")
+    n_campos = page.locator(".classification-node").count()
+    n_col = page.locator(".method-collection").count()
+    cena.check("trilha_seis_campos", n_campos == 6, f"{n_campos} cartões")
+    cena.check("quatro_colecoes", n_col == 4, f"{n_col} cartões")
+    page.locator(".classification-node").first.focus()
+    page.keyboard.press("End")
+    selecionado = page.locator(".classification-step.is-selected strong").inner_text().strip()
+    cena.check("teclado_end_seleciona_natureza", selecionado == "Natureza", selecionado)
+    painel = page.locator(".classification-detail:not([hidden]) h3").inner_text().strip()
+    cena.check("painel_mostra_a_pergunta", painel.endswith("?"), painel)
+    page.screenshot(path=str(out / f"colecoes-metodologia-desktop-{suffix}.png"), full_page=True)
 
-    # Ajuste de 16/09: listas em colunas (assuntos em 3 no desktop), contagem por
-    # assunto, subcategorias em texto corrido e régua fechando em cada item (sem
-    # "célula fantasma" na última linha incompleta).
-    colunas = page.evaluate(
-        "() => new Set([...document.querySelectorAll('#assuntos .glossario__item')]"
-        ".map(li => Math.round(li.getBoundingClientRect().left))).size"
-    )
-    cena.check("assuntos_3_colunas_desktop", colunas == 3, f"{colunas} colunas")
-    n_count = page.locator("#assuntos .glossario__count").count()
-    cena.check("contagem_por_assunto", n_count == n_assuntos, f"{n_count} contagens para {n_assuntos} assuntos")
-    # 17/09: sub e microcategorias ficam no "Saiba mais" da categoria (árvore de links)
-    arvores = page.locator("#categorias details.glossario__mais .glossario__arvore")
-    n_arv = arvores.count()
-    n_links = page.locator("#categorias .glossario__arvore a").count()
-    cena.check("subcategorias_no_saiba_mais", n_arv >= 1 and n_links >= n_arv, f"{n_arv} árvores, {n_links} nomes")
-    fecho = page.evaluate(
-        "() => { const ul = document.querySelector('#assuntos .glossario__lista');"
-        " const li = [...ul.querySelectorAll('.glossario__item')].pop();"
-        " return Math.round(ul.getBoundingClientRect().bottom - li.getBoundingClientRect().bottom); }"
-    )
-    cena.check("regua_fecha_no_ultimo_item", fecho == 0, f"ul termina {fecho}px após o último item")
-    page.screenshot(path=str(out / f"colecoes-organizacao-desktop-{suffix}.png"), full_page=True)
+    # Troca de aba sem recarregar: uma marca no window sobrevive; URL, título e h1 acompanham; voltar restaura.
+    page.evaluate("window.__bdlpMarca = 1")
+    page.click('[data-metodologia-abas] a[data-aba="categorias"]')
+    page.wait_for_timeout(300)
+    viva = page.evaluate("window.__bdlpMarca") == 1
+    h1 = page.locator("h1:visible").inner_text().strip()
+    cena.check("aba_categorias_sem_recarregar",
+               viva and page.url.endswith("/metodologia/categorias/") and h1 == "Categorias",
+               f"marca {'viva' if viva else 'perdida'} · {page.url} · h1 {h1}")
+    cena.check("titulo_acompanha_a_aba", page.title().startswith("Categorias — Metodologia"), page.title())
+    n_cat = page.locator("#painel-categorias details.method-subject").count()
+    n_arv = page.locator("#painel-categorias .method-subject-tree a").count()
+    cena.check("seis_categorias", n_cat == 6, f"{n_cat} cartões")
+    cena.check("arvore_completa_com_links", n_arv == 24, f"{n_arv} nomes (9 sub + 15 micro)")
+    page.screenshot(path=str(out / f"colecoes-categorias-desktop-{suffix}.png"), full_page=True)
+    page.go_back()
+    page.wait_for_timeout(300)
+    h1 = page.locator("h1:visible").inner_text().strip()
+    cena.check("voltar_restaura_a_aba_anterior",
+               h1 == "Estrutura da classificação" and page.evaluate("window.__bdlpMarca") == 1, h1)
+
+    page.goto(f"{base}/metodologia/assuntos/", wait_until="networkidle")
+    n_ass = page.locator("#painel-assuntos details.method-subject").count()
+    visiveis = page.locator("#painel-assuntos details.method-subject:visible").count()
+    cena.check("dezesseis_assuntos_seis_a_vista", n_ass == 16 and visiveis == 6, f"{n_ass} no total, {visiveis} à vista")
+    page.locator(".method-subject-input").fill("internacional")
+    achados = page.locator("#painel-assuntos details.method-subject:visible").count()
+    cena.check("busca_sem_acento_acha_um", achados == 1, f"{achados} para 'internacional'")
+    page.locator(".method-subject-input").fill("")
+    page.screenshot(path=str(out / f"colecoes-assuntos-desktop-{suffix}.png"), full_page=True)
+
+    page.goto(f"{base}/colecoes/assuntos/", wait_until="networkidle")
+    cena.check("endereco_antigo_redireciona", page.url.endswith("/metodologia/assuntos/"), page.url)
 
     page.set_viewport_size(MOBILE)
-    page.goto(f"{base}/colecoes/", wait_until="networkidle")
-    page.screenshot(path=str(out / f"colecoes-organizacao-mobile-{suffix}.png"), full_page=True)
+    page.goto(f"{base}/metodologia/", wait_until="networkidle")
+    page.screenshot(path=str(out / f"colecoes-metodologia-mobile-{suffix}.png"), full_page=True)
 
     # Regressão do comentário {# #} multi-linha que vazava como texto no Acervo.
     page.set_viewport_size(DESKTOP)

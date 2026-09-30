@@ -10,16 +10,17 @@
  *
  * Uso (portal no ar em http://localhost:8000):
  *   node tools/auditoria_interface.js <pasta-de-saida> [base-url]
- * Requer o puppeteer empacotado no pa11y (caminho em PUPPETEER_PATH; o padrão
- * abaixo é o do Mac do Bernardo — ver memória "bdlp-local-dev-loop").
+ * Requer o puppeteer. Sem instalação própria, use o que vem empacotado no pa11y
+ * e informe o caminho em PUPPETEER_PATH, por exemplo:
+ *   PUPPETEER_PATH="$(npm root -g)/pa11y/node_modules/puppeteer" node tools/auditoria_interface.js …
  * Observação: o regex de placeholders casa "todo" em português (falso positivo
  * conhecido); "TODO" em páginas de documento vem de "MÉTODO" em caixa alta via CSS.
  */
-const puppeteer = require(process.env.PUPPETEER_PATH || '/Users/bernardogalvao/.local/share/fnm/node-versions/v24.17.0/installation/lib/node_modules/pa11y/node_modules/puppeteer');
+const puppeteer = require(process.env.PUPPETEER_PATH || 'puppeteer');
 const fs = require('fs');
 const BASE = process.argv[3] || 'http://localhost:8000';
 const PAGINAS = ['/', '/busca/', '/busca/?q=licita%C3%A7%C3%A3o', '/busca/?assunto_id=1&category_id=6&natureza=Contrata%C3%A7%C3%A3o%20de%20TIC', '/busca/?q=zzzzsemresultado',
-  '/busca/?page=99', '/colecoes/', '/colecao/1/', '/colecao/3/', '/documento/bdlp-000982/', '/documento/bdlp-000077/', '/documento/bdlp-000061/',
+  '/busca/?page=99', '/metodologia/', '/metodologia/categorias/', '/metodologia/assuntos/', '/colecao/1/', '/colecao/3/', '/documento/bdlp-000982/', '/documento/bdlp-000077/', '/documento/bdlp-000061/',
   '/sobre/', '/transparencia/', '/acessibilidade/', '/politica-de-privacidade/', '/politica-de-cookies/', '/mapa-do-site/', '/fale-conosco/', '/curadoria/', '/nao-existe/', '/colecao/999/'];
 (async () => {
   const out = process.argv[2];
