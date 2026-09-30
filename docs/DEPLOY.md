@@ -21,10 +21,12 @@ A **borda** é o servidor web que recebe o acesso de fora e o repassa ao portal:
 
 > **`DEBUG` e `SECURE_SSL` são desacoplados** de propósito: homologação roda `DEBUG=false` em HTTP puro sem quebrar o login (as flags que exigem HTTPS — cookies Secure, redirect, HSTS — ficam só sob `SECURE_SSL`).
 
-Gerar a `DJANGO_SECRET_KEY`:
+Gerar a `DJANGO_SECRET_KEY` (qualquer texto aleatório com 50 ou mais caracteres serve; grave na linha `DJANGO_SECRET_KEY=` do `.env`, sem aspas e sem espaços). Na VM não há Django fora do contêiner; use o Python do sistema ou o `openssl`:
 ```bash
-python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
+python3 -c "import secrets; print(secrets.token_urlsafe(60))"
+# ou: openssl rand -base64 60 | tr -d '\n='
 ```
+(Com Django à mão: `python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"`.)
 
 ## 2. Promoção para homologação (VM) — por solicitação à TI
 
@@ -44,13 +46,13 @@ git rev-parse HEAD        # igual ao hash da solicitação
 docker compose --env-file .env -f docker/docker-compose.yml up -d --build
 docker compose --env-file .env -f docker/docker-compose.yml exec -T portal python manage.py check --deploy --fail-level ERROR
 # Teste rápido, na própria VM:
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1/Biblioteca/      # 200
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1/Biblioteca/      # 200, se a rota da borda estiver aberta
 curl -s http://127.0.0.1:8010/__nao_existe__/ | grep -c "Using the URLconf" # 0 (DEBUG desligado)
 ```
 
 O `check --deploy` termina sem erro e mostra 3 avisos (`security.W004`, `security.W008`, `security.W016`). Eles tratam de HTTPS e são esperados em homologação, que roda em HTTP. Um aviso a mais segue a regra do §4.1 (pré-requisitos): `security.W009` é motivo para parar. Se o `up` parar com `defina DJANGO_SECRET_KEY no .env`, o `.env` da VM não tem a chave: gere uma (§1) e grave antes de seguir.
 
-Os testes chamam o portal em `127.0.0.1`, como a borda já faz: o `deploy/edge/index.php` (função `proxyToDjango`) fala com o portal em `http://127.0.0.1:<porta>`, com o cabeçalho `Host: 127.0.0.1:<porta>`. Por isso o `ALLOWED_HOSTS` do `.env` da VM precisa aceitar `127.0.0.1`, além do host público (para quem vem de fora, o portal confere o nome público, que a borda repassa no cabeçalho `X-Forwarded-Host`). Se aparecer `400`, o problema é o `ALLOWED_HOSTS`: pare e devolva a saída. A linha de `/Biblioteca/` passa pela borda e não fez parte do ensaio; ela só dá `200` se a rota da borda estiver aberta (a Biblioteca está fora do ar desde 08/09; ver §4.1).
+Os testes chamam o portal direto em `127.0.0.1`. A borda (`deploy/edge/index.php`, função `proxyToDjango`) também fala com o portal em `http://127.0.0.1:<porta>`, mas repassa o nome público no cabeçalho `X-Forwarded-Host`, e é esse nome que o portal confere para quem vem de fora. Por isso o `ALLOWED_HOSTS` do `.env` da VM precisa ter os dois: o host público (para a borda) e `127.0.0.1` (para estes testes diretos). Se aparecer `400`, o problema é o `ALLOWED_HOSTS`: pare e devolva a saída. A linha de `/Biblioteca/` passa pela borda e não fez parte do ensaio; ela só dá `200` se a rota da borda estiver aberta (a Biblioteca está fora do ar desde 08/09; ver §4.1).
 
 Quando a subida também troca o acervo, siga o §4.1 inteiro, e não este bloco. Se algo falhar ou estiver inacessível, a TI para, registra e devolve a saída. Ninguém contorna: sem túnel, sem acesso direto.
 
@@ -87,10 +89,13 @@ A planilha precisa estar dentro do contêiner do portal (§4.1, passo 5). A simu
 
 **Antes de começar, confira (pré-requisitos).**
 
-- O `make` está instalado na VM (os passos 2 e 9 usam `make backup` e `make validate`; o caminho de volta usa `make restore`).
+- O `make` está instalado na VM (os passos 2 e 9 usam `make backup` e `make validate`; o caminho de volta usa `make restore`). Se não estiver, instale o pacote `make` da distribuição antes de começar; sem ele, não comece.
+- Docker Compose v2 (`docker compose version` responde; o `docker compose cp` do passo 5 é do v2).
+- A VM alcança o GitHub com a credencial de leitura já configurada no clone (é o que o `git pull` usa; nenhum comando pede senha — se o `pull` pedir, pare) e os registros públicos que o `--build` usa (imagem `python:3.12-slim`, pacotes Debian e PyPI). É o mesmo caminho das atualizações de 17 e 27/08 feitas pela TI (relato); se a saída de rede tiver mudado, pare e avise antes de começar — nenhum passo deste roteiro mexe em firewall ou proxy.
 - O `.env` da VM tem `DJANGO_SECRET_KEY` própria (não a de outro ambiente) e `DJANGO_DEBUG=false`. Sem a chave, o passo 4 para na hora com `defina DJANGO_SECRET_KEY no .env`.
 - O `ALLOWED_HOSTS` do `.env` da VM aceita `127.0.0.1`. Os testes dos passos 0 e 11 chamam o portal direto nesse endereço (a borda não precisa disso: ela envia o nome público em `X-Forwarded-Host`). O passo 0 confere antes de qualquer mudança no banco.
-- A planilha está na pasta do clone, com o nome exato acima. O `cp` do passo 5 usa esse caminho relativo.
+- A planilha chegou pelo canal institucional (e-mail corporativo ou site de equipe) e foi copiada para a pasta do clone, com o nome exato acima. O `cp` do passo 5 usa esse caminho relativo.
+- A TI sabe como a Biblioteca foi retirada do ar em 08/09 (parada dos contêineres, bloqueio na borda ou outro) e como reabrir: o roteiro não reabre nada; o passo 12 diz quando. Se a stack estiver parada, o passo 0 diz o que fazer.
 - Ninguém vai usar o Nou-Rau (`/manager`) entre os passos 3 e 10. Nesse intervalo o acervo é apagado e carregado de novo, e o que for cadastrado no meio se perde ou entra em conflito com a carga.
 - O `check --deploy` (passo 4) foi ensaiado com o `.env` de desenvolvimento. Com o `.env` da VM, ele pode mostrar um aviso a mais. Se o aviso for `security.W009` (chave secreta fraca ou padrão), pare: a chave própria é condição de segurança (§5). Outro aviso a mais: devolva a saída e aguarde a resposta antes de seguir.
 
@@ -104,11 +109,12 @@ A planilha precisa estar dentro do contêiner do portal (§4.1, passo 5). A simu
 **Regras.**
 
 - Rode tudo na VM, na pasta do clone, com o `.env` de lá. Nenhum comando pede senha.
+- Quem decide voltar atrás (§4.2) é o Bernardo, a partir da saída devolvida; a TI não volta atrás por conta própria, a não ser que ele peça.
 - Siga a ordem. Cada passo diz o que deve aparecer.
 - Se aparecer outra coisa, pare e devolva a saída ao Bernardo. Não improvise.
 - Os backups (`backup_*.dump`, `backup_*.sql`, `backup_*_arquivos.tgz`) contêm a tabela de usuários do Nou-Rau. Não os envie a ninguém: devolva só nome, tamanho e sha256.
 
-**Passo 0 — Conferir o portal atual e o banco.** Primeiro, confira que o portal atual responde direto em `127.0.0.1` (porta `PORTAL_PORT` do `.env`; 8010 pelo ADR-0008). Esperado: `200`. Se der `400`, o `ALLOWED_HOSTS` do `.env` não aceita `127.0.0.1`: pare e devolva, antes de mexer no banco.
+**Passo 0 — Conferir o portal atual e o banco.** Primeiro, confira que o portal atual responde direto em `127.0.0.1` (porta `PORTAL_PORT` do `.env`; 8010 pelo ADR-0008). Esperado: `200`. Se der `000` (conexão recusada), a stack está parada: suba-a com `docker compose --env-file .env -f docker/docker-compose.yml up -d` (ainda com o código atual, sem `--build`) e repita. Se der `400`, o `ALLOWED_HOSTS` do `.env` não aceita `127.0.0.1`. Se você acabou de editar o `.env` para esta subida (chave, `DEBUG`, `ALLOWED_HOSTS`), o contêiner em execução ainda não sabe: rode `docker compose --env-file .env -f docker/docker-compose.yml up -d portal` (recria o contêiner com o `.env` novo, mesmo código) e repita. Continuando `400`, pare e devolva, antes de mexer no banco.
 
 ```bash
 curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8010/
@@ -130,9 +136,10 @@ docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psq
 
 Esperado (ensaio): `portal_reader` presente; `docs` 982; `assuntos` 14; `subcolecoes` 24; `unaccent` e `portuguese_unaccent` sem linhas (`0 rows`); `portal_reader_le_users` = `t` ou `f` (no ensaio deu `f`, porque a cópia já tinha o REVOKE; na VM pode ser `t` — o passo 3 fecha isso); `visitas` 0 e `suplementares` 0.
 
-- `assuntos` = 16: a seção 1 já rodou antes. Siga; ela pode rodar de novo.
+- `assuntos` = 16, ou `unaccent`/`portuguese_unaccent` presentes: a seção 1 já rodou antes. Siga; ela pode rodar de novo.
+- `docs` diferente de 982 ou `subcolecoes` diferente de 24: o banco da VM não está no estado que o ensaio usou (cópia do desenvolvimento em v11, que é o estado registrado da homologação desde 27/08). Pare e devolva a saída; o Bernardo decide se o roteiro vale como está.
 - `visitas` ou `suplementares` maior que 0: pare e avise. A troca do acervo renumera os códigos `bdlp-NNNNNN`, e esses registros passariam a apontar para outros materiais.
-- `portal_reader` ausente: rode `docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres bash -s < docker/postgres/init/09-portal-readonly-user.sh` (a senha vem do ambiente do contêiner) e siga; a seção 1 do passo 3 fecha a leitura de `users`.
+- `portal_reader` ausente: rode `docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres bash -s < docker/postgres/init/09-portal-readonly-user.sh` (o arquivo existe no código atual e no novo; a senha vem de `PORTAL_DB_PASSWORD`, que o compose já passa ao contêiner do Postgres) e siga; a seção 1 do passo 3 fecha a leitura de `users`.
 
 **Passo 1 — Atualizar o código.** Vem antes de tudo: o script da migração e os alvos novos do Makefile (`backup`, `restore`) só existem no código novo. O portal no ar só muda no passo 4.
 
@@ -145,7 +152,7 @@ git status --short --untracked-files=no
 cat commit_anterior.txt
 ```
 
-Esperado: `main`; nenhuma linha no `git status` (nenhum arquivo do repositório foi mudado na VM; arquivos novos, como a planilha e os backups, não entram nesta conferência — no ensaio apareceram os documentos ainda não commitados da própria sessão, o que na VM não acontece); e o hash em uso hoje. Se a branch não for `main` ou se o `git status` listar algum arquivo, pare e devolva a saída.
+Esperado: `main`; nenhuma linha no `git status` (nenhum arquivo do repositório foi mudado na VM; arquivos novos, como a planilha e os backups, não entram nesta conferência — no ensaio apareceram os documentos ainda não commitados da própria sessão, o que na VM não acontece); e o hash em uso hoje. Se a branch não for `main` ou se o `git status` listar algum arquivo, pare e devolva a saída. Caso típico: `deploy/edge/index.php` ou `.htaccess` modificados, se a borda foi editada na VM para tirar o site do ar — o Bernardo decide como reconciliar antes do `pull`; não descarte a alteração.
 
 Depois, atualize e confira que o código é o da solicitação:
 
@@ -170,12 +177,12 @@ ls -l backup_*; sha256sum backup_*
 grep -c 'PostgreSQL database dump complete' backup_clean_*.sql
 ```
 
-Esperado: `Banco: backup_….dump (… bytes)`, `Arquivos: backup_…_arquivos.tgz (… bytes)` e a frase "Guarde os dois juntos"; os três arquivos novos na listagem (a listagem também mostra backups de subidas anteriores, se houver; no ensaio, o `.dump` com 426.376 bytes, o `.tgz` com 104 bytes — volume de arquivos vazio — e o `_clean_….sql` com 1.363.883; na VM os tamanhos serão parecidos, não iguais); `dump complete` = 1 por arquivo `_clean_`.
+Esperado: `Banco: backup_….dump (… bytes)`, `Arquivos: backup_…_arquivos.tgz (… bytes)` e a frase "Guarde os dois juntos"; os três arquivos novos na listagem (a listagem também mostra backups de subidas anteriores, se houver; no ensaio, o `.dump` com 426.376 bytes, o `.tgz` com 104 bytes — volume de arquivos vazio — e o `_clean_….sql` com 1.363.883; na VM os tamanhos do banco serão parecidos, não iguais; o `.tgz` será maior se o volume tiver arquivos da curadoria); `dump complete` = 1 por arquivo `_clean_`.
 
 - Se o `make backup` terminar com `ERRO`, pare: nenhum arquivo parcial fica (o alvo apaga o `.part`).
 - Os três ficam na pasta do clone e não entram no `git` (`.gitignore`).
 
-**Passo 3 — Rodar a seção 1 da migração.** O script tem duas seções e roda sempre inteiro. Nesta hora, a seção 1 acrescenta a classificação nova, a coluna de busca indexada e fecha a leitura de `users`; a seção 2 só avisa (ela age no passo 10).
+**Passo 3 — Rodar a seção 1 da migração.** O script tem duas seções e roda sempre inteiro. Nesta hora, a seção 1 acrescenta a classificação nova, a coluna de busca indexada e fecha a leitura de `users`; a seção 2 só remove o que nenhum documento usa (no ensaio, a subcoleção Enunciados vazia sob Jurisprudência) e avisa sobre o resto — ela age de verdade no passo 10.
 
 ```bash
 docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psql -U php -d nourau -v ON_ERROR_STOP=1 < docker/postgres/migrations/2026-09-v12-taxonomia-e-busca.sql
@@ -208,12 +215,13 @@ DO
 ```
 
 - `INSERT 0 6` é o número de usuários do Nou-Rau (2 no ensaio) vezes o número de subcoleções ainda sem nenhum usuário vinculado (3 no ensaio, as novas). Na VM pode ser outro número; não é erro. O número do `topic` também pode mudar.
-- `DROP INDEX`, `ALTER TABLE` e `CREATE INDEX` são a busca indexada (seção 1.10); o `DO` seguinte é o `REVOKE` de `users` (seção 1.11).
+- `DROP INDEX`, `ALTER TABLE` e `CREATE INDEX` são a busca indexada (seção 1.10); o `DO` seguinte é o `REVOKE` de `users` (seção 1.11). Se a VM não tiver o índice antigo, no lugar de `DROP INDEX` aparece `NOTICE: index "idx_nr_document_fts" does not exist, skipping` — não é erro.
+- A linha `removido Jurisprudência/Enunciados` só aparece se a VM tiver essa subcoleção vazia (a cópia do ensaio tinha); sem ela, a linha não aparece e não é erro.
 - Os dois avisos não são erro. A seção 2 roda junto e só remove Documentos Normativos e Vídeos depois da troca do acervo (passo 10).
 
 No segundo comando: `assuntos` = 16; nenhuma subcategoria começando com `FASE PREPARAT`; uma linha `portuguese_unaccent`; uma linha `idx_nr_document_busca`; `portal_reader_le_users` = `f`. O arquivo pode rodar de novo: na segunda vez aparecem só `INSERT 0 0`, `UPDATE 0`, os avisos `already exists, skipping` (extensão, coluna e índice) e os mesmos dois avisos da seção 2.
 
-**Passo 4 — Subir o portal novo.**
+**Passo 4 — Subir o portal novo.** Só o portal: o Postgres é a mesma imagem (`postgres:15-alpine`) e o Nou-Rau não mudou nesta versão (nenhum arquivo em `docker/nourau/` alterado desde o commit em uso na VM).
 
 ```bash
 docker compose --env-file .env -f docker/docker-compose.yml up -d --build portal
@@ -260,7 +268,7 @@ Possíveis redundâncias e problemas de qualidade — AVISOS para a curadoria, n
 docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psql -U php -d nourau -v ON_ERROR_STOP=1 -c "TRUNCATE TABLE nr_document RESTART IDENTITY;" -c "SELECT setval('nr_document_seq', 1, false);" -c "SELECT count(*) FROM nr_document;"
 ```
 
-Esperado: `TRUNCATE TABLE`, `setval` = 1 e `count` = 0. Nenhuma outra tabela depende de `nr_document` (conferido no ensaio). A sequência `nr_document_seq` é o contador do banco que dá o número do próximo material; o `setval` o põe de volta em 1. Ele é necessário porque o `RESTART IDENTITY` não zera essa sequência.
+Esperado: `TRUNCATE TABLE`, `setval` = 1 e `count` = 0. Nenhuma outra tabela depende de `nr_document` (conferido no ensaio). O volume de arquivos da curadoria (`nourau_data`) não é tocado: os 982 materiais atuais são referências a endereços externos (`supplementary_files` = 0 no passo 0), e o backup do passo 2 guarda o volume de qualquer forma. A sequência `nr_document_seq` é o contador do banco que dá o número do próximo material; o `setval` o põe de volta em 1. Ele é necessário porque o `RESTART IDENTITY` não zera essa sequência.
 
 **Passo 8 — Carregar.**
 
@@ -302,7 +310,7 @@ docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psq
 docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psql -U php -d nourau -c "SELECT id, name FROM type_information WHERE name IN ('Documentos Normativos','Vídeos','Pareceres');" -c "SELECT count(*) AS subcolecoes FROM topic WHERE parent_id<>0;"
 ```
 
-Esperado no primeiro comando (ensaio): `NOTICE:  extension "unaccent" already exists, skipping`, `INSERT 0 0` (7 vezes), `UPDATE 0` (8 vezes), os avisos `index "idx_nr_document_fts" does not exist, skipping`, `column "busca" of relation "nr_document" already exists, skipping` e `relation "idx_nr_document_busca" already exists, skipping`, `DO`, `NOTICE:  seção 2: removido Jurisprudência/Documentos Normativos (topic 8)` e `NOTICE:  seção 2: removido Instrução e Capacitação/Vídeos (topic 27)`. Nenhum aviso da seção 2. No segundo: a consulta de tipos volta sem linhas (`0 rows`) e `subcolecoes` = 24.
+Esperado no primeiro comando (ensaio): `NOTICE:  extension "unaccent" already exists, skipping`, `INSERT 0 0` (7 vezes), `UPDATE 0` (8 vezes), os avisos `index "idx_nr_document_fts" does not exist, skipping`, `column "busca" of relation "nr_document" already exists, skipping` e `relation "idx_nr_document_busca" already exists, skipping`, `DO`, `NOTICE:  seção 2: removido Jurisprudência/Documentos Normativos (topic 8)` e `NOTICE:  seção 2: removido Instrução e Capacitação/Vídeos (topic 27)`. Nenhum aviso da seção 2. No segundo: a consulta de tipos volta sem linhas (`0 rows`; Pareceres só existiria se a v12 de 11/09 tivesse sido aplicada na VM, o que não ocorreu) e `subcolecoes` = 24.
 
 **Passo 11 — Testar o portal.** Na VM, o portal responde em `127.0.0.1`, na porta do `.env` (variável `PORTAL_PORT`; 8010 pelo ADR-0008). Troque `<id>` pelo número que o primeiro comando mostrar. O `ALLOWED_HOSTS` do `.env` da VM precisa aceitar `127.0.0.1` para estes testes diretos (o passo 0 já conferiu).
 
@@ -332,19 +340,26 @@ Esperado (ensaio), linha a linha: o id de Acórdãos (97 no ensaio; na VM será 
 
 - Se todas as respostas derem `400` (e as contagens vierem vazias), é o `ALLOWED_HOSTS`, que não aceita `127.0.0.1`: pare e devolva a saída.
 - Se `/colecoes/` responder `200` ou `/metodologia/` responder `404`, o código não é o ensaiado: pare e devolva a saída.
-- Tempo da página inicial acima de 3 s: devolva o tempo e a saída de `docker compose … logs portal | grep 'coluna nr_document.busca'` (se aparecer, a seção 1 do passo 3 não criou a coluna de busca).
+- Tempo da página inicial acima de 1 s: devolva o tempo e a saída de `docker compose --env-file .env -f docker/docker-compose.yml logs --no-log-prefix portal | grep 'coluna nr_document.busca'` (se aparecer, a seção 1 do passo 3 não criou a coluna de busca).
+- Com `FORCE_SCRIPT_NAME=/Biblioteca` no `.env` da VM, estes testes diretos em `127.0.0.1:8010` continuam valendo: o prefixo só muda os links que o portal gera (o `301` de `/colecoes/`, por exemplo, aponta para `/Biblioteca/metodologia/`). Pela borda, os mesmos endereços ficam sob `/Biblioteca/`.
+
+**Passo 12 — Borda e segurança (TI).** Depois do passo 11, e só então:
+
+1. **Reabrir a rota `/Biblioteca/` na borda**, do mesmo jeito que foi fechada em 08/09 (só a TI sabe como fez). Depois, `curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1/Biblioteca/` deve dar `200`, e `http://127.0.0.1/Biblioteca/metodologia/` também.
+2. **Conferir que o `/manager` do Nou-Rau não responde de fora** (pela borda): o teste é o que a TI já usa para a borda; de dentro da VM, o Nou-Rau continua em `127.0.0.1:8082`. Se estiver aberto, bloqueie na borda antes de avisar que a homologação está no ar.
+3. **Trocar as senhas iniciais do Nou-Rau** (`admin` e `colab`), se ainda forem as do seed: pelo próprio Nou-Rau (área de usuários → "Trocar a senha"), nunca por SQL — o formato de armazenamento é do Nou-Rau. Guarde no cofre de senhas da TI. Faça isto depois da carga (passo 10): uma volta atrás pelo §4.2 restaura o backup do passo 2, com as senhas de antes.
 
 **O que devolver ao Bernardo.**
 
 - Data, hora e quem executou cada passo.
-- A saída dos passos 0, 1, 3, 4, 5, 7, 10 e 11 (o texto da tela).
+- A saída dos passos 0, 1, 3, 4, 5, 7, 10 e 11 (o texto da tela) e, do passo 12, o que foi feito em cada item (rota reaberta; `/manager` bloqueado: sim/não; senhas trocadas: sim/não).
 - Nome, tamanho e sha256 dos três backups do passo 2. Os arquivos, não.
 - Os arquivos `dryrun_…txt`, `carga_…txt` e `validate_…txt`.
 - Qualquer diferença do esperado, com a saída literal.
 
 ### 4.2 Se precisar voltar atrás
 
-Use quando um passo de 3 a 11 sair diferente do esperado e não houver correção simples. Os dois métodos devolvem o banco ao estado do passo 2 (982 materiais, taxonomia v11). Os dois foram ensaiados em 30/09/2026 sobre o banco já carregado com a v12.1 (1089 materiais); depois de cada um, o roteiro foi executado de novo do passo 3 ao 11 com o mesmo resultado.
+Use quando um passo de 3 a 11 sair diferente do esperado e o Bernardo, ao receber a saída, pedir para voltar (a TI não decide sozinha). Os dois métodos devolvem o banco ao estado do passo 2 (982 materiais, taxonomia v11). Os dois foram ensaiados em 30/09/2026 sobre o banco já carregado com a v12.1 (1089 materiais); depois de cada um, o roteiro foi executado de novo do passo 3 ao 11 com o mesmo resultado.
 
 **Método A (recomendado): `make restore` com o `backup_….dump` do passo 2.** Roda numa transação única: se falhar, nada muda. Depois do restore, o alvo recria a conta de leitura do portal e fecha de novo a leitura de `users` — a restauração recria a tabela e devolveria a leitura ao portal. Troque `AAAAMMDD_HHMMSS` pelo nome do arquivo do passo 2.
 
@@ -356,7 +371,7 @@ docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres psq
 
 Esperado (ensaio): o `pg_restore` sem mensagem de erro; `DO`, `ALTER ROLE`, `GRANT` (4 vezes) e `ALTER DEFAULT PRIVILEGES` (2 vezes), da conta de leitura; a frase "Banco restaurado de …; leitura de users revogada do portal"; `docs` 982, `assuntos` 14 e `portal_reader_le_users` = `f`. A busca do portal volta a mostrar `982 documentos` e a página inicial responde `200` (mais lenta, cerca de 3 s: sem a coluna de busca, o portal usa o caminho antigo e escreve `coluna nr_document.busca ausente` no log).
 
-- O código novo lê o banco antigo sem erro: sem a coluna de busca, o portal busca pelo caminho antigo (mais lento) e escreve um aviso `coluna nr_document.busca ausente` no log. Voltar também o código (`git checkout $(cat commit_anterior.txt)`, com o arquivo do passo 1, e `up -d --build portal`) é opcional e não foi ensaiado.
+- O código novo lê o banco antigo sem erro: sem a coluna de busca, o portal busca pelo caminho antigo (mais lento) e escreve um aviso `coluna nr_document.busca ausente` no log. Voltar também o código é opcional e não foi ensaiado: `git checkout $(cat commit_anterior.txt)` (com o arquivo do passo 1) e `up -d --build portal`; isso deixa o clone fora da branch (`HEAD` solto) — para retomar depois, `git checkout main` e o passo 1 de novo.
 - Se o `pg_restore` reclamar de `role "portal_reader" does not exist`, a conta não existe na VM: rode `docker compose --env-file .env -f docker/docker-compose.yml exec -T postgres bash -s < docker/postgres/init/09-portal-readonly-user.sh` e repita o `make restore`.
 
 **Método B (se o `make restore` falhar): restaurar o `backup_clean_….sql` do passo 2 com o `psql`.** É um comando só, também numa transação única. Foi ensaiado em 23/09 (3 vezes) e em 30/09/2026.
@@ -381,7 +396,7 @@ Esperado (ensaio): `grep -c ERROR` = 0; o `REVOKE` roda em silêncio (`-q`); `do
 - [ ] `DJANGO_DEBUG=false` (ou ausente) em homologação e produção (confirmar CSP no fio; uma URL inexistente NÃO pode mostrar a página de debug do Django).
 - [ ] `DJANGO_SECRET_KEY` própria e única por ambiente. Desde 30/09/2026 não há chave padrão: sem ela o compose não sobe e, fora do dev, o portal recusa subir.
 - [ ] `POSTGRES_PASSWORD` e `PORTAL_DB_PASSWORD` fortes (o stack falha claro se ausentes).
-- [ ] **Senhas iniciais do Nou-Rau trocadas** (os usuários `admin` e `colab` nascem com a senha padrão do seed, definida em `docker/postgres/init/03-reset.sql`). Rotacionar pelo próprio Nou-Rau ou via `UPDATE users SET password=... WHERE username IN ('admin','colab');` e guardar no cofre do projeto.
+- [ ] **Senhas iniciais do Nou-Rau trocadas** (os usuários `admin` e `colab` nascem com a senha padrão do seed, definida em `docker/postgres/init/03-reset.sql`). Rotacionar pelo próprio Nou-Rau (área de usuários → "Trocar a senha"), nunca por SQL, e guardar no cofre de senhas da TI (§4.1, passo 12).
 - [ ] **`/manager` (admin do Nou-Rau) bloqueado na borda**: só por IP/VPN/Basic-Auth (ver [adr/0006](adr/0006-borda-canonica.md)); nunca público.
 - [ ] A conta `portal_reader` **sem leitura da tabela `users`**: a seção 1.11 da migração e o `make restore` fazem o `REVOKE`; confira com `has_table_privilege` depois de qualquer restauração ou init 09.
 - [ ] Portas internas só em loopback (`127.0.0.1`); em produção, sob a borda, sem publish direto.

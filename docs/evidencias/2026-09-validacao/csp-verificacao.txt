@@ -35,5 +35,5 @@ Referrer-Policy: strict-origin-when-cross-origin
    [ok] badges_do_heroi: ok — Artigos | Aspectos Jurídicos e Regulatórios | Etapa: Seleção do Fornecedor › Procedimentos Auxiliares | Aberto
    [ok] rotulos_classificacao: ok — Coleção | Tipo de informação | Assunto | Natureza | Etapa (categoria processual) | Subcategoria | Microcategoria
 
-capturas em /var/folders/s4/9b8pvl5n5595hmstq0sz6dnh0000gn/T/evid-csp — verificações com falha: 0
+capturas em <pasta temporária do sistema>/evid-csp — verificações com falha: 0
 exit playwright: 0
