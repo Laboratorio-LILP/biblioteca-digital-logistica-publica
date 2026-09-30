@@ -54,7 +54,7 @@
       {# Ordem v6 (Lina): Coleção → Categoria → Natureza → Assunto. "Coleção" é a cascata de tipos agrupada por coleção (substitui a faceta simples). Manter em UMA linha — comentário multi-linha vaza como texto. #}
       <details class="side-section"{% if filters.colecao_v6 or filters.typeinform_id %} open{% endif %}>
         <summary><h3>Coleção</h3></summary>
-        <p class="side-section__hint">Agrupa os documentos por tipo, em quatro coleções.</p>
+        <p class="side-section__hint">Agrupa os documentos por tipo de informação, em quatro coleções.</p>
         {% for grp in facets.tipos_por_colecao %}
         <details class="filter-group"{% if grp.active %} open{% endif %}>
           <summary><span class="filter-group__label">{{ grp.colecao }}</span></summary>
@@ -71,7 +71,7 @@
       {# Categorias em accordion por Categoria (Cat > Sub > Micro); single-select por name + cascata-clear em acervo-filters.js. Manter em UMA linha — comentario Django multi-linha vaza como texto. #}
       <details class="side-section"{% if filters.category_id or filters.subcategoria_id or filters.microcategoria_id %} open{% endif %}>
         <summary><h3>Categorias</h3></summary>
-        <p class="side-section__hint">A etapa da contratação em que o material se aplica. <a class="side-section__link" href="{% url 'catalog:collection_list' %}#categorias">O que significa cada opção?</a></p>
+        <p class="side-section__hint">A etapa da contratação em que o material se aplica. <a class="side-section__link" href="{% url 'catalog:metodologia_categorias' %}">O que significa cada opção?</a></p>
         {# Toda categoria é um <details> expansível (mesmo sem subcategorias, ex.: PCA, Ciclo Completo, Conteúdos Transversais) — coesão visual entre os cabeçalhos. #}
         {% for cat in facets.categorias_hierarquia %}
         <details class="filter-group"{% if cat.active %} open{% endif %}>
@@ -106,7 +106,7 @@
 
       <details class="side-section"{% if filters.assunto_id %} open{% endif %}>
         <summary><h3>Assunto</h3></summary>
-        <p class="side-section__hint">O tema tratado no documento (um documento tem um assunto principal). <a class="side-section__link" href="{% url 'catalog:collection_list' %}#assuntos">O que significa cada opção?</a></p>
+        <p class="side-section__hint">O tema tratado no documento (um documento tem um assunto principal). <a class="side-section__link" href="{% url 'catalog:metodologia_assuntos' %}">O que significa cada opção?</a></p>
         {% include "_partials/_facet_options.html" with facet=facets.assuntos param="assunto_id" current=filters.assunto_id %}
       </details>
 

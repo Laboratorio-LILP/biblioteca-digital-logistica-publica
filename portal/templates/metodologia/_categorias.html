@@ -1,0 +1,48 @@
+{% load catalog_tags %}
+{# Aba "Categorias" da Metodologia (painel #painel-categorias de metodologia.html). #}
+{# Seis categorias no mesmo cartão expansível dos assuntos (protótipo do Eduardo). Descrição = nr_category.description (curadoria); subcategorias com rotulo_sub e microcategorias com titulo_pt, como no Acervo, cada uma com a definição de ARVORE_DESCRICAO (rascunho a partir da Lei nº 14.133/2021, a validar pela curadoria); cada nome leva ao Acervo filtrado. #}
+<section id="categorias" class="method-section" aria-labelledby="categorias-title" data-sec="O que entra em cada categoria">
+  <div class="method-section-heading">
+    <div><p class="method-section-number">Ciclo da contratação</p><h2 id="categorias-title">A etapa a que o conteúdo se refere</h2></div>
+    <p>Quatro categorias são etapas, do planejamento à gestão do contrato.<br>Duas reúnem materiais que atravessam todas as etapas.</p>
+  </div>
+  <div class="method-subjects method-subjects--lista">
+    {% for c in categorias %}
+    <details class="method-subject" id="categoria-{{ c.id }}">
+      <summary>
+        <span class="method-subject-number" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+        <svg class="fi method-subject-icon" aria-hidden="true"><use href="#{{ c.icon }}"/></svg>
+        <span class="method-subject-heading"><strong class="method-subject-name">{{ c.nome|titulo_pt }}</strong>{% if c.descricao %}<span class="method-subject-summary">{{ c.descricao }}</span>{% endif %}</span>
+        <svg class="fi method-subject-indicator" aria-hidden="true"><use href="#fi-plus"/></svg>
+      </summary>
+      <div class="method-subject-body">
+        {% if c.subcategorias %}
+        <p><strong>Subcategorias e microcategorias</strong></p>
+        <ul class="method-subject-tree" aria-label="Subcategorias de {{ c.nome|titulo_pt }}">
+          {% for s in c.subcategorias %}
+          <li>
+            <a href="{% url 'catalog:search' %}?category_id={{ c.id }}&amp;subcategoria_id={{ s.id }}">{{ s.nome|rotulo_sub }}</a>
+            {% if s.descricao %}<span class="method-subject-def">{{ s.descricao }}</span>{% endif %}
+            {% if s.microcategorias %}
+            <ul aria-label="Microcategorias de {{ s.nome|rotulo_sub }}">
+              {% for m in s.microcategorias %}
+              <li>
+                <a href="{% url 'catalog:search' %}?category_id={{ c.id }}&amp;subcategoria_id={{ s.id }}&amp;microcategoria_id={{ m.id }}">{{ m.nome|titulo_pt }}</a>
+                {% if m.descricao %}<span class="method-subject-def">{{ m.descricao }}</span>{% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p>Esta categoria não se desdobra em subcategorias.</p>
+        {% endif %}
+        <p class="method-subject-meta">{% if c.count %}{{ c.count }} {{ c.count|pluralize_pt:"documento" }}{% else %}Ainda sem documentos{% endif %} · <a href="{% url 'catalog:search' %}?category_id={{ c.id }}">Ver no acervo</a></p>
+      </div>
+    </details>
+    {% endfor %}
+  </div>
+  <p class="method-source">Referência: árvore de classificação da curadoria da BDLP. As definições das subcategorias e microcategorias seguem a Lei nº 14.133/2021 e aguardam validação da curadoria.</p>
+</section>

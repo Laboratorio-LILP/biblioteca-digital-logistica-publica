@@ -1,0 +1,88 @@
+{% load catalog_tags %}
+{# Aba "Conceitos e coleções" da Metodologia (painel #painel-conceitos de metodologia.html). #}
+{# Trilha interativa dos seis campos: cartões (mouse, teclado, toque) + painel de explicação no desktop; no celular a explicação abre sob o cartão. Comportamento em js/metodologia.js; sem JS, o primeiro campo fica explicado. #}
+<section id="trilha" class="method-section" aria-labelledby="trilha-title" data-sec="Campos que se completam">
+  <div class="method-section-heading">
+    <div><p class="method-section-number">Os seis campos</p><h2 id="trilha-title">Campos que se completam</h2></div>
+    <ul class="classification-legend" aria-label="Legenda da classificação"><li><span class="classification-dot required" aria-hidden="true"></span>Obrigatório</li><li><span class="classification-dot conditional" aria-hidden="true"></span>Se aplicável</li></ul>
+  </div>
+  <p class="classification-intro">Cada campo responde a uma pergunta e acrescenta uma dimensão à classificação.</p>
+  <div class="classification-explorer" data-classification-trail>
+    <ol class="classification-steps" aria-label="Campos da classificação">
+      {% for campo in campos %}
+      <li data-trail-field="{{ campo.id }}" class="classification-step{% if forloop.first %} is-selected{% endif %}">
+        {% if not forloop.first %}<span class="classification-connector" aria-hidden="true"><svg class="fi"><use href="#{% if campo.id == 'subcategoria' or campo.id == 'microcategoria' %}fi-arrow-right{% else %}fi-plus{% endif %}"/></svg></span>{% endif %}
+        <button type="button" class="classification-node {% if campo.obrigatorio %}is-required{% else %}is-conditional{% endif %}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="classificacao-{{ campo.id }} classificacao-mobile-{{ campo.id }}">
+          <span class="classification-node-top"><span>{{ forloop.counter|stringformat:"02d" }}</span><svg class="fi classification-icon" aria-hidden="true"><use href="#{{ campo.icon }}"/></svg></span>
+          <strong>{{ campo.nome }}</strong>
+          <span class="classification-value">{{ campo.resumo }}</span>
+          <span class="classification-caption">{{ campo.legenda }}</span>
+          <span class="classification-requirement">{% if campo.obrigatorio %}Obrigatório{% else %}Se aplicável{% endif %}</span>
+          <svg class="fi classification-disclosure" aria-hidden="true"><use href="#fi-chevron-down"/></svg>
+        </button>
+        <div id="classificacao-mobile-{{ campo.id }}" class="classification-mobile-detail"{% if not forloop.first %} hidden{% endif %}><p class="classification-question">{{ campo.pergunta }}</p><p>{{ campo.descricao }}</p></div>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="sr-only" role="status">Campo selecionado: {{ campos.0.nome }}</p>
+    <div class="classification-inspector">
+      {% for campo in campos %}
+      <div id="classificacao-{{ campo.id }}" class="classification-detail"{% if not forloop.first %} hidden{% endif %}>
+        <div class="classification-detail-heading"><span class="classification-detail-label">{{ forloop.counter|stringformat:"02d" }} / {{ campo.nome }}</span><h3>{{ campo.pergunta }}</h3><span class="classification-detail-status"><span class="classification-dot {% if campo.obrigatorio %}required{% else %}conditional{% endif %}" aria-hidden="true"></span>{% if campo.obrigatorio %}Obrigatório{% else %}Se aplicável{% endif %}</span></div>
+        <div class="classification-detail-copy"><p>{{ campo.descricao }}</p></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="method-practical" aria-labelledby="practical-title">
+  <div class="method-practical-heading"><svg class="fi" aria-hidden="true"><use href="#fi-file-text"/></svg><h2 id="practical-title">Exemplo prático</h2><p>{{ exemplo_pratico.titulo }}.</p></div>
+  <dl class="method-practical-fields">
+    {% for campo, valor in exemplo_pratico.campos_valores %}<div><dt>{{ campo.nome }}</dt><dd>{{ valor }}</dd></div>{% endfor %}
+  </dl>
+</section>
+
+{# As quatro coleções com os tipos de informação do vocabulário vigente (tipos_de_colecao) e a contagem do acervo; a cor de cada card é a mesma da coleção no resto da plataforma (COLECOES_V6.color). #}
+<section id="colecoes" class="method-section method-collections" aria-labelledby="collections-title" data-sec="Coleções e tipos de informação">
+  <div class="method-section-heading"><div><h2 id="collections-title">Coleções e tipos de informação</h2><p class="method-section-intro">O tipo de informação determina a coleção do material.</p></div></div>
+  <div class="method-collection-grid">
+    {% for c in colecoes %}
+    <article class="method-collection" data-color="{{ c.color }}">
+      <svg class="fi method-collection-icon" aria-hidden="true"><use href="#{{ c.icon }}"/></svg>
+      <h3>{{ c.nome }}</h3>
+      <p>{{ c.tipos|join:", " }}.</p>
+      <p class="method-collection-count">{% if c.count %}{{ c.count }} {{ c.count|pluralize_pt:"documento" }}{% else %}Ainda sem documentos{% endif %}</p>
+      <a href="{{ c.href }}" aria-label="Consultar coleção: {{ c.nome }}">Consultar coleção <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+    </article>
+    {% endfor %}
+  </div>
+  <p class="method-collection-note"><svg class="fi" aria-hidden="true"><use href="#fi-file-text"/></svg><span><strong>Enunciados fazem parte de Doutrina e Conteúdo Técnico.</strong> Nesta taxonomia, os enunciados de especialistas são conteúdos de interpretação e orientação, não decisões de tribunais.</span></p>
+</section>
+
+<div class="method-more">
+  <details id="hierarquia">
+    <summary><span><strong>A relação entre os campos</strong><span>Categoria, desdobramentos e natureza do objeto</span></span><svg class="fi" aria-hidden="true"><use href="#fi-chevron-down"/></svg></summary>
+    <div class="method-more-body">
+      <p>A hierarquia está em <strong>Categoria → Subcategoria → Microcategoria</strong>. Cada desdobramento pertence ao nível anterior. Coleção, assunto e natureza acrescentam informações complementares.</p>
+      <ol class="method-tree" aria-label="Relação entre os níveis"><li><span>Categoria</span><strong>Etapa da contratação</strong></li><li><span>Subcategoria</span><strong>Tópico específico</strong></li><li><span>Microcategoria</span><strong>Modalidade, regime ou hipótese</strong></li></ol>
+      <p>As seis categorias, com as subcategorias e microcategorias de cada uma, estão na aba <a href="{% url 'catalog:metodologia_categorias' %}">Categorias</a>.</p>
+      <h3>Natureza: o objeto da contratação</h3>
+      <p>Contratação de Materiais, Contratação de Serviços, Contratação de Obras e Serviços de Engenharia ou Contratação de TIC (tecnologia da informação e comunicação). A natureza identifica o objeto contratado, enquanto o assunto identifica o tema do conteúdo. Quando o material não trata de uma compra específica, a natureza recebe "Não se aplica".</p>
+    </div>
+  </details>
+  <details id="exemplos">
+    <summary><span><strong>Exemplos de classificação</strong><span>Aplicação dos conceitos a materiais ilustrativos</span></span><svg class="fi" aria-hidden="true"><use href="#fi-chevron-down"/></svg></summary>
+    <div class="method-more-body method-examples">
+      {% for ex in exemplos %}
+      <article class="method-example">
+        <p class="method-section-number">Exemplo {{ forloop.counter|stringformat:"02d" }}</p>
+        <h3>{{ ex.titulo }}</h3>
+        <p>{{ ex.intro }}</p>
+        <dl>{% for campo, valor in ex.campos_valores %}<div><dt>{{ campo.nome }}</dt><dd>{{ valor }}</dd></div>{% endfor %}</dl>
+        <p class="method-example-note">{{ ex.nota }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </details>
+</div>

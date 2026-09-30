@@ -33,13 +33,14 @@ def test_css_respiro_final_cobre_seta_e_form():
 
 
 def test_colecoes_segue_o_trio():
-    t = _template("collection_list.html")
+    # 23/09: o trio vive no documento único da Metodologia (três abas)
+    t = _template("metodologia.html")
     assert "breadcrumb-bar" not in t                          # faixa branca antiga saiu
     abertura = t.index('sp-section sp-section--pattern colecoes-hero')
     assert t.index('class="breadcrumb"', abertura) > abertura  # breadcrumb dentro da banda
-    # fechamento cinza: a ultima secao (Como encontrar) e --alt; a do meio nao e
+    # fechamento cinza: a última seção (Explorar o acervo) é --alt; o miolo não é
     assert t.count("sp-section--alt") == 1
-    assert t.index("sp-section--alt") > t.index("Como o acervo se organiza")
+    assert t.index("sp-section--alt") > t.index('class="sp-section method-page"')
 
 
 def test_sobre_segue_o_trio():

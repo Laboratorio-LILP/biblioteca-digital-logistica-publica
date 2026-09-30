@@ -18,7 +18,18 @@ from .facets import (
 )
 from .models import Document, NrCategory, Topic, TypeInformation
 from .search import filter_documents, search_documents
-from .taxonomy_v6 import COLECOES_BY_SLUG, TEMAS_DESTAQUE
+from .taxonomy_v6 import (
+    ASSUNTOS_COMPARACOES,
+    ASSUNTOS_FOCO,
+    ASSUNTOS_ICONE,
+    CAMPOS_CLASSIFICACAO,
+    COLECOES_BY_SLUG,
+    COLECOES_ICONE_METODOLOGIA,
+    EXEMPLOS_CLASSIFICACAO,
+    TEMAS_DESTAQUE,
+    ordenar_como_a_curadoria,
+    tipos_de_colecao,
+)
 from .templatetags.catalog_tags import titulo_pt
 
 
@@ -335,16 +346,74 @@ def document_detail(request, code):
     })
 
 
-def collection_list(request):
-    """As 4 coleções v6 (derivadas do Tipo de Informação) com contagem real, e o
-    glossário público de Assuntos e Categorias (definições da curadoria,
-    contagens do acervo e subcategorias)."""
-    colecoes_v6 = colecao_v6_overview()
-    return render(request, "collection_list.html", {
-        "colecoes_v6": colecoes_v6,
-        "cards": [_card_colecao(c) for c in colecoes_v6],
-        "assuntos_glossario": assuntos_glossario(),
-        "categorias_glossario": categorias_glossario(),
+# Sub-navegação das três páginas de Coleções (porte da "Metodologia" do protótipo
+# do Eduardo, 23/09/2026): a ordem segue a fórmula da classificação.
+_ABAS_METODOLOGIA = (
+    # chave, rota, rótulo da aba, título do documento, meta description
+    ("conceitos", "catalog:metodologia", "Conceitos e coleções",
+     "Metodologia — Biblioteca Digital de Logística Pública",
+     "Como cada documento da Biblioteca Digital de Logística Pública é classificado: os seis campos, "
+     "as quatro coleções e os tipos de informação, e como pesquisar por qualquer palavra, com ou sem filtros."),
+    ("categorias", "catalog:metodologia_categorias", "Categorias",
+     "Categorias — Metodologia — Biblioteca Digital de Logística Pública",
+     "As seis categorias da classificação da Biblioteca Digital de Logística Pública (etapas da contratação), "
+     "com as subcategorias e microcategorias de cada uma e o que entra em cada nível."),
+    ("assuntos", "catalog:metodologia_assuntos", "Assuntos",
+     "Assuntos — Metodologia — Biblioteca Digital de Logística Pública",
+     "Os assuntos da Biblioteca Digital de Logística Pública, com a caracterização e a explicação da curadoria, "
+     "o foco de cada um e como diferenciar assuntos próximos."),
+)
+
+
+def _abas_metodologia(ativa):
+    return [
+        {"chave": chave, "href": reverse(rota), "rotulo": rotulo, "titulo": titulo, "meta": meta,
+         "ativa": chave == ativa}
+        for chave, rota, rotulo, titulo, meta in _ABAS_METODOLOGIA
+    ]
+
+
+def metodologia(request, aba="conceitos"):
+    """Metodologia (chamava-se Coleções até 23/09/2026): um só documento com três
+    abas que trocam sem recarregar — porte da página de Metodologia do protótipo
+    do Eduardo sobre os dados reais. Conceitos e coleções: os seis campos e a
+    trilha interativa (CAMPOS_CLASSIFICACAO), o exemplo prático e os exemplos
+    (EXEMPLOS_CLASSIFICACAO), as quatro coleções com os tipos do vocabulário
+    vigente e a contagem do acervo. Categorias: as seis categorias (etapas da
+    contratação) com a descrição do seed, a contagem e a árvore de subcategorias
+    e microcategorias com definições — destino do link "O que significa cada
+    opção?" da faceta de Categoria. Assuntos: caracterização e explicação da
+    curadoria, foco da classificação, contagem, busca sem acento e comparação de
+    assuntos próximos — destino do link da faceta de Assunto. As três URLs
+    servem o mesmo HTML com a aba da URL marcada (sem JS, as abas são links)."""
+    colecoes = [
+        {
+            "nome": c["nome"], "slug": c["id"], "count": c["count"], "color": c["color"],
+            "icon": COLECOES_ICONE_METODOLOGIA.get(c["nome"], c["icon"]),
+            "tipos": tipos_de_colecao(c["id"]),
+            "href": _search_url(colecao_v6=c["id"]),
+        }
+        for c in colecao_v6_overview()
+    ]
+    exemplos = [
+        dict(e, campos_valores=list(zip(CAMPOS_CLASSIFICACAO, e["valores"])))
+        for e in EXEMPLOS_CLASSIFICACAO
+    ]
+    assuntos = [
+        dict(a, foco=ASSUNTOS_FOCO.get(a["nome"], ""), icon=ASSUNTOS_ICONE.get(a["nome"], "fi-tag"))
+        for a in ordenar_como_a_curadoria(assuntos_glossario())
+    ]
+    abas = _abas_metodologia(aba)
+    return render(request, "metodologia.html", {
+        "abas": abas,
+        "aba_ativa": next(a for a in abas if a["ativa"]),
+        "campos": CAMPOS_CLASSIFICACAO,
+        "exemplo_pratico": exemplos[0],
+        "exemplos": exemplos,
+        "colecoes": colecoes,
+        "categorias": categorias_glossario(),
+        "assuntos": assuntos,
+        "comparacoes": ASSUNTOS_COMPARACOES,
     })
 
 
@@ -430,11 +499,10 @@ def download(request, code):
 
 
 def curadoria(request):
-    """Rota legada: a Curadoria foi unificada na página de Coleções. Redireciona
-    links externos/marcados para /colecoes/ (a página agora explica a organização
-    do acervo abaixo dos cards das coleções)."""
+    """Rota legada: a Curadoria foi unificada na página de Metodologia (ex-Coleções).
+    Redireciona links externos/marcados para /metodologia/."""
     from django.shortcuts import redirect
-    return redirect("catalog:collection_list")
+    return redirect("catalog:metodologia")
 
 
 def about(request):

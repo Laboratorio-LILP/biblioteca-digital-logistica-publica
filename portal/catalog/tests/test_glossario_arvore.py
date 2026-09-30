@@ -74,7 +74,7 @@ def test_facets_anexa_a_definicao_a_cada_no(monkeypatch):
 
 
 def test_template_mostra_a_definicao_sob_cada_nome():
-    t = (TEMPLATES / "collection_list.html").read_text(encoding="utf-8")
-    assert t.count('class="glossario__arvore-def"') == 2            # subcategoria e microcategoria
+    t = (TEMPLATES / "metodologia" / "_categorias.html").read_text(encoding="utf-8")
+    assert t.count('class="method-subject-def"') == 2               # subcategoria e microcategoria
     assert "{{ s.descricao }}" in t and "{{ m.descricao }}" in t
-    assert "conforme a Lei nº 14.133/2021" in t                     # a fonte dita ao leitor
+    assert "Lei nº 14.133/2021" in t                                 # a fonte dita ao leitor

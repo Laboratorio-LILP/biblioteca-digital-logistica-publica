@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static catalog_tags %}
+{% comment %}
+Metodologia — um só documento com três abas: Conceitos e coleções · Categorias ·
+Assuntos. Porte da "Metodologia de classificação" do protótipo do Eduardo
+(dudyfarias/biblioteca, branch codex/biblioteca-home-acervo-filtros, commits de
+10 a 15/09/2026) para o trio de fundos da plataforma: abertura quadriculada
+(breadcrumb, eyebrow, h1, lead e introdução de cada aba), sub-navegação colada
+sob o cabeçalho com as abas (.method-jumpnav), miolo branco com um painel por
+aba (.method-page) e fechamento cinza com a chamada para o Acervo (.method-next).
+As três abas vêm inteiras no HTML: o servidor marca a aba da URL (/metodologia/,
+/metodologia/categorias/, /metodologia/assuntos/) e js/metodologia.js troca
+abertura + painel sem recarregar (history.pushState, título, seta-guia). Sem JS,
+cada aba é um link para a mesma URL. A página chamava-se Coleções até 23/09/2026.
+{% endcomment %}
+
+{% block title %}{{ aba_ativa.titulo }}{% endblock %}
+{% block meta_description %}{{ aba_ativa.meta }}{% endblock %}
+
+{% block content_raw %}
+<section class="sp-section sp-section--pattern colecoes-hero" data-sec="Metodologia">
+  <div class="sp-container">
+    <div class="method-hero" data-aba-hero="conceitos"{% if aba_ativa.chave != "conceitos" %} hidden{% endif %}>
+      <nav class="breadcrumb" aria-label="Você está em">
+        <a href="{% url 'catalog:home' %}">Início</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        <span>Metodologia</span>
+      </nav>
+      <span class="eyebrow">Metodologia de classificação</span>
+      <h1>Estrutura da classificação</h1>
+      <p class="page__intro">A classificação de cada documento combina estes campos:</p>
+      {# Os seis campos da fórmula da curadoria (CAMPOS_CLASSIFICACAO), como no protótipo: nome + obrigatoriedade, com "+" entre eles. #}
+      <ol class="method-structure" aria-label="Estrutura da classificação">
+        {% for campo in campos %}
+        <li class="{% if campo.obrigatorio %}is-required{% else %}is-conditional{% endif %}"><strong>{{ campo.nome }}</strong><span>{% if campo.obrigatorio %}Obrigatório{% else %}Se aplicável{% endif %}</span></li>
+        {% endfor %}
+      </ol>
+      <p class="method-rule"><strong>A taxonomia é multidimensional.</strong> Os campos se complementam: identificam a forma do material, a etapa da contratação, o tema e, se aplicável, o objeto contratado.</p>
+      <p class="method-rule"><strong>Na pesquisa, todos os filtros são opcionais.</strong> Assunto é um filtro temático para facilitar a consulta. Você pode buscar no acervo por qualquer palavra, sem selecionar filtros.</p>
+    </div>
+    <div class="method-hero" data-aba-hero="categorias"{% if aba_ativa.chave != "categorias" %} hidden{% endif %}>
+      <nav class="breadcrumb" aria-label="Você está em">
+        <a href="{% url 'catalog:home' %}">Início</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        <a href="{% url 'catalog:metodologia' %}">Metodologia</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        <span>Categorias</span>
+      </nav>
+      <span class="eyebrow">Metodologia de classificação</span>
+      <h1>Categorias</h1>
+      <p class="page__intro">Categoria é a etapa da contratação a que o documento se refere. Algumas se desdobram em subcategorias e microcategorias.</p>
+      <p class="method-rule">Na pesquisa, a categoria é um filtro opcional. Você pode <a href="{% url 'catalog:search' %}">buscar no acervo por qualquer palavra</a>, sem selecionar uma categoria ou outros filtros.</p>
+    </div>
+    <div class="method-hero" data-aba-hero="assuntos"{% if aba_ativa.chave != "assuntos" %} hidden{% endif %}>
+      <nav class="breadcrumb" aria-label="Você está em">
+        <a href="{% url 'catalog:home' %}">Início</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        <a href="{% url 'catalog:metodologia' %}">Metodologia</a>
+        <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
+        <span>Assuntos</span>
+      </nav>
+      <span class="eyebrow">Metodologia de classificação</span>
+      <h1>Assuntos</h1>
+      <p class="page__intro">Assunto é a dimensão temática da classificação. Na pesquisa, funciona como um filtro opcional para facilitar a consulta.</p>
+      <p class="method-rule">Você pode <a href="{% url 'catalog:search' %}">buscar no acervo por qualquer palavra</a>, sem selecionar um assunto ou outros filtros.</p>
+    </div>
+  </div>
+</section>
+
+{# Abas: links para as três URLs (sem JS) que o JS transforma em troca de painel; a aba ativa vem marcada do servidor. #}
+<nav class="method-jumpnav" aria-label="Metodologia" data-metodologia-abas>
+  <div class="sp-container method-jumpnav__inner">
+    <div class="method-jumpnav__abas" role="tablist" aria-label="Seções da Metodologia">
+      {% for aba in abas %}<a role="tab" id="aba-{{ aba.chave }}" href="{{ aba.href }}" aria-selected="{% if aba.ativa %}true{% else %}false{% endif %}" aria-controls="painel-{{ aba.chave }}" data-aba="{{ aba.chave }}" data-titulo="{{ aba.titulo }}">{{ aba.rotulo }}</a>{% endfor %}
+    </div>
+    <a class="method-jump-acervo" href="{% url 'catalog:search' %}">Consultar acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+  </div>
+</nav>
+
+<section class="sp-section method-page">
+  <div class="sp-container">
+    <div id="painel-conceitos" class="method-painel" role="tabpanel" aria-labelledby="aba-conceitos"{% if aba_ativa.chave != "conceitos" %} hidden{% endif %}>
+      {% include "metodologia/_conceitos.html" %}
+    </div>
+    <div id="painel-categorias" class="method-painel" role="tabpanel" aria-labelledby="aba-categorias"{% if aba_ativa.chave != "categorias" %} hidden{% endif %}>
+      {% include "metodologia/_categorias.html" %}
+    </div>
+    <div id="painel-assuntos" class="method-painel" role="tabpanel" aria-labelledby="aba-assuntos"{% if aba_ativa.chave != "assuntos" %} hidden{% endif %}>
+      {% include "metodologia/_assuntos.html" %}
+    </div>
+  </div>
+</section>
+
+<section class="sp-section sp-section--alt method-next" data-sec="Explorar o acervo">
+  <div class="sp-container method-next__inner">
+    <div>
+      <h2>Encontre o conhecimento que você precisa.</h2>
+      <p>Explore as coleções e os temas da biblioteca.</p>
+    </div>
+    <a class="sp-button-secondary" href="{% url 'catalog:search' %}">Explorar o acervo <svg class="fi" aria-hidden="true"><use href="#fi-arrow-right"/></svg></a>
+  </div>
+</section>
+{% include "_partials/_seta_secoes.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/seta-secoes.js' %}" defer></script>
+<script src="{% static 'js/metodologia.js' %}" defer></script>
+{% endblock %}

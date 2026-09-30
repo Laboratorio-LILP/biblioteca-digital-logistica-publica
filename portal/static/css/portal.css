@@ -29,6 +29,7 @@
   /* Canais RGB para usar com rgb(... / alpha) */
   --rgb-red: 237 28 36;
   --rgb-blue: 3 78 162;
+  --rgb-blue-medium: 66 151 211;   /* --sp-blue-medium em canais, p/ tintas rgb(... / a) */
   --rgb-green: 11 146 71;
   --rgb-yellow: 251 186 0;
   --rgb-olive: 148 170 90;
@@ -457,9 +458,8 @@ main { flex: 1 0 auto; }
 .tema-chip__count { font-size: 11px; color: rgb(var(--rgb-black) / 0.55); margin-top: 2px; }
 
 /* Divisor sutil na fronteira branco-branco (como o stats tem border-bottom) — o
-   espaçamento já é padrão (--space-section); falta só o divisor. Home:
-   Coleções→Etapas. Coleções: Organização→Glossário. */
-.home-etapas, .colecoes-glossario { border-top: var(--border); }
+   espaçamento já é padrão (--space-section); falta só o divisor. */
+.home-etapas { border-top: var(--border); }
 
 /* Stepper: ícone no nó (acento vermelho) + linha conectora = fluxo do processo.
    Base = mobile (vertical, linha à esquerda); ≥768px vira horizontal. O <ol> dá a
@@ -858,49 +858,6 @@ html.js .btn-apply { display: none; }
 .meta-item__desc { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.62); }
 /* Link discreto do hint das facetas para o glossário da página de Coleções. */
 .side-section__link { color: var(--sp-blue); text-decoration: underline; }
-/* Links nas notas dos cards de Coleções ("Veja o que entra em cada um"): o reset
-   global `a { color: inherit; text-decoration: none }` os deixava iguais ao texto. */
-.org-card__nota a { color: var(--sp-blue); text-decoration: underline; }
-.org-card__nota a:hover, .org-card__nota a:focus-visible { text-decoration-thickness: 2px; }
-
-/* Glossário de Assuntos e Categorias (seção própria na página de Coleções,
-   set/2026): verbete = nome linkado ao acervo filtrado, caracterização curta da
-   curadoria, subcategorias em linha, contagem e a explicação longa num
-   <details>. Os dois grupos são sub-blocos da seção, rotulados com
-   .tema-grupo da home ("Temas em alta": título em destaque + ícone + intro,
-   âncora com folga para o cabeçalho) — nenhuma regra própria de grupo. Listas em
-   colunas (2 a partir de 640px; assuntos em 3 a partir de 1024px) para a página
-   não descer demais nem sobrar coluna vazia. */
-.section-heading + .tema-grupo { margin-top: var(--space-6); }   /* mesmo respiro da home após o eyebrow */
-/* Régua no fundo de CADA item (como .meta-item), não no <ul>: numa grade com a
-   última linha incompleta (16 assuntos em 3 colunas), a régua do contêiner
-   corria inteira sob as células vazias e parecia esticar os itens de cima. */
-.glossario__lista { list-style: none; margin: 0; padding: 0; border-top: var(--border); display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--space-6); }
-@media (min-width: 640px) { .glossario__lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .glossario__lista--3col { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.glossario__item { padding: 10px 0; border-bottom: var(--border); font-size: 14px; line-height: 1.6; }
-.glossario__nome { font-family: var(--font-subtitle); font-weight: 600; color: var(--sp-blue); }
-.glossario__nome:hover, .glossario__nome:focus-visible { text-decoration: underline; }
-.glossario__curta { display: block; color: rgb(var(--rgb-black) / 0.72); }
-.glossario__count { display: block; font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
-.glossario__mais { margin-top: 4px; }
-.glossario__mais > summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--sp-blue); }
-.glossario__mais > summary::-webkit-details-marker { display: none; }
-.glossario__mais > summary::before { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 150ms ease; }
-.glossario__mais[open] > summary::before { transform: rotate(45deg); }
-.glossario__mais > summary:focus-visible { outline: 3px solid rgb(var(--rgb-blue) / 0.55); outline-offset: 2px; border-radius: 4px; }
-.glossario__mais > p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
-/* "Saiba mais" das categorias: subcategorias e, recuadas, microcategorias — lista
-   simples no mesmo corpo/cor do texto do "Saiba mais" dos assuntos, cada nó com o
-   nome (link para o Acervo filtrado) e a definição embaixo. Recuo 18px como as
-   listas dos cards (.org-card ul). */
-.glossario__arvore { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.72); }
-.glossario__arvore ul { margin: 2px 0 4px; padding-left: 18px; }
-.glossario__arvore li { margin: 4px 0; }
-.glossario__arvore-def { display: block; color: rgb(var(--rgb-black) / 0.62); }   /* definição sob o nome */
-.glossario__arvore a { color: var(--sp-blue); }
-.glossario__arvore a:hover, .glossario__arvore a:focus-visible { text-decoration: underline; }
-@media (prefers-reduced-motion: reduce) { .glossario__mais > summary::before { transition: none; } }
 
 .meta-grid { display: grid; gap: 14px; margin-top: 16px; grid-template-columns: 1fr; }
 @media (min-width: 600px) { .meta-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -952,7 +909,6 @@ html.js .btn-apply { display: none; }
 .curadoria-lista > li:last-child { margin-bottom: 0; } /* colapsaria através do <ul> e vazaria p/ a seção */
 .curadoria-lista ul { margin: 8px 0 0; padding-left: 20px; }
 .curadoria-lista ul li { font-size: 13px; line-height: 1.6; margin-bottom: 4px; color: rgb(var(--rgb-black) / 0.72); }
-.curadoria-dica { max-width: 760px; margin: 16px 0 0; border-left: 4px solid var(--sp-red); background: var(--sp-gray-light); border-radius: 8px; padding: 14px 18px; font-size: 13px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.78); }
 .curadoria-acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 
 /* Páginas de Coleções, Sobre e legais no padrão de seções da Home (full-bleed + section-heading) */
@@ -963,18 +919,15 @@ html.js .btn-apply { display: none; }
 .colecao-miolo h2 { font-family: var(--font-heading); font-weight: 700; margin: 24px 0 12px; font-size: 22px; }
 .colecao-miolo .sp-container > h2:first-child { margin-top: 0; }
 
-/* Cards de organização do acervo (classificação + como encontrar) — reusa .sp-card */
+/* Cards de organização (Sobre: papéis SGGD/LILP e SBU) — reusa .sp-card */
 .org-grid { display: grid; gap: 12px; margin-top: 20px; grid-template-columns: 1fr; }
-@media (min-width: 768px) { .org-grid--3 { grid-template-columns: repeat(3, 1fr); } .org-grid--2 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 768px) { .org-grid--2 { grid-template-columns: repeat(2, 1fr); } }
 .org-card { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .org-card__icon { height: 44px; width: 44px; flex-shrink: 0; display: grid; place-items: center; border-radius: 8px; font-size: 20px; color: var(--sp-petrol); background: rgb(var(--rgb-petrol) / 0.1); }
 .org-card h3 { font-family: var(--font-subtitle); font-weight: 600; font-size: 16px; color: var(--sp-black); }
 .org-card p { margin: 0; font-size: 14px; line-height: 1.65; color: rgb(var(--rgb-black) / 0.72); }
 .org-card ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 .org-card li { font-size: 13px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.78); }
-.org-card__nota { margin-top: auto; font-size: 13px; color: rgb(var(--rgb-black) / 0.6); }
-.org-card--busca { flex-direction: row; align-items: flex-start; gap: 16px; }
-.org-card--busca > div { display: flex; flex-direction: column; gap: 6px; }
 
 /* Trilho editorial (Sobre): cabeçalho da seção num trilho à esquerda, conteúdo
    à direita. Dá função ao espaço que sobrava ao lado da medida de leitura
@@ -1086,6 +1039,291 @@ body.sp-alto-contraste img:not([alt=""]) { filter: grayscale(100%) contrast(1.4)
 .sp-cookies-modal__categoria legend { padding: 0 6px; font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; }
 .sp-cookies-modal__categoria label { display: flex; gap: 8px; font-size: 12px; line-height: 1.5; color: rgb(var(--rgb-black) / 0.72); }
 .sp-cookies-modal__panel footer { display: flex; gap: 8px; margin-top: 18px; }
+
+/* ============================================================
+   Metodologia (chamava-se Coleções até 23/09/2026)
+   Porte do protótipo do Eduardo (dudyfarias/biblioteca › branch
+   codex/biblioteca-home-acervo-filtros › src/app/metodologia/metodologia.css,
+   commits de 10 a 15/09/2026; port em 23/09/2026) para o trio de fundos: a
+   estrutura dos seis campos (.method-structure) vive na abertura quadriculada;
+   as abas (.method-jumpnav) colam sob o cabeçalho fixo de 77px; o miolo
+   branco (.method-page) recebe a trilha interativa, o exemplo prático, as
+   coleções, os "Saiba mais" e o navegador de assuntos; o fechamento cinza
+   (.method-next) chama para o Acervo. Cores do protótipo → tokens da plataforma
+   (#ff161f → --sp-red GESP; tintas com rgb(canal / alfa) em vez de color-mix).
+   Breakpoints do protótipo (1150/950/720/480/420) mantidos: o desenho da trilha
+   (6 → 3 → 1 coluna) e o painel de explicação dependem deles.
+   ============================================================ */
+/* Abertura: os seis campos somados + as duas regras */
+.method-structure { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; margin: 20px 0 16px; padding: 0; }
+.method-structure li { position: relative; min-width: 0; padding: 10px 0 12px; border-bottom: 2px solid var(--sp-blue); }
+.method-structure li.is-conditional { border-bottom-color: var(--sp-blue-light); }
+.method-structure li + li::before { content: "+"; position: absolute; left: -18px; top: 18px; color: var(--sp-blue); font-size: 16px; }
+.method-structure strong { display: block; font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; }
+.method-structure span { display: block; margin-top: 4px; font-size: 12px; color: rgb(var(--rgb-black) / 0.76); }
+.method-rule { max-width: 990px; margin: 12px 0 0; font-size: 13px; line-height: 1.75; color: rgb(var(--rgb-black) / 0.76); }
+.method-rule strong { color: var(--sp-black); }
+.method-rule a { color: var(--sp-blue); text-decoration: underline; }
+
+/* Abas coladas sob o cabeçalho (77px medidos); aba ativa com a linha vermelha. São links
+   (funcionam sem JS) com papel de tab: a troca de painel é do js/metodologia.js. */
+.method-jumpnav { position: sticky; top: 77px; z-index: 30; background: var(--sp-white); border-bottom: var(--border); }
+.method-jumpnav__inner { display: flex; gap: 32px; align-items: center; }
+.method-jumpnav__abas { display: flex; gap: 32px; }
+.method-jumpnav a { position: relative; min-height: 52px; display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; color: rgb(var(--rgb-black) / 0.75); }
+.method-jumpnav a:hover, .method-jumpnav a[aria-selected="true"] { color: var(--sp-blue); }
+.method-jumpnav a[aria-selected="true"]::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background: var(--sp-red); }
+.method-jumpnav .method-jump-acervo { margin-left: auto; color: var(--sp-blue); }
+
+/* Miolo */
+.method-page.sp-section { padding-top: 0; }
+.method-page { font-size: 15px; line-height: 1.75; overflow-wrap: anywhere; }
+.method-page :where(h2, h3, p, ol, ul, dl, dd) { margin: 0; }
+.method-page :where(ol, ul) { padding: 0; list-style: none; }
+.method-page a { color: var(--sp-blue); }
+.method-page :where(h2, h3) { text-wrap: balance; }
+.method-page h2 { font-family: var(--font-heading); font-weight: 700; font-size: 28px; line-height: 1.2; }
+.method-page h3 { font-family: var(--font-subtitle); font-weight: 600; font-size: 15px; line-height: 1.5; }
+/* Âncoras e paradas da seta-guia sob cabeçalho (77px) + sub-navegação (52px) */
+.method-page, .method-page [id], .method-page [data-sec], .method-next { scroll-margin-top: 150px; }
+/* Elementos com display próprio (flex/grid) ainda somem com [hidden] — como .is-hidden */
+.method-page [hidden], .method-jumpnav [hidden], .colecoes-hero [hidden] { display: none !important; }
+.method-section { padding-block: 36px; }
+.method-section + .method-section, .method-practical + .method-section { border-top: var(--border); }
+.method-section-number { margin-bottom: 10px; font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; line-height: 1.5; color: var(--sp-blue); }
+.method-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+.method-section-heading > p { max-width: 360px; font-size: 13px; color: rgb(var(--rgb-black) / 0.7); }
+.method-section-intro { margin-top: 12px; max-width: 730px; }
+.method-page summary { cursor: pointer; list-style: none; }
+.method-page summary::-webkit-details-marker { display: none; }
+.method-page summary > .fi { width: 17px; height: 17px; flex-shrink: 0; color: var(--sp-blue); transition: transform 160ms ease; }
+.method-page details[open] > summary > .fi { transform: rotate(180deg); }
+
+/* Trilha dos seis campos: cartão por campo, conectores + / →, painel de explicação */
+.classification-legend { display: flex; align-items: center; gap: 24px; font-size: 12px; }
+.classification-legend li { display: flex; align-items: center; gap: 8px; }
+.classification-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.classification-dot.required { background: var(--sp-blue); }
+.classification-dot.conditional { background: var(--sp-blue-light); outline: 1px solid var(--sp-blue-dark); outline-offset: -1px; }
+.classification-intro { padding-bottom: 20px; max-width: 1000px; font-size: 14px; }
+.classification-steps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; }
+.classification-step { --field-accent: var(--rgb-blue); position: relative; min-width: 0; display: flex; flex-direction: column; }
+.classification-step[data-trail-field="categoria"] { --field-accent: var(--rgb-green); }
+.classification-step[data-trail-field="subcategoria"] { --field-accent: var(--rgb-blue-medium); }
+.classification-step[data-trail-field="microcategoria"] { --field-accent: var(--rgb-petrol); }
+.classification-step[data-trail-field="assunto"] { --field-accent: var(--rgb-red); }
+.classification-step[data-trail-field="natureza"] { --field-accent: var(--rgb-olive); }
+.classification-node { position: relative; display: grid; grid-template-rows: 42px auto 40px 1fr 30px; align-content: start; flex: 1; width: 100%; min-height: 260px; gap: 6px; padding: 14px 12px 12px; border: 1px solid transparent; border-radius: 8px; background: rgb(var(--field-accent) / 0.09); color: var(--sp-black); text-align: center; cursor: pointer; transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.classification-node-top { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; font-size: 11px; color: var(--sp-black); }
+.classification-node-top > span:first-child { position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: rgb(var(--field-accent) / 0.17); }
+.classification-icon { width: 29px; height: 29px; color: rgb(var(--field-accent)); }
+.classification-node strong { max-width: 100%; font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; }
+.classification-value { font-size: 12px; line-height: 1.5; }
+.classification-caption { display: block; border-top: 1px solid rgb(var(--field-accent) / 0.13); padding-block: 10px; font-size: 12px; line-height: 1.6; text-align: left; color: rgb(var(--rgb-black) / 0.76); }
+.classification-requirement { align-self: end; padding: 5px 19px 5px 7px; border: 1px solid transparent; border-radius: 4px; background: rgb(var(--rgb-white) / 0.7); color: var(--sp-blue); font-family: var(--font-subtitle); font-weight: 600; font-size: 11px; line-height: 1.6; }
+.classification-node.is-conditional .classification-requirement { border: 1px dashed var(--sp-gray-medium); background: rgb(var(--rgb-white) / 0.4); color: var(--sp-black); }
+.classification-disclosure { position: absolute; right: 18px; bottom: 20px; width: 13px; height: 13px; color: var(--sp-blue); transition: transform 160ms ease; }
+.classification-node[aria-expanded="true"] .classification-disclosure { transform: rotate(180deg); }
+.classification-node[aria-pressed="true"], .classification-node:hover { background: rgb(var(--field-accent) / 0.13); border-color: var(--sp-blue); }
+.classification-node:hover { transform: translateY(-2px); }
+.classification-connector { position: absolute; left: -17px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; color: var(--sp-blue); }
+.classification-connector .fi { width: 14px; height: 14px; }
+.classification-inspector { margin-top: 16px; background: var(--sp-gray-light); border-left: 3px solid var(--sp-blue); padding: 16px 20px; min-height: 144px; }
+.classification-detail { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr); gap: 38px; animation: classification-reveal 180ms ease-out; }
+.classification-detail-label { color: var(--sp-blue); font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; line-height: 1.5; }
+.method-page .classification-detail h3 { font-family: var(--font-heading); font-weight: 700; font-size: 18px; line-height: 1.35; margin-top: 6px; }
+.classification-detail-status { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; }
+.classification-detail-copy { font-size: 13px; }
+.classification-mobile-detail { display: none; }
+@keyframes classification-reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Exemplo prático (faixa verde) */
+.method-practical { padding: 20px; background: rgb(var(--rgb-green) / 0.06); border-block: 1px solid rgb(var(--rgb-green) / 0.15); }
+.method-practical-heading { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.method-practical-heading > .fi { width: 21px; height: 21px; color: var(--sp-blue-dark); flex-shrink: 0; align-self: center; }
+.method-page .method-practical h2 { font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; flex-shrink: 0; }
+.method-practical-heading p { font-size: 12px; }
+.method-practical-fields { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.method-practical-fields > div { min-width: 0; padding-left: 12px; border-left: 1px solid rgb(var(--rgb-green) / 0.25); }
+.method-practical-fields dt { font-size: 11px; color: var(--sp-blue-dark); margin-bottom: 5px; }
+.method-practical-fields dd { font-size: 12px; line-height: 1.6; }
+
+/* Coleções e tipos de informação: a tinta é a cor da coleção no resto da plataforma */
+.method-collections .method-section-intro { font-size: 13px; margin-top: 8px; }
+.method-collection-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.method-collection { --collection-accent: var(--rgb-blue); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; min-width: 0; border: 1px solid rgb(var(--collection-accent) / 0.12); border-radius: 8px; background: rgb(var(--collection-accent) / 0.07); }
+.method-collection[data-color="c-petrol"] { --collection-accent: var(--rgb-petrol); }
+.method-collection[data-color="c-red"] { --collection-accent: var(--rgb-red); }
+.method-collection[data-color="c-yellow"] { --collection-accent: var(--rgb-yellow); }
+.method-collection[data-color="c-green"] { --collection-accent: var(--rgb-green); }
+.method-collection-icon { width: 30px; height: 30px; color: rgb(var(--collection-accent)); }
+.method-collection[data-color="c-yellow"] .method-collection-icon { color: var(--sp-yellow-dark); }   /* âmbar AA, como .c-yellow */
+.method-collection p { font-size: 12px; line-height: 1.8; }
+.method-collection-count { color: rgb(var(--rgb-black) / 0.62); }
+.method-collection a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: auto; font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; line-height: 1.5; }
+.method-collection a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.method-collection-note { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; padding: 14px 16px; background: var(--sp-gray-light); font-size: 12px; }
+.method-collection-note > .fi { width: 20px; height: 20px; color: var(--sp-blue); flex-shrink: 0; margin-top: 2px; }
+.method-collection-note strong { color: var(--sp-blue); }
+
+/* "Saiba mais" da página de conceitos: relação entre os campos e exemplos */
+.method-more { border-top: var(--border); }
+.method-more > details { border-bottom: var(--border); }
+.method-more > details > summary { min-height: 68px; padding-block: 14px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.method-more > details > summary:hover, .method-subject summary:hover, .method-comparisons > summary:hover { background: var(--sp-gray-light); }
+.method-more summary strong { display: block; font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; }
+.method-more summary span span { display: block; font-size: 12px; margin-top: 4px; color: rgb(var(--rgb-black) / 0.7); }
+.method-more-body { padding-block: 8px 28px; font-size: 14px; }
+.method-more-body > p + p { margin-top: 12px; }
+.method-more-body > h3 { margin-block: 24px 12px; }
+.method-tree { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-block: 24px; }
+.method-tree li { border-left: 2px solid var(--sp-blue); padding-left: 16px; }
+.method-tree span { display: block; color: var(--sp-blue); font-size: 12px; }
+.method-tree strong { display: block; font-family: var(--font-subtitle); font-weight: 600; font-size: 15px; line-height: 1.6; }
+.method-examples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.method-example > p { font-size: 13px; margin-block: 12px; }
+.method-example dl > div { display: grid; grid-template-columns: 1fr; gap: 3px; padding-block: 10px; border-top: var(--border); }
+.method-example dt { color: var(--sp-blue); font-size: 12px; }
+.method-example dd { font-size: 13px; }
+.method-example-note { font-size: 12px; }
+
+/* Navegador de assuntos e cartões de categoria (mesmo cartão expansível) */
+.method-subject-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.method-subject-toolbar > p { font-size: 12px; color: rgb(var(--rgb-black) / 0.7); padding-bottom: 10px; }
+.method-subject-control { flex: 1; width: 100%; }
+.method-subject-label { display: block; font-family: var(--font-subtitle); font-weight: 600; font-size: 12px; line-height: 1.5; margin-bottom: 8px; }
+.method-subject-search { position: relative; display: flex; align-items: center; gap: 10px; width: 100%; }
+.method-subject-search input { width: 100%; min-height: 46px; padding: 10px 42px; font-size: 14px; line-height: 1.5; color: var(--sp-black); background: var(--sp-white); border: 1px solid var(--sp-gray-medium); border-radius: 6px; }
+.method-subject-search input::-webkit-search-cancel-button { appearance: none; }
+.method-subject-search > .fi { position: absolute; left: 14px; color: var(--sp-blue); width: 18px; height: 18px; }
+.method-subject-search button { position: absolute; right: 2px; min-width: 40px; min-height: 40px; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; color: var(--sp-blue); }
+.method-subjects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.method-subject { border: var(--border); border-radius: 8px; overflow: clip; background: var(--sp-white); }
+/* Página Categorias: os seis cartões em lista de uma coluna — aberta, a árvore de
+   Seleção do Fornecedor tem ~1.000px e, em grade, empurrava a linha de baixo
+   deixando buracos ao lado; em lista, a árvore se distribui em colunas dentro do
+   cartão (uma subcategoria por coluna). Duas classes vencem as regras de grade
+   por breakpoint, que têm uma classe só. */
+.method-subjects.method-subjects--lista { grid-template-columns: 1fr; gap: 12px; }
+.method-subjects--lista .method-subject summary { min-height: 0; padding: 16px 18px; }
+.method-subjects--lista .method-subject-body { padding-inline: 18px; }
+.method-subjects--lista .method-subject-tree > li { break-inside: avoid; }
+.method-subject summary { display: grid; grid-template-columns: 16px 24px minmax(0, 1fr) 16px; align-items: start; gap: 9px; padding: 16px 12px; min-height: 132px; }
+.method-subject summary:focus-visible { outline-offset: -3px; }
+.method-page .method-subject summary .method-subject-icon { width: 24px; height: 24px; align-self: start; transform: none; color: var(--sp-blue); }
+.method-subject:nth-child(4n) .method-subject-icon { color: var(--sp-green); }
+.method-subject-number { font-size: 11px; color: var(--sp-blue); }
+.method-subject-name { font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; line-height: 1.5; }
+.method-subject-summary { display: block; font-size: 12px; line-height: 1.65; margin-top: 5px; color: rgb(var(--rgb-black) / 0.75); }
+.method-subject summary .method-subject-indicator { align-self: center; width: 16px; height: 16px; }
+.method-page .method-subject[open] summary .method-subject-indicator { transform: rotate(45deg); }
+.method-subject-body { padding: 0 16px 20px; font-size: 13px; }
+.method-subject-body p + p, .method-subject-body ul + p { margin-top: 12px; }
+.method-subject-body strong { color: var(--sp-blue); }
+.method-subject-tree { margin-top: 8px; padding-left: 16px; list-style: disc; }
+.method-subject-tree ul { margin: 4px 0 6px; padding-left: 16px; list-style: circle; }
+.method-subject-tree li { margin: 4px 0; }
+.method-subject-tree a, .method-subject-meta a { text-decoration: underline; text-underline-offset: 3px; }
+.method-subject-def { display: block; font-size: 12px; line-height: 1.6; color: rgb(var(--rgb-black) / 0.62); }
+.method-subject-meta { font-size: 12px; color: rgb(var(--rgb-black) / 0.62); }
+.method-subject-empty { padding: 28px 0; }
+.method-subject-empty button { color: var(--sp-blue); background: transparent; border: 0; text-decoration: underline; cursor: pointer; min-height: 44px; }
+.method-subject-more { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; margin: 14px auto 20px; padding: 8px 18px; color: var(--sp-blue); font-family: var(--font-subtitle); font-weight: 600; font-size: 13px; line-height: 1.5; border: var(--border); border-radius: 6px; background: var(--sp-white); cursor: pointer; }
+.method-subject-more:hover { background: var(--sp-gray-light); border-color: var(--sp-blue); }
+.method-comparisons { border-top: var(--border); }
+.method-comparisons > summary { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-block: 20px; font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; }
+.method-comparisons dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; padding-bottom: 24px; }
+.method-comparisons dt { font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; }
+.method-comparisons dd { font-size: 13px; margin-top: 8px; }
+.method-source { font-size: 11px; margin-top: 8px; color: rgb(var(--rgb-black) / 0.7); }
+
+/* Fechamento cinza: chamada para o Acervo */
+.method-next__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.method-next h2 { font-family: var(--font-heading); font-weight: 700; font-size: 23px; line-height: 1.2; margin: 0; }
+.method-next p { margin: 8px 0 0; font-size: 14px; color: rgb(var(--rgb-black) / 0.72); }
+
+@media (min-width: 721px) { .method-subjects--lista .method-subject-tree { columns: 2; column-gap: 32px; } }
+@media (min-width: 951px) { .method-subjects--lista .method-subject-tree { columns: 3; } }
+@media (min-width: 951px) {
+  /* Linhas compartilhadas (subgrid) alinham intro, os seis campos e a nota entre os exemplos. */
+  .method-examples { row-gap: 0; }
+  .method-example { display: grid; grid-row: span 10; grid-template-rows: subgrid; row-gap: 0; min-width: 0; }
+  .method-example dl { display: grid; grid-row: span 6; grid-template-rows: subgrid; row-gap: 0; }
+  .method-example dl > div { align-content: start; }
+}
+@media (max-width: 1150px) {
+  .method-subject summary { min-height: 164px; }
+  .classification-steps { gap: 16px; }
+  .classification-node { padding-inline: 10px; min-height: 280px; }
+  .classification-node strong { font-size: 13px; }
+  .classification-connector { left: -15px; }
+  .method-jumpnav__inner, .method-jumpnav__abas { gap: 24px; }
+}
+@media (max-width: 950px) {
+  .method-structure { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 8px; }
+  .method-structure li:nth-child(4)::before { content: none; }
+  .classification-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .classification-node { min-height: 250px; padding: 12px; }
+  .classification-node strong { font-size: 14px; }
+  .classification-connector { display: none; }
+  .classification-inspector { margin-top: 20px; }
+  .method-jumpnav .method-jump-acervo { display: none; }
+  .method-examples { grid-template-columns: 1fr; gap: 28px; }
+  .method-example dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+  .method-collection-grid, .method-subjects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .method-practical-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 18px; }
+  .method-practical-heading { flex-wrap: wrap; gap: 8px; }
+  .method-practical-heading p { flex-basis: 100%; }
+}
+@media (max-width: 720px) {
+  .method-jumpnav { position: static; }
+  .method-jumpnav__inner { display: block; }
+  .method-jumpnav__abas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
+  .method-jumpnav a { min-height: 46px; font-size: 12px; }
+  .method-page, .method-page [id], .method-page [data-sec], .method-next { scroll-margin-top: 104px; }
+  .method-section { padding-block: 30px; }
+  .method-page h2 { font-size: 25px; }
+  .method-section-heading { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+  .classification-steps { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .classification-node { flex: initial; min-height: 118px; display: grid; grid-template-columns: 32px minmax(0, 1fr) 106px; grid-template-rows: auto; align-items: center; gap: 5px 12px; padding: 14px 12px; text-align: left; }
+  .classification-node:hover { transform: none; }
+  .classification-node-top { grid-column: 1; grid-row: 1 / 4; flex-direction: column; gap: 12px; width: auto; }
+  .classification-node-top > span:first-child { position: static; }
+  .classification-icon { width: 24px; height: 24px; }
+  .classification-node strong { grid-column: 2; font-size: 14px; }
+  .classification-requirement { grid-column: 3; grid-row: 1; margin: 0; padding: 4px 6px; text-align: center; font-size: 10px; }
+  .classification-value { grid-column: 2 / 4; padding-right: 22px; }
+  .classification-caption { grid-column: 2 / 4; border: 0; padding: 2px 20px 0 0; font-size: 12px; }
+  .classification-mobile-detail:not([hidden]) { display: block; padding: 16px 18px 20px 48px; background: var(--sp-gray-light); border-bottom: var(--border); animation: classification-reveal 160ms ease-out; }
+  .classification-mobile-detail p { font-size: 13px; margin-bottom: 10px; }
+  .classification-mobile-detail .classification-question { font-family: var(--font-subtitle); font-weight: 600; font-size: 14px; line-height: 1.5; color: var(--sp-blue); }
+  .classification-mobile-detail p:last-child { margin: 0; }
+  .classification-inspector { display: none; }
+  .method-subject-toolbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .method-subject-search { width: 100%; }
+  .method-subject-toolbar > p { padding: 0; }
+  .method-subjects { grid-template-columns: 1fr; }
+  .method-collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .method-practical-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .method-subject summary { min-height: 84px; }
+  .method-comparisons dl { grid-template-columns: 1fr; }
+  .method-next__inner { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .method-structure { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .method-structure li:nth-child(4)::before { content: "+"; }
+  .method-structure li:nth-child(odd)::before { content: none; }
+}
+@media (max-width: 420px) {
+  .method-tree, .method-example dl { grid-template-columns: 1fr; }
+  .classification-node { grid-template-columns: 24px minmax(0, 1fr) 94px; gap: 6px 8px; }
+  .classification-node strong { font-size: 13px; }
+  .classification-requirement { font-size: 10px; }
+  .method-collection-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .method-page *, .method-page *::before, .method-page *::after, .method-jumpnav * { animation: none; transition: none; }
+}
 
 /* ============================================================
    Seta-guia de seções (Home e Coleções)

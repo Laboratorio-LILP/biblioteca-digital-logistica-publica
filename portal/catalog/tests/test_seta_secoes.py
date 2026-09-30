@@ -1,4 +1,4 @@
-"""Testes da seta-guia de seções (Home e Coleções), sem banco.
+"""Testes da seta-guia de seções (Home e Metodologia), sem banco.
 
 A feature é de front (templates/CSS/JS); estes testes leem os arquivos e
 pinam os invariantes do design: âncoras [data-sec], parcial da seta nas
@@ -40,13 +40,18 @@ def test_home_tem_5_ancoras_e_a_seta():
     assert "js/seta-secoes.js" in home
 
 
-def test_colecoes_tem_4_ancoras_e_a_seta():
-    # 16/09: o glossário saiu da seção "Organização" e virou seção própria.
-    colecoes = _template("collection_list.html")
-    assert colecoes.count("data-sec=") == 4
-    assert "_partials/_seta_secoes.html" in colecoes
-    assert "js/seta-secoes.js" in colecoes
-
+def test_metodologia_tem_6_ancoras_e_a_seta_ignora_as_ocultas():
+    # 23/09: um documento com três abas — abertura e fechamento no template, duas
+    # âncoras no painel de conceitos e uma em cada outro painel; a seta só conta as
+    # âncoras fora de [hidden] e recolhe de novo quando a aba troca.
+    doc = _template("metodologia.html")
+    abas = ("conceitos", "categorias", "assuntos")
+    paineis = sum(_template(f"metodologia/_{aba}.html").count("data-sec=") for aba in abas)
+    assert doc.count("data-sec=") + paineis == 6
+    assert "_partials/_seta_secoes.html" in doc
+    assert "js/seta-secoes.js" in doc
+    js = (STATIC / "js" / "seta-secoes.js").read_text(encoding="utf-8")
+    assert "closest('[hidden]')" in js and "bdlp:secoes-mudaram" in js
 
 def test_css_tem_componente_ancoras_e_offset_do_banner():
     css = (STATIC / "css" / "portal.css").read_text(encoding="utf-8")

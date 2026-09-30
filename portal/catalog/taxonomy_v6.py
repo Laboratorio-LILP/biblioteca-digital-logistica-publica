@@ -507,3 +507,191 @@ def descricao_assunto(nome):
     não há descrição (um Assunto novo sem texto da curadoria não quebra nada)."""
     d = ASSUNTOS_DESCRICAO.get(str(nome or "").strip())
     return dict(d) if d else dict(_SEM_DESCRICAO)
+
+
+# ---------------------------------------------------------------------------
+# Metodologia de classificação — conteúdo das páginas de Coleções (Estrutura da
+# classificação · Categorias · Assuntos). Porte do protótipo do Eduardo Cappia
+# (github.com/dudyfarias/biblioteca, branch codex/biblioteca-home-acervo-filtros,
+# src/lib/metodologia.ts, commits de 10 a 15/09/2026), reconciliado com a árvore
+# canônica desta plataforma (seeds 07-categories.sql, v12.1) e com a terminologia
+# fixada em 17/09/2026 (o eixo é "Categoria"; "etapa da contratação" explica).
+#
+# Divergências do protótipo resolvidas a favor da árvore da curadoria:
+#   • o protótipo tratava "Procedimentos Auxiliares" como CATEGORIA própria, com
+#     Registro de Preços como subcategoria; na árvore da BDLP Procedimentos
+#     Auxiliares é SUBCATEGORIA de Seleção do Fornecedor e Registro de Preços (RP)
+#     é microcategoria — os exemplos abaixo seguem a árvore;
+#   • "Fase Preparatória - ETP" e "Contratação Todas as Fases" são grafias
+#     anteriores (v12: "ETP"; v9: "Ciclo Completo da Contratação");
+#   • a natureza usa os valores gravados no acervo (NATUREZA_CHOICES), não os
+#     rótulos curtos do protótipo ("Material", "Serviços"...);
+#   • "Pareceres" saiu do vocabulário na v12.1 (23/09) — a lista de tipos de cada
+#     coleção vem de _TIPOS_POR_COLECAO, não do protótipo.
+# ---------------------------------------------------------------------------
+
+# Os seis campos, na ordem da fórmula da curadoria. `legenda` = frase curta do
+# cartão; `pergunta` e `descricao` = painel de explicação.
+CAMPOS_CLASSIFICACAO = [
+    {
+        "id": "colecao", "nome": "Coleção", "obrigatorio": True, "icon": "fi-book-open",
+        "resumo": "Tipo de informação",
+        "legenda": "Define a coleção a partir do tipo de informação.",
+        "pergunta": "Em que forma ou tipo o material se apresenta?",
+        "descricao": "É definida pelo tipo de informação do material. Um artigo, uma dissertação e um "
+                     "manual podem tratar do mesmo tema e pertencer a coleções diferentes.",
+    },
+    {
+        "id": "categoria", "nome": "Categoria", "obrigatorio": True, "icon": "fi-layers",
+        "resumo": "Etapa da contratação",
+        "legenda": "Situa o conteúdo no ciclo da contratação.",
+        "pergunta": "A que etapa do ciclo da contratação o conteúdo se refere?",
+        "descricao": "Situa o conteúdo no ciclo da contratação pública, do planejamento à gestão do "
+                     "contrato. É o ponto de partida para identificar uma subcategoria e, quando "
+                     "existir, uma microcategoria.",
+    },
+    {
+        "id": "subcategoria", "nome": "Subcategoria", "obrigatorio": False, "icon": "fi-folder",
+        "resumo": "Tópico da etapa",
+        "legenda": "Detalha um tópico dentro da categoria.",
+        "pergunta": "Qual tópico específico daquela etapa?",
+        "descricao": "Detalha um tópico dentro da categoria escolhida. É preenchida quando esse "
+                     "desdobramento existe na árvore e corresponde ao conteúdo do material.",
+    },
+    {
+        "id": "microcategoria", "nome": "Microcategoria", "obrigatorio": False, "icon": "fi-file-text",
+        "resumo": "Modalidade, regime ou hipótese",
+        "legenda": "Especifica a modalidade, o regime ou a hipótese.",
+        "pergunta": "Qual modalidade, regime ou hipótese?",
+        "descricao": "Especifica o recorte previsto dentro da subcategoria, como uma modalidade de "
+                     "licitação ou uma hipótese de contratação direta. Depende da categoria e da "
+                     "subcategoria selecionadas.",
+    },
+    {
+        "id": "assunto", "nome": "Assunto", "obrigatorio": True, "icon": "fi-tag",
+        "resumo": "Tema central",
+        "legenda": "Identifica o tema principal do conteúdo.",
+        "pergunta": "Sobre qual tema o conteúdo trata?",
+        "descricao": "Identifica o foco temático do material entre os assuntos da biblioteca. O "
+                     "assunto pode aparecer em diferentes coleções e etapas da contratação.",
+    },
+    {
+        "id": "natureza", "nome": "Natureza", "obrigatorio": False, "icon": "fi-grid",
+        "resumo": "Objeto da contratação",
+        "legenda": "Identifica o objeto da contratação.",
+        "pergunta": "Qual é o objeto da contratação?",
+        "descricao": "Identifica o objeto da contratação: materiais, serviços, obras e serviços de "
+                     "engenharia ou tecnologia da informação e comunicação (TIC). É informada quando "
+                     "esse recorte se aplica ao conteúdo; nos demais casos, recebe \"Não se aplica\".",
+    },
+]
+
+# Exemplos ilustrativos (não são registros do acervo). `valores` segue a ordem de
+# CAMPOS_CLASSIFICACAO. O primeiro também é o "Exemplo prático" da página.
+EXEMPLOS_CLASSIFICACAO = [
+    {
+        "titulo": "Artigo sobre Registro de Preços para aquisição de cadeiras de escritório",
+        "intro": "Um artigo que discute aspectos normativos, procedimentos, limitações e cuidados "
+                 "sobre Registro de Preços para aquisição de cadeiras de escritório.",
+        "valores": ["Doutrina e Conteúdo Técnico", "Seleção do Fornecedor", "Procedimentos Auxiliares",
+                    "Registro de Preços (RP)", "Aspectos Jurídicos e Regulatórios",
+                    "Contratação de Materiais"],
+        "nota": "Coleção, categoria e assunto são obrigatórios. Neste artigo, subcategoria, "
+                "microcategoria e natureza também se aplicam: Seleção do Fornecedor é a categoria, "
+                "Procedimentos Auxiliares é a subcategoria e Registro de Preços (RP) é a "
+                "microcategoria. Aspectos Jurídicos e Regulatórios identifica o foco do artigo, e "
+                "Contratação de Materiais identifica as cadeiras de escritório que serão adquiridas.",
+    },
+    {
+        "titulo": "Manual de elaboração do Estudo Técnico Preliminar para serviços",
+        "intro": "O manual orienta a aplicação das normas na elaboração de um ETP para a "
+                 "contratação de serviços.",
+        "valores": ["Instrução e Capacitação", "Planejamento/Fase Preparatória",
+                    "Estudo Técnico Preliminar (ETP)", "Não se aplica",
+                    "Aspectos Jurídicos e Regulatórios", "Contratação de Serviços"],
+        "nota": "A subcategoria já identifica o tópico. Sem um desdobramento aplicável, a "
+                "microcategoria não é preenchida.",
+    },
+    {
+        "titulo": "Artigo sobre governança ao longo do ciclo da contratação",
+        "intro": "O artigo discute papéis e tomada de decisão em todo o ciclo, sem se restringir a "
+                 "uma etapa ou a um objeto contratado.",
+        "valores": ["Doutrina e Conteúdo Técnico", "Ciclo Completo da Contratação", "Não se aplica",
+                    "Não se aplica", "Governança", "Não se aplica"],
+        "nota": "Coleção, categoria e assunto continuam presentes. Os demais campos não se aplicam "
+                "ao recorte deste exemplo.",
+    },
+]
+
+# Ícones das coleções na página de metodologia (escolha do Eduardo para esta
+# página: martelo para Jurisprudência e apresentação para Instrução; as demais
+# usam o mesmo ícone de COLECOES_V6).
+COLECOES_ICONE_METODOLOGIA = {
+    "Jurisprudência": "fi-gavel",
+    "Instrução e Capacitação": "fi-presentation",
+}
+
+# "Foco da classificação" de cada Assunto — TRANSCRITO DO PROTÓTIPO DO EDUARDO
+# (metodologia.ts, 15/09/2026): reformulação, em uma frase, do critério que a
+# Lina escreveu no fim da explicação longa ("Quando o foco for…"). Não é texto
+# da curadoria; a validar por ela junto com ARVORE_DESCRICAO.
+ASSUNTOS_FOCO = {
+    "Aspectos Jurídicos e Regulatórios": "Como o assunto é tratado na norma.",
+    "Governança": "A estrutura de gestão como um todo.",
+    "Inovação e Tecnologia": "A inovação e a transformação em si e as novas soluções.",
+    "Sustentabilidade e ODS": "Os critérios ambientais e sociais das contratações.",
+    "Controle, Auditoria e Combate à Corrupção": "O ato de fiscalizar, auditar ou responsabilizar.",
+    "Gestão de Competências": "As pessoas, suas habilidades e sua formação.",
+    "Logística e Gestão de Suprimentos": "A operação logística.",
+    "Compras Centralizadas/compartilhadas": "O modelo de aquisição.",
+    "Transparência": "A divulgação e o acesso à informação.",
+    "Integridade": "A conduta ética e o compliance.",
+    "Micro e Pequenas Empresas": "A participação e o tratamento favorecido às MPEs.",
+    "Uso de Sistemas": "Os sistemas que já estão em uso.",
+    "Sanções Administrativas": "A penalização.",
+    "Catálogo eletrônico de Padronização": "A padronização das especificações de materiais e serviços.",
+    "Gestão Estratégica e Desempenho das Contratações": "A operação e os resultados dos processos de contratação.",
+    "Logística Pública Internacional": "Os marcos, as comparações e a cooperação internacional em "
+                                       "contratações públicas.",
+}
+
+# Ícone de cada Assunto (methodology-icons.tsx do protótipo; sprite _feather.html).
+ASSUNTOS_ICONE = {
+    "Aspectos Jurídicos e Regulatórios": "fi-scale",
+    "Governança": "fi-building",
+    "Inovação e Tecnologia": "fi-settings",
+    "Sustentabilidade e ODS": "fi-leaf",
+    "Controle, Auditoria e Combate à Corrupção": "fi-chart",
+    "Gestão de Competências": "fi-users",
+    "Logística e Gestão de Suprimentos": "fi-truck",
+    "Compras Centralizadas/compartilhadas": "fi-link",
+    "Transparência": "fi-eye",
+    "Integridade": "fi-shield",
+    "Micro e Pequenas Empresas": "fi-store",
+    "Uso de Sistemas": "fi-monitor",
+    "Sanções Administrativas": "fi-gavel",
+    "Catálogo eletrônico de Padronização": "fi-list",
+    "Gestão Estratégica e Desempenho das Contratações": "fi-trending-up",
+    "Logística Pública Internacional": "fi-globe",
+}
+
+# "Como diferenciar assuntos próximos" (protótipo do Eduardo; a validar pela curadoria).
+ASSUNTOS_COMPARACOES = [
+    ("Inovação e Tecnologia / Uso de Sistemas",
+     "O primeiro trata de transformação e novas soluções. O segundo trata da operação de "
+     "sistemas e plataformas já adotados."),
+    ("Governança / Integridade",
+     "Governança aborda papéis, decisões e a estrutura de gestão. Integridade aborda conduta "
+     "ética, conflitos de interesse e compliance."),
+    ("Controle, Auditoria e Combate à Corrupção / Sanções Administrativas",
+     "O primeiro tem foco em fiscalização e auditoria. Sanções Administrativas tem foco nas "
+     "penalidades e nos processos sancionatórios."),
+]
+
+
+def ordenar_como_a_curadoria(assuntos):
+    """Ordena dicts de assunto (chave "nome") na sequência da caracterização da
+    curadoria (11/09/2026) — a mesma numeração 01–16 da página de Assuntos do
+    protótipo do Eduardo. Nome fora da lista vai para o fim, em ordem alfabética."""
+    posicao = {nome: i for i, nome in enumerate(ASSUNTOS_DESCRICAO)}
+    return sorted(assuntos, key=lambda a: (posicao.get(a["nome"], len(posicao)), a["nome"]))

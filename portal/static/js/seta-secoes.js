@@ -1,5 +1,5 @@
 /*
- * seta-secoes.js — seta-guia de seções (Home e Coleções).
+ * seta-secoes.js — seta-guia de seções (Home e Metodologia).
  *
  * Botão flutuante ([data-seta-secoes]) que rola até a próxima seção lógica
  * da página (âncoras [data-sec], na ordem do DOM). Na última seção, vira
@@ -18,7 +18,7 @@
     var Seta = {
         init: function () {
             this.btn = document.querySelector('[data-seta-secoes]');
-            this.secoes = Array.prototype.slice.call(document.querySelectorAll('[data-sec]'));
+            this.secoes = this.coletar();
             if (!this.btn || this.secoes.length < 2 || !window.IntersectionObserver) return;
 
             this.uso = this.btn.querySelector('use');
@@ -37,10 +37,34 @@
             }
 
             this.btn.addEventListener('click', this.onClick.bind(this));
+            document.addEventListener('bdlp:secoes-mudaram', this.recarregar.bind(this));
             this.observarSecoes();
             this.observarBanner();
             this.atualizar();
             this.revelar();
+        },
+
+        /* Âncoras [data-sec] visíveis, na ordem do DOM: as que estão dentro de um
+           ancestral [hidden] (painéis de aba da Metodologia) ficam de fora. */
+        coletar: function () {
+            return Array.prototype.slice.call(document.querySelectorAll('[data-sec]')).filter(function (el) {
+                return !el.closest('[hidden]');
+            });
+        },
+
+        /* A Metodologia trocou de aba (evento bdlp:secoes-mudaram): as âncoras
+           visíveis mudaram — reobserva e recomeça do topo. */
+        recarregar: function () {
+            if (!this.io) return;
+            this.io.disconnect();
+            this.secoes = this.coletar();
+            this.visiveis = [];
+            this.idx = 0;
+            this._renderizado = -1;
+            for (var i = 0; i < this.secoes.length; i++) {
+                this.io.observe(this.secoes[i]);
+            }
+            this.atualizar();
         },
 
         /* Seção "corrente" = a de maior índice com o topo acima do meio da

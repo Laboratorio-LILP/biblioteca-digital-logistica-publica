@@ -9,7 +9,7 @@
     <nav class="breadcrumb" aria-label="Você está em">
       <a href="{% url 'catalog:home' %}">Início</a>
       <svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>
-      <a href="{% url 'catalog:collection_list' %}">Coleções</a>
+      <a href="{% url 'catalog:metodologia' %}">Metodologia</a>
       {% for item in breadcrumb %}<svg class="fi sep" aria-hidden="true"><use href="#fi-chevron-right"/></svg>{% if forloop.last %}<span>{{ item.name }}</span>{% else %}<a href="{% url 'catalog:collection_detail' item.id %}">{{ item.name }}</a>{% endif %}{% endfor %}
     </nav>
     <h1>{{ topic.name }}</h1>
@@ -35,7 +35,7 @@
     <div class="sp-panel empty-state">
       <svg class="fi" aria-hidden="true"><use href="#fi-search"/></svg>
       <strong>Ainda não há documentos nesta coleção</strong>
-      <p>Esta coleção faz parte da organização do acervo, mas ainda não recebeu materiais. Explore o <a href="{% url 'catalog:search' %}">acervo completo</a> ou veja outras <a href="{% url 'catalog:collection_list' %}">coleções</a>.</p>
+      <p>Esta coleção faz parte da organização do acervo, mas ainda não recebeu materiais. Explore o <a href="{% url 'catalog:search' %}">acervo completo</a> ou veja outras <a href="{% url 'catalog:metodologia' %}#colecoes">coleções</a>.</p>
     </div>
     {% endif %}
   </div>

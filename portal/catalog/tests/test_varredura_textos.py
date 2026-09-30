@@ -49,5 +49,5 @@ def test_descricoes_das_colecoes_nao_citam_tipos_retirados():
 
 
 def test_colecoes_e_glossario_sem_tipos_retirados():
-    t = _template("collection_list.html").lower()
+    t = _template("metodologia/_conceitos.html").lower()
     assert "documentos normativos" not in t and "vídeo" not in t

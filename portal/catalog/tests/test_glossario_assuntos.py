@@ -81,71 +81,49 @@ def test_facets_expoe_o_glossario():
         "descricao_assunto" in facets.assuntos_glossario.__code__.co_names
 
 
-def test_pagina_de_colecoes_tem_o_glossario():
-    t = _template("collection_list.html")
-    assert 'id="assuntos"' in t and 'id="categorias"' in t
-    assert "glossario__item" in t and "<details" in t
-    assert "?assunto_id={{" in t and "?category_id={{" in t
-    assert "Hoje são 14 assuntos" not in t                    # contagem chumbada saiu
-    # 17/09: a fórmula em caixa alta saiu a pedido do Bernardo; a intro explica em LS
-    assert "COLEÇÃO" not in t and "MICROCATEGORIA" not in t
-    assert "A curadoria classifica cada documento por coleção, categoria e assunto." in t
-    assert "sem filtro nenhum" in t
-    # 4 âncoras de seção (o glossário é seção própria) e um único fechamento cinza
-    assert t.count("data-sec=") == 4
-    assert t.count("sp-section--alt") == 1
+def test_abas_da_metodologia_tem_o_glossario():
+    # 23/09/2026: o glossário virou duas abas da Metodologia (porte da interface do Eduardo)
+    cat = _template("metodologia/_categorias.html")
+    ass = _template("metodologia/_assuntos.html")
+    assert 'id="categorias"' in cat and 'id="assuntos"' in ass
+    assert "<details" in cat and "<details" in ass
+    assert "?assunto_id={{" in ass and "?category_id={{" in cat
+    doc = _template("metodologia.html")
+    assert "Hoje são 14 assuntos" not in doc and "Hoje são 14 assuntos" not in ass
+    assert "A taxonomia é multidimensional." in doc
+    assert "sem selecionar filtros" in doc                        # a busca por palavra funciona sem filtro
 
-
-def test_links_das_notas_dos_cards_sao_visiveis_como_link():
-    # Revisão 14/09: `a { color: inherit; text-decoration: none }` global deixava
-    # "Veja o que entra em cada um" igual ao texto cinza ao redor.
+def test_categorias_trazem_contagem_e_arvore_no_saiba_mais():
+    # 23/09: subcategorias e microcategorias com definição no "Saiba mais" de cada
+    # categoria (cartão expansível do protótipo), nomes como no Acervo
+    t = _template("metodologia/_categorias.html")
+    assert "Ainda sem documentos" in t and "pluralize_pt" in t
+    assert 'class="method-subject-tree"' in t and "&amp;microcategoria_id={{ m.id }}" in t
+    assert "{{ s.nome|rotulo_sub }}" in t and "{{ s.nome|titulo_pt }}" not in t
     css = (TEMPLATES.parent / "static" / "css" / "portal.css").read_text(encoding="utf-8")
-    assert ".org-card__nota a {" in css
-    bloco = css[css.index(".org-card__nota a {"):][:160]
-    assert "var(--sp-blue)" in bloco and "underline" in bloco
+    assert ".method-subjects { display: grid; grid-template-columns: repeat(3" in css   # Assuntos: grade
+    # Categorias: lista de uma coluna (a árvore aberta em grade deixava buracos ao lado)
+    assert 'class="method-subjects method-subjects--lista"' in t
+    assert ".method-subjects.method-subjects--lista { grid-template-columns: 1fr" in css
+    assert ".method-subjects--lista .method-subject-tree { columns: 3; }" in css
 
-
-def test_glossario_traz_contagem_subcategorias_e_colunas():
-    # Ajuste 16/09 (mesma identidade da plataforma — cards + listas): contagem
-    # por assunto, subcategorias em texto corrido sob a categoria, listas em
-    # colunas (grupos empilhados, sem coluna vazia) e barra de chegada na âncora.
-    t = _template("collection_list.html")
-    assert t.count("glossario__count") == 2 and "Sem materiais ainda" in t
-    # 17/09: sub e microcategorias vão para o "Saiba mais" da categoria, como árvore
-    assert "glossario__subs" not in t and "Subcategorias:" not in t
-    assert 'class="glossario__arvore"' in t and "&amp;microcategoria_id={{ m.id }}" in t
-    assert "org-grid--3" in t and t.count("org-card__nota") == 2   # os 3 cards de organização ficam
+def test_metodologia_segue_o_porte_do_eduardo():
+    """23/09/2026: a Metodologia é um só documento no trio de fundos — abertura
+    quadriculada, abas coladas, miolo branco com um painel por aba e fechamento
+    cinza — e nada da versão anterior (tema-grupo, glossário, cards de organização) sobra."""
+    doc = _template("metodologia.html")
     css = (TEMPLATES.parent / "static" / "css" / "portal.css").read_text(encoding="utf-8")
-    assert ".glossario__lista--3col { grid-template-columns: repeat(3" in css
-    for morto in (".formula", ".natureza-chip", ".etapa-gl", ".glossario__total"):
-        assert morto not in css, morto                             # componentes da v1 descartada
-
-
-def test_glossario_e_secao_propria_no_padrao_da_plataforma():
-    """16/09: a seção "Organização" fazia dois trabalhos (fórmula + cards + 22
-    verbetes) e o glossário precisou de título e realce próprios para se separar.
-    Virou seção com .section-heading, como toda seção da plataforma; os dois
-    grupos são .tema-grupo — o sub-bloco com título em destaque, ícone e âncora
-    da home ("Temas em alta") — pedido de 17/09 para os subtítulos ficarem mais
-    evidentes sem componente novo."""
-    t = _template("collection_list.html")
-    css = (TEMPLATES.parent / "static" / "css" / "portal.css").read_text(encoding="utf-8")
-    assert 'class="sp-section colecoes-glossario" data-sec="O que significa cada opção"' in t
-    assert t.index("colecoes-glossario") > t.index("Como cada documento é classificado")
-    assert t.index("colecoes-glossario") < t.index("sp-section--alt")     # antes do fechamento cinza
-    assert t.count('<section class="tema-grupo"') == 2                    # sub-bloco padrão da home
-    assert t.count('<h3 class="tema-grupo__titulo"') == 2 and t.count("tema-grupo__icone c-petrol") == 2
-    assert t.count('class="tema-grupo__intro"') == 2 and "subsection-label" not in t
-    assert ".section-heading + .tema-grupo {" in css                       # respiro após o cabeçalho
-    # duas seções brancas adjacentes se separam por fio, como na home (.home-etapas)
-    assert ".home-etapas, .colecoes-glossario { border-top: var(--border); }" in css
-    # nada de título nem de realce de chegada inventados para esta página
-    assert "glossario__titulo" not in t and ".glossario__titulo" not in css
-    assert ".glossario__grupo" not in css                                 # nenhuma regra própria de grupo
-    assert ":target" not in css
-    # todo h3 da plataforma é Montserrat 16px (ou 12px nas facetas) — nenhum em Futura
-    assert "h3 { font-family: var(--font-heading)" not in css
-
+    assert "sp-section sp-section--pattern colecoes-hero" in doc
+    assert 'class="method-jumpnav"' in doc and 'role="tablist"' in doc and "aria-selected=" in doc
+    assert doc.count("sp-section--alt") == 1 and "method-next" in doc
+    for nome in ("metodologia.html", "metodologia/_conceitos.html", "metodologia/_categorias.html",
+                 "metodologia/_assuntos.html"):
+        t = _template(nome)
+        assert "tema-grupo" not in t and "glossario__" not in t and "org-card" not in t, nome
+    assert ".method-jumpnav { position: sticky; top: 77px" in css
+    for morto in (".glossario", ".org-card__nota", ".curadoria-dica", ".colecoes-glossario",
+                  ".section-heading + .tema-grupo"):
+        assert morto not in css, morto
 
 def test_categorias_glossario_anexa_subcategorias_na_ordem(monkeypatch):
     # Comportamento, sem banco: a lista plana segue núcleo + transversais e cada
@@ -179,21 +157,14 @@ def test_categorias_glossario_anexa_subcategorias_na_ordem(monkeypatch):
     assert out[1]["subcategorias"] == []
 
 
-def test_glossario_usa_o_rotulo_curado_das_subcategorias():
-    # "ETP" nu não explica nada; o Acervo e a página do documento já mostram
-    # "Estudo Técnico Preliminar (ETP)" via rotulo_sub — o glossário segue igual.
-    t = _template("collection_list.html")
-    assert "{{ s.nome|rotulo_sub }}" in t and "{{ s.nome|titulo_pt }}" not in t
-    assert t.count("Sem materiais ainda") == 2                 # estado zero igual nos dois grupos
 
 
 def test_busca_linka_o_glossario_nas_facetas():
     t = _template("search.html")
     assert t.count("O que significa cada opção?") == 2
-    assert "{% url 'catalog:collection_list' %}#assuntos" in t
-    assert "{% url 'catalog:collection_list' %}#categorias" in t
+    assert "{% url 'catalog:metodologia_assuntos' %}" in t
+    assert "{% url 'catalog:metodologia_categorias' %}" in t
     assert "title=" not in t[t.index("O que significa cada opção?") - 200: t.index("O que significa cada opção?")]
-
 
 def test_documento_mostra_a_caracterizacao_curta():
     t = _template("document_detail.html")
@@ -203,24 +174,21 @@ def test_documento_mostra_a_caracterizacao_curta():
     assert "cat.description" in t
 
 
-def test_textos_da_pagina_de_colecoes_em_linguagem_simples():
-    """Revisão de LS de 17/09/2026 (NBR ISO 24495-1): ordem única na página inteira
-    (coleção → categoria → assunto, natureza por último), verbos neutros quanto ao
-    dispositivo (sem "Clique"), um só nome para a mesma coisa ("tipo de material")
-    e "Etapa" nunca nomeando o eixo Categoria sozinha."""
+def test_textos_das_paginas_de_colecoes_em_linguagem_simples():
+    """LS (NBR ISO 24495-1) nas três abas da Metodologia: verbos neutros quanto ao dispositivo
+    (sem "Clique"), um só nome para a mesma coisa ("tipo de informação", como na
+    ficha do documento), e frases curtas nas introduções."""
     import re
-    t = _template("collection_list.html")
-    visivel = re.sub(r"\{#.*?#\}", "", t)
-    assert "Clique" not in visivel and "clique" not in visivel
-    assert "tipo de informação" not in visivel and visivel.count("tipo de material") == 2
-    assert "várias dimensões" not in visivel and "marcas" not in visivel      # abstrações que saíram
-    # a mesma ordem nos cards, no glossário e na dica final
-    assert visivel.index("<h3>Categoria</h3>") < visivel.index("<h3>Assunto</h3>") < visivel.index("<h3>Natureza</h3>")
-    assert visivel.index('id="categorias"') < visivel.index('id="assuntos"')
-    assert "primeiro a coleção,\n      depois a categoria, depois o assunto" in visivel
-    assert "materiais daquela etapa" not in visivel and "materiais daquela categoria" in visivel
-    # frases curtas: nenhuma acima de 25 palavras nos parágrafos de introdução
-    for par in re.findall(r'<p class="(?:page__intro|tema-grupo__intro)">(.*?)</p>', visivel, flags=re.S):
-        texto = " ".join(re.sub(r"<[^>]+>", " ", par).split())
-        for frase in re.split(r"(?<=[.!?])\s+", texto):
-            assert len(frase.split()) <= 25, frase
+    css_intros = r'<p class="(?:page__intro|method-rule|classification-intro|method-section-intro)">(.*?)</p>'
+    for nome in ("metodologia.html", "metodologia/_conceitos.html",
+                 "metodologia/_categorias.html", "metodologia/_assuntos.html"):
+        visivel = re.sub(r"\{#.*?#\}", "", _template(nome))
+        visivel = re.sub(r"\{% comment %\}.*?\{% endcomment %\}", "", visivel, flags=re.S)
+        assert "Clique" not in visivel and "clique" not in visivel, nome
+        assert "tipo de material" not in visivel, nome
+        for par in re.findall(css_intros, visivel, flags=re.S):
+            texto = " ".join(re.sub(r"<[^>]+>", " ", par).split())
+            for frase in re.split(r"(?<=[.!?])\s+", texto):
+                assert len(frase.split()) <= 25, (nome, frase)
+    assert "tipo de informação" in _template("metodologia/_conceitos.html").lower()
+

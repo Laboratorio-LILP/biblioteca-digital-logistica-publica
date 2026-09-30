@@ -56,7 +56,7 @@
         </button>
         <nav id="sp-menu" class="primary-nav" aria-label="Navegação principal">
           <a href="{% url 'catalog:home' %}"{% if current_url_name == 'home' %} class="active" aria-current="page"{% endif %}>Início</a>
-          <a href="{% url 'catalog:collection_list' %}"{% if current_url_name == 'collection_list' or current_url_name == 'collection_detail' %} class="active" aria-current="page"{% endif %}>Coleções</a>
+          <a href="{% url 'catalog:metodologia' %}"{% if current_url_name == 'metodologia' or current_url_name == 'metodologia_categorias' or current_url_name == 'metodologia_assuntos' or current_url_name == 'collection_detail' %} class="active" aria-current="page"{% endif %}>Metodologia</a>
           <a href="{% url 'catalog:search' %}"{% if current_url_name == 'search' %} class="active" aria-current="page"{% endif %}>Acervo</a>
           <a href="{% url 'catalog:about' %}"{% if current_url_name == 'about' %} class="active" aria-current="page"{% endif %}>Sobre</a>
         </nav>
@@ -98,7 +98,7 @@
           <h2>Biblioteca</h2>
           <ul>
             <li><a href="{% url 'catalog:search' %}">Acervo</a></li>
-            <li><a href="{% url 'catalog:collection_list' %}">Coleções</a></li>
+            <li><a href="{% url 'catalog:metodologia' %}">Metodologia</a></li>
             <li><a href="{% url 'catalog:about' %}">Sobre</a></li>
             <li><a href="{% url 'catalog:mapa_site' %}">Mapa do site</a></li>
           </ul>

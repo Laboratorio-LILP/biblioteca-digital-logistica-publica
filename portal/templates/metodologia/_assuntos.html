@@ -1,0 +1,46 @@
+{% load catalog_tags %}
+{# Aba "Assuntos" da Metodologia (painel #painel-assuntos de metodologia.html). #}
+{# Navegador de assuntos (protótipo do Eduardo): busca sem acento em nome, caracterização, explicação e foco; seis cartões à vista e "Ver todos" com JS — sem JS, todos aparecem. Textos: caracterização e explicação = ASSUNTOS_DESCRICAO (curadoria, verbatim); foco = ASSUNTOS_FOCO (protótipo, a validar). #}
+<section id="assuntos" class="method-section" aria-labelledby="assuntos-title" data-sec="O tema central do conteúdo">
+  <div class="method-section-heading">
+    <div><p class="method-section-number">Critérios de classificação</p><h2 id="assuntos-title">O tema central do conteúdo</h2></div>
+    <p>Assuntos com critérios próprios.<br>Conheça o foco de cada um.</p>
+  </div>
+  <div class="method-subject-browser">
+    <div class="method-subject-toolbar">
+      <div class="method-subject-control">
+        <label class="method-subject-label" for="assuntos-busca">Buscar um assunto</label>
+        <div class="method-subject-search">
+          <svg class="fi method-subject-search-icon" aria-hidden="true"><use href="#fi-search"/></svg>
+          <input id="assuntos-busca" class="method-subject-input" type="search" autocomplete="off" aria-controls="assuntos-lista" aria-describedby="assuntos-contagem">
+          <button class="method-subject-clear" type="button" aria-label="Limpar busca" title="Limpar busca" hidden><svg class="fi" aria-hidden="true"><use href="#fi-x"/></svg></button>
+        </div>
+      </div>
+      <p id="assuntos-contagem" class="method-subject-count" role="status" aria-live="polite" aria-atomic="true">{{ assuntos|length }} assuntos</p>
+    </div>
+    <div id="assuntos-lista" class="method-subjects">
+      {% for a in assuntos %}
+      <details class="method-subject" id="assunto-{{ a.id }}" data-subject-focus="{{ a.foco }}">
+        <summary>
+          <span class="method-subject-number" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+          <svg class="fi method-subject-icon" aria-hidden="true"><use href="#{{ a.icon }}"/></svg>
+          <span class="method-subject-heading"><strong class="method-subject-name">{{ a.nome }}</strong>{% if a.curta %}<span class="method-subject-summary">{{ a.curta }}</span>{% endif %}</span>
+          <svg class="fi method-subject-indicator" aria-hidden="true"><use href="#fi-plus"/></svg>
+        </summary>
+        <div class="method-subject-body">
+          <p>{{ a.longa|default:a.curta }}</p>
+          {% if a.foco %}<p><strong>Foco da classificação:</strong> {{ a.foco }}</p>{% endif %}
+          <p class="method-subject-meta">{% if a.count %}{{ a.count }} {{ a.count|pluralize_pt:"documento" }}{% else %}Ainda sem documentos{% endif %} · <a href="{% url 'catalog:search' %}?assunto_id={{ a.id }}">Ver no acervo</a></p>
+        </div>
+      </details>
+      {% endfor %}
+      <div class="method-subject-empty" hidden><p>Nenhum assunto encontrado.</p><button class="method-subject-reset" type="button">Limpar busca</button></div>
+    </div>
+    <button class="method-subject-more" type="button" aria-expanded="false" aria-controls="assuntos-lista" hidden>Ver todos os assuntos</button>
+  </div>
+  <details class="method-comparisons">
+    <summary>Como diferenciar assuntos próximos<svg class="fi" aria-hidden="true"><use href="#fi-chevron-down"/></svg></summary>
+    <dl>{% for par in comparacoes %}<div><dt>{{ par.0 }}</dt><dd>{{ par.1 }}</dd></div>{% endfor %}</dl>
+  </details>
+  <p class="method-source">Referência: Caracterização dos Assuntos da Taxonomia BDLP (curadoria, 11/09/2026).</p>
+</section>

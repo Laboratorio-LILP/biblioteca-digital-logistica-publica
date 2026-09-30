@@ -41,8 +41,8 @@ def test_etapa_nao_nomeia_o_eixo_sozinha():
 def test_o_par_categoria_e_etapa_da_contratacao_nos_pontos_de_contato():
     t = _templates()
     assert 'Categoria (etapa da contratação)' in t["document_detail.html"]          # ficha do documento
-    assert 'Categorias (etapas da contratação)' in t["collection_list.html"]        # glossário
-    assert "Veja o que entra em cada categoria" in t["collection_list.html"]
+    assert "Categoria é a etapa da contratação" in t["metodologia.html"]              # aba Categorias (abertura)
+    assert "A etapa a que o conteúdo se refere" in t["metodologia/_categorias.html"]
     assert "<h3>Categorias</h3>" in t["search.html"]                                 # faceta do Acervo
     assert "A etapa da contratação em que o material se aplica." in t["search.html"]
     assert 'data-sec="Categorias da contratação"' in t["home.html"]
